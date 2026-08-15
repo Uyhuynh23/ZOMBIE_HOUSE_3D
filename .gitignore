@@ -90,3 +90,22 @@ ehthumbs_vista.db
 # =========================
 .idea/
 .vscode/
+
+
+# =========================
+# 3rd Party Assets (Do not commit per project rules)
+# =========================
+/[Aa]ssets/LowpolyBakersHouse/
+/[Aa]ssets/LowpolyBakersHouse.meta
+
+/[Aa]ssets/SimpleNaturePack/
+/[Aa]ssets/SimpleNaturePack.meta
+
+/[Aa]ssets/Mini Simple Characters Demo/
+/[Aa]ssets/Mini Simple Characters Demo.meta
+
+/[Aa]ssets/swordtember-2021-day-25-translu/
+/[Aa]ssets/swordtember-2021-day-25-translu.meta
+
+/[Aa]ssets/Battle Wizard Poly Art/
+/[Aa]ssets/Battle Wizard Poly Art.meta
