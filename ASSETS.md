@@ -1,6 +1,11 @@
 # 3rd Party Assets
 
-This document tracks all 3rd party assets used in the project. These assets are excluded from version control via `.gitignore`.
+This document tracks all 3rd party assets used in the project. These assets are excluded from version control via `.gitignore` to keep the repository lightweight and prevent licensing issues.
+
+## 🛠️ Setup Instructions for New Developers
+When cloning this repository for the first time, you will notice missing assets in the project (pink materials or missing models). You must manually import these assets from the Unity Asset Store using the **Package Manager** (`Window > Package Manager` -> `My Assets`).
+
+**Do not change the installation directory.** Simply click **Import** and let Unity place the files in their default directories. The `.gitignore` is specifically configured to match Unity's default import paths, ensuring everyone on the team has identical folder structures.
 
 | Map element | Asset name | Expected use | Link |
 | :--- | :--- | :--- | :--- |
@@ -10,3 +15,4 @@ This document tracks all 3rd party assets used in the project. These assets are 
 | **Shop / repair area** | Low-Poly Medieval Market | Market stall, shop decoration, recovery focal point | [View on Asset Store](https://assetstore.unity.com/packages/3d/environments/low-poly-medieval-market-262473) |
 | **Plant zone dressing** | Cartoon Farm Crops | Soil patches, crop props, garden decoration | [View on Asset Store](https://assetstore.unity.com/packages/3d/vegetation/plants/cartoon-farm-crops-79777) |
 | **Character** | Mini Simple Characters \| Free Demo | Main character and zombies | [View on Asset Store](https://assetstore.unity.com/packages/3d/characters/humanoids/mini-simple-characters-free-demo-262799) |
+| **Character** | KayKit Character Pack Adventures | Additional high-quality characters, enemies, animations | [View on Asset Store](https://assetstore.unity.com/packages/3d/characters/kaykit-character-pack-adventures-249539) |
