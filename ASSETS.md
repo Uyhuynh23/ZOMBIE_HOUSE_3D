@@ -15,4 +15,4 @@ When cloning this repository for the first time, you will notice missing assets 
 | **Shop / repair area** | Low-Poly Medieval Market | Market stall, shop decoration, recovery focal point | [View on Asset Store](https://assetstore.unity.com/packages/3d/environments/low-poly-medieval-market-262473) |
 | **Plant zone dressing** | Cartoon Farm Crops | Soil patches, crop props, garden decoration | [View on Asset Store](https://assetstore.unity.com/packages/3d/vegetation/plants/cartoon-farm-crops-79777) |
 | **Character** | Mini Simple Characters \| Free Demo | Main character and zombies | [View on Asset Store](https://assetstore.unity.com/packages/3d/characters/humanoids/mini-simple-characters-free-demo-262799) |
-| **Character** | KayKit Character Pack Adventures | Additional high-quality characters, enemies, animations | [View on Asset Store](https://assetstore.unity.com/packages/3d/characters/kaykit-character-pack-adventures-249539) |
+| **Character** | KayKit Character Pack Adventures | Additional high-quality characters, enemies, animations | [View on GitHub](https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0) |
