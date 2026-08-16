@@ -3,9 +3,20 @@
 This document tracks all 3rd party assets used in the project. These assets are excluded from version control via `.gitignore` to keep the repository lightweight and prevent licensing issues.
 
 ## 🛠️ Setup Instructions for New Developers
-When cloning this repository for the first time, you will notice missing assets in the project (pink materials or missing models). You must manually import these assets from the Unity Asset Store using the **Package Manager** (`Window > Package Manager` -> `My Assets`).
 
-**Do not change the installation directory.** Simply click **Import** and let Unity place the files in their default directories. The `.gitignore` is specifically configured to match Unity's default import paths, ensuring everyone on the team has identical folder structures.
+### For Unity Asset Store Packages
+When cloning this repository for the first time, you will notice missing assets in the project. You must manually import these assets from the Unity Asset Store using the **Package Manager** (`Window > Package Manager` -> `My Assets`).
+**Do not change the installation directory.** Simply click **Import** and let Unity place the files in their default directories.
+
+### For GitHub Packages (KayKit)
+For assets linked to GitHub (like the KayKit Character Pack):
+1. Download the `.zip` file from the provided GitHub link and extract it.
+2. Open the extracted folder and navigate into the `addons/` directory.
+3. Copy the `kaykit_character_pack_adventures` folder.
+4. Paste it directly into the `Assets/` folder of this Unity project.
+5. Rename the folder exactly to `KayKit_Character_Pack_Adventures`.
+
+The `.gitignore` is specifically configured to match these exact folder names, ensuring everyone on the team has identical, perfectly protected folder structures.
 
 | Map element | Asset name | Expected use | Link |
 | :--- | :--- | :--- | :--- |
