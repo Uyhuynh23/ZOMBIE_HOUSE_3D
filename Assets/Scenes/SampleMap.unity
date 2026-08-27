@@ -12636,6 +12636,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2895695086908937691, guid: 602930db617e2a64bb7d321706c6dee6, type: 3}
+      propertyPath: m_Center.y
+      value: 1.32
+      objectReference: {fileID: 0}
     - target: {fileID: 6918325262496768956, guid: 602930db617e2a64bb7d321706c6dee6, type: 3}
       propertyPath: m_Name
       value: Knight
