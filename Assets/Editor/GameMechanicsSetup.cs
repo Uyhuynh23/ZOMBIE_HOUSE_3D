@@ -133,7 +133,7 @@ public class GameMechanicsSetup
             textObj.transform.SetParent(canvasObj.transform, false);
             Text text = textObj.AddComponent<Text>();
             text.text = "Sun: 50";
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 40;
             text.color = Color.yellow;
             text.alignment = TextAnchor.UpperLeft;
