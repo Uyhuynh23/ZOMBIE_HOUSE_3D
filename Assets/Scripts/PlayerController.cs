@@ -1,6 +1,16 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[System.Serializable]
+public class PlantData
+{
+    public string name;
+    public GameObject prefab;
+    public int cost;
+    public float cooldownTime;
+    [HideInInspector] public float currentCooldown = 0f;
+}
+
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
@@ -9,13 +19,16 @@ public class PlayerController : MonoBehaviour
     public float turnSmoothTime = 0.1f;
     private float turnSmoothVelocity;
 
-    [Header("Planting Settings")]
-    public GameObject peashooterPrefab;
+    [Header("Planting Roster")]
+    public PlantData[] plants;
+    private int currentPlantIndex = 0;
+    private bool isShovelMode = false;
     public float plantingDuration = 1f;
 
     [Header("Visual Indicator")]
-    public GameObject indicatorPrefab; // Optional: Assign a custom prefab in Inspector
+    public GameObject indicatorPrefab; 
     private GameObject currentIndicator;
+    private Material indicatorMaterial;
 
     private CharacterController controller;
     private Animator animator;
@@ -29,39 +42,42 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
         
-        // Setup Visual Indicator
+        SetupIndicator();
+    }
+
+    void SetupIndicator()
+    {
         if (indicatorPrefab == null)
         {
-            // Create a default indicator (a flat quad slightly above the ground)
             currentIndicator = GameObject.CreatePrimitive(PrimitiveType.Quad);
             currentIndicator.name = "PlantIndicator";
-            Destroy(currentIndicator.GetComponent<Collider>()); // Remove physics
+            Destroy(currentIndicator.GetComponent<Collider>()); 
             currentIndicator.transform.rotation = Quaternion.Euler(90, 0, 0);
             currentIndicator.transform.localScale = new Vector3(1.8f, 1.8f, 1f);
             
-            // Use URP Unlit shader to avoid the Pink material issue
             Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
             if (shader == null) shader = Shader.Find("Standard");
             
-            Material mat = new Material(shader);
+            indicatorMaterial = new Material(shader);
             if (shader.name.Contains("Universal"))
             {
-                mat.SetColor("_BaseColor", new Color(1f, 1f, 0f, 0.5f));
-                mat.SetFloat("_Surface", 1); // Transparent
-                mat.renderQueue = 3000;
+                indicatorMaterial.SetColor("_BaseColor", new Color(1f, 1f, 0f, 0.5f));
+                indicatorMaterial.SetFloat("_Surface", 1); 
+                indicatorMaterial.renderQueue = 3000;
             }
             else
             {
-                mat.color = new Color(1f, 1f, 0f, 0.5f);
-                mat.SetFloat("_Mode", 3); // Transparent
-                mat.SetInt("_ZWrite", 0);
-                mat.renderQueue = 3000;
+                indicatorMaterial.color = new Color(1f, 1f, 0f, 0.5f);
+                indicatorMaterial.SetFloat("_Mode", 3); 
+                indicatorMaterial.SetInt("_ZWrite", 0);
+                indicatorMaterial.renderQueue = 3000;
             }
-            currentIndicator.GetComponent<MeshRenderer>().material = mat;
+            currentIndicator.GetComponent<MeshRenderer>().material = indicatorMaterial;
         }
         else
         {
             currentIndicator = Instantiate(indicatorPrefab);
+            indicatorMaterial = currentIndicator.GetComponentInChildren<Renderer>().material;
         }
         
         currentIndicator.SetActive(false);
@@ -69,7 +85,18 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Don't move or plant again if we are already in the middle of a planting sequence
+        // Update Cooldowns
+        if (plants != null)
+        {
+            foreach (var plant in plants)
+            {
+                if (plant.currentCooldown > 0)
+                {
+                    plant.currentCooldown -= Time.deltaTime;
+                }
+            }
+        }
+
         if (isPlanting)
         {
             HandlePlantingSequence();
@@ -77,8 +104,46 @@ public class PlayerController : MonoBehaviour
         }
 
         HandleMovement();
+        HandleSelectionInput();
         CheckCurrentSquare();
-        HandlePlantInput();
+        HandleActionInput();
+    }
+
+    void HandleSelectionInput()
+    {
+        if (Keyboard.current == null || plants == null || plants.Length == 0) return;
+
+        if (Keyboard.current.digit1Key.wasPressedThisFrame && plants.Length > 0) SelectPlant(0);
+        if (Keyboard.current.digit2Key.wasPressedThisFrame && plants.Length > 1) SelectPlant(1);
+        if (Keyboard.current.digit3Key.wasPressedThisFrame && plants.Length > 2) SelectPlant(2);
+        
+        // Shovel Mode on 4
+        if (Keyboard.current.digit4Key.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            isShovelMode = true;
+            Debug.Log("Equipped: Shovel");
+            UpdateIndicatorColor(Color.red);
+        }
+    }
+
+    void SelectPlant(int index)
+    {
+        isShovelMode = false;
+        currentPlantIndex = index;
+        Debug.Log("Equipped: " + plants[index].name);
+        UpdateIndicatorColor(Color.yellow);
+    }
+
+    void UpdateIndicatorColor(Color color)
+    {
+        if (indicatorMaterial != null)
+        {
+            color.a = 0.5f;
+            if (indicatorMaterial.HasProperty("_BaseColor"))
+                indicatorMaterial.SetColor("_BaseColor", color);
+            else if (indicatorMaterial.HasProperty("_Color"))
+                indicatorMaterial.color = color;
+        }
     }
 
     void HandleMovement()
@@ -98,7 +163,6 @@ public class PlayerController : MonoBehaviour
 
         if (direction.magnitude >= 0.1f)
         {
-            // Calculate movement direction relative to camera rotation if Camera.main exists
             if (Camera.main != null)
             {
                 float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
@@ -115,7 +179,6 @@ public class PlayerController : MonoBehaviour
             }
 
             controller.Move(direction * moveSpeed * Time.deltaTime);
-
             if (animator != null) animator.SetBool("IsMoving", true);
         }
         else
@@ -123,7 +186,6 @@ public class PlayerController : MonoBehaviour
             if (animator != null) animator.SetBool("IsMoving", false);
         }
 
-        // Apply simple gravity
         if (!controller.isGrounded)
         {
             controller.Move(Vector3.down * 9.81f * Time.deltaTime);
@@ -132,18 +194,27 @@ public class PlayerController : MonoBehaviour
 
     void CheckCurrentSquare()
     {
-        // Raycast down from slightly above the player's feet
         Vector3 origin = transform.position + Vector3.up * 0.5f;
         
         if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 2f))
         {
             PlantableSquare square = hit.collider.GetComponent<PlantableSquare>();
             
-            if (square != null && !square.isOccupied)
+            if (square != null)
             {
                 currentSquare = square;
                 currentIndicator.SetActive(true);
                 currentIndicator.transform.position = square.transform.position + Vector3.up * 0.06f; 
+
+                // Change indicator color if invalid (planting on occupied, or shoveling empty)
+                if (isShovelMode)
+                {
+                    UpdateIndicatorColor(square.isOccupied ? Color.red : Color.gray);
+                }
+                else
+                {
+                    UpdateIndicatorColor(square.isOccupied ? Color.red : Color.yellow);
+                }
             }
             else
             {
@@ -158,33 +229,62 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void HandlePlantInput()
+    void HandleActionInput()
     {
-        if (currentSquare != null && !currentSquare.isOccupied)
+        if (currentSquare == null) return;
+        
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
-            bool plantPressed = false;
-            
-            // Check for 'E' key to plant instead of click/space (since those are used for attacking)
-            if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+            if (isShovelMode)
             {
-                plantPressed = true;
-            }
-
-            if (plantPressed)
-            {
-                if (peashooterPrefab == null)
+                if (currentSquare.isOccupied)
                 {
-                    Debug.LogError("Cannot plant! The 'peashooterPrefab' is not assigned in the PlayerController inspector.");
+                    // Find the plant object and destroy it
+                    Collider[] hits = Physics.OverlapBox(currentSquare.transform.position + Vector3.up * 0.5f, Vector3.one * 0.4f);
+                    foreach (var h in hits)
+                    {
+                        if (h.gameObject != gameObject && !h.CompareTag("PlantableNode") && !h.gameObject.name.Contains("Sun"))
+                        {
+                            Destroy(h.transform.root.gameObject);
+                        }
+                    }
+                    currentSquare.SetOccupied(false);
+                    Debug.Log("Shoveled plant!");
+                }
+            }
+            else // Planting Mode
+            {
+                if (currentSquare.isOccupied) return;
+                
+                if (plants == null || plants.Length == 0) return;
+                PlantData activePlant = plants[currentPlantIndex];
+                
+                if (activePlant.prefab == null) return;
+
+                if (activePlant.currentCooldown > 0f)
+                {
+                    Debug.Log(activePlant.name + " is on cooldown!");
                     return;
                 }
 
+                if (EconomyManager.Instance != null && EconomyManager.Instance.currentSun < activePlant.cost)
+                {
+                    Debug.Log("Not enough sun for " + activePlant.name + "!");
+                    return;
+                }
+
+                // Proceed with planting
+                if (EconomyManager.Instance != null)
+                {
+                    EconomyManager.Instance.SpendSun(activePlant.cost);
+                }
+
+                activePlant.currentCooldown = activePlant.cooldownTime;
+                
                 isPlanting = true;
                 plantingTimer = plantingDuration;
                 
-                // If you have a specific planting animation, use it here. Otherwise, we just wait.
-                // if (animator != null) animator.SetTrigger("Plant"); 
-                
-                currentIndicator.SetActive(false); // Hide indicator while planting
+                currentIndicator.SetActive(false); 
             }
         }
     }
@@ -195,11 +295,15 @@ public class PlayerController : MonoBehaviour
         
         if (plantingTimer <= 0f)
         {
-            if (peashooterPrefab != null && currentSquare != null)
+            if (currentSquare != null && plants != null && plants.Length > currentPlantIndex)
             {
-                // Plant slightly above the square's center, and apply the exact rotation of the square!
-                Instantiate(peashooterPrefab, currentSquare.transform.position + Vector3.up * 0.05f, currentSquare.transform.rotation);
-                currentSquare.SetOccupied(true);
+                GameObject prefab = plants[currentPlantIndex].prefab;
+                if (prefab != null)
+                {
+                    Quaternion finalRotation = currentSquare.transform.rotation * prefab.transform.rotation;
+                    Instantiate(prefab, currentSquare.transform.position + Vector3.up * 0.05f, finalRotation);
+                    currentSquare.SetOccupied(true);
+                }
             }
             
             isPlanting = false;
