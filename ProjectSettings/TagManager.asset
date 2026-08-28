@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - PlantableNode
+  - Zombie
   layers:
   - Default
   - TransparentFX

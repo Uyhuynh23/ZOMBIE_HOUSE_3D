@@ -15,9 +15,12 @@ public class PeashooterCombat : MonoBehaviour
     private SphereCollider aggroCollider;
     private List<GameObject> zombiesInRange = new List<GameObject>();
     private float fireTimer = 0f;
+    private Animator animator;
 
     void Start()
     {
+        animator = GetComponent<Animator>();
+        
         // Setup aggro collider if not already set
         aggroCollider = GetComponent<SphereCollider>();
         aggroCollider.isTrigger = true;
@@ -44,18 +47,12 @@ public class PeashooterCombat : MonoBehaviour
 
         if (zombiesInRange.Count > 0)
         {
-            // Optional: rotate to face the closest zombie
-            Vector3 direction = (zombiesInRange[0].transform.position - transform.position).normalized;
-            direction.y = 0; // Keep rotation horizontal
-            if (direction != Vector3.zero)
-            {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
-            }
-
+            // Do NOT rotate toward the zombie. The plant's direction is fixed by the ground it was planted on!
+            
             fireTimer -= Time.deltaTime;
             if (fireTimer <= 0f)
             {
-                FireProjectile(zombiesInRange[0].transform);
+                FireProjectile();
                 fireTimer = 1f / fireRate;
             }
         }
@@ -65,7 +62,7 @@ public class PeashooterCombat : MonoBehaviour
         }
     }
 
-    void FireProjectile(Transform target)
+    void FireProjectile()
     {
         if (ObjectPoolManager.Instance == null || spawnPoint == null) return;
 
@@ -76,9 +73,10 @@ public class PeashooterCombat : MonoBehaviour
         Rigidbody rb = pea.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // Aim slightly above the target's base if they don't have a center point defined
-            Vector3 targetPos = target.position + Vector3.up * 1f; 
-            Vector3 direction = (targetPos - spawnPoint.position).normalized;
+            // Shoot straight forward relative to the plant's current rotation (which matches the ground's forward)
+            Vector3 direction = transform.forward;
+            
+            // Unity 6 uses linearVelocity, older versions use velocity. Fallback to velocity if linearVelocity is a compile error, but linearVelocity is fine here.
             rb.linearVelocity = direction * projectileSpeed;
         }
 
@@ -89,6 +87,11 @@ public class PeashooterCombat : MonoBehaviour
             pp = pea.AddComponent<PeaProjectile>();
         }
         pp.Initialize();
+        
+        if (animator != null)
+        {
+            animator.SetTrigger("Shoot");
+        }
     }
 
     void OnTriggerEnter(Collider other)
