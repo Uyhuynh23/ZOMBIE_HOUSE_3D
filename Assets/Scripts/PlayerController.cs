@@ -1,5 +1,12 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // <-- ADDED: Needed for the New Input System
+using UnityEngine.InputSystem;
+
+public enum PlayerState
+{
+    Idle,
+    Moving,
+    Planting
+}
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -9,74 +16,110 @@ public class PlayerController : MonoBehaviour
     public float turnSmoothTime = 0.1f;
     private float turnSmoothVelocity;
 
+    [Header("Planting Settings")]
+    public GameObject peashooterPrefab;
+    public float plantingDuration = 1f;
+
     private CharacterController controller;
     private Animator animator;
+
+    private PlayerState currentState = PlayerState.Idle;
+    private Vector3 targetMovePosition;
+    private GridManager.GridNode targetNode;
+    private float plantingTimer = 0f;
+
+    private Camera mainCamera;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        animator = GetComponentInChildren<Animator>(); 
+        animator = GetComponentInChildren<Animator>();
+        mainCamera = Camera.main;
     }
 
     void Update()
     {
-        HandleMovement();
-        HandleAttack();
-    }
-
-    void HandleMovement()
-    {
-        // 1. Get Input using the NEW Input System
-        float horizontal = 0f;
-        float vertical = 0f;
-
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) vertical += 1f;
-            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) vertical -= 1f;
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) horizontal -= 1f;
-            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) horizontal += 1f;
-        }
-
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
-
-        // 2. If the player is trying to move
-        if (direction.magnitude >= 0.1f)
-        {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-            controller.Move(direction * moveSpeed * Time.deltaTime);
-
-            if (animator != null) animator.SetBool("IsMoving", true);
-        }
-        else
-        {
-            if (animator != null) animator.SetBool("IsMoving", false);
-        }
-
-        // 3. Simple Gravity
+        // Simple Gravity
         if (!controller.isGrounded)
         {
             controller.Move(Vector3.down * 9.81f * Time.deltaTime);
         }
+
+        switch (currentState)
+        {
+            case PlayerState.Idle:
+                HandleMouseInput();
+                if (animator != null) animator.SetBool("IsMoving", false);
+                break;
+            case PlayerState.Moving:
+                MoveTowardsTarget();
+                if (animator != null) animator.SetBool("IsMoving", true);
+                break;
+            case PlayerState.Planting:
+                HandlePlanting();
+                if (animator != null) animator.SetBool("IsMoving", false);
+                break;
+        }
     }
 
-    void HandleAttack()
+    void HandleMouseInput()
     {
-        // Attack using the NEW Input System (Spacebar or Left Mouse Button)
-        bool attackPressed = false;
-        
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
-            attackPressed = true;
-            
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-            attackPressed = true;
-
-        if (attackPressed && animator != null)
         {
-            animator.SetTrigger("Attack");
+            Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                if (hit.collider.CompareTag("PlantableNode"))
+                {
+                    GridManager.GridNode node = GridManager.Instance.GetNodeFromWorldPosition(hit.point);
+                    if (node != null && !node.isOccupied)
+                    {
+                        targetNode = node;
+                        targetMovePosition = node.worldPosition;
+                        targetMovePosition.y = transform.position.y; // Keep current y
+                        currentState = PlayerState.Moving;
+                    }
+                }
+            }
+        }
+    }
+
+    void MoveTowardsTarget()
+    {
+        Vector3 direction = (targetMovePosition - transform.position).normalized;
+        direction.y = 0; // Ensure movement is strictly horizontal
+        
+        float distance = Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(targetMovePosition.x, 0, targetMovePosition.z));
+
+        if (distance > 0.1f)
+        {
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+            controller.Move(direction * moveSpeed * Time.deltaTime);
+        }
+        else
+        {
+            // Reached target
+            currentState = PlayerState.Planting;
+            plantingTimer = plantingDuration;
+            if (animator != null) animator.SetTrigger("Attack"); // Use attack anim as planting anim for now
+        }
+    }
+
+    void HandlePlanting()
+    {
+        plantingTimer -= Time.deltaTime;
+        if (plantingTimer <= 0f)
+        {
+            // Spawn Peashooter
+            if (peashooterPrefab != null && targetNode != null)
+            {
+                Instantiate(peashooterPrefab, targetNode.worldPosition, Quaternion.identity);
+                targetNode.isOccupied = true;
+            }
+            currentState = PlayerState.Idle;
         }
     }
 }
