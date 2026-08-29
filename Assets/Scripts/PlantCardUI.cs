@@ -53,7 +53,7 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     /// </summary>
     public void UpdateCard(PlantData data, bool isSelected, int currentSun)
     {
-        if (data == null) return;
+        
 
         // Portrait
         if (portraitImage != null && data.portrait != null)
