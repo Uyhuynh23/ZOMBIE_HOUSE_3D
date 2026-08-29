@@ -31,14 +31,20 @@ public class PlantPortraitCapture
                         || prefab.GetComponentInChildren<SunflowerLogic>() != null;
             if (!isPlant) continue;
 
-            CapturePlant(prefab, prefab.name);
+            float yRot = 0f;
+            if (prefab.name.Contains("PeaShooter") || prefab.name.Contains("PeaShooterFroze"))
+            {
+                yRot = 90f;
+            }
+
+            CapturePlant(prefab, prefab.name, yRot);
         }
 
         AssetDatabase.Refresh();
         Debug.Log("[PlantPortraitCapture] Done! Portraits saved to " + OUTPUT_DIR);
     }
 
-    static void CapturePlant(GameObject prefab, string plantName)
+    static void CapturePlant(GameObject prefab, string plantName, float cameraYAngle = 0f)
     {
         // Spawn prefab off-screen
         Vector3 capturePos = new Vector3(1000f, 0f, 1000f);
@@ -59,15 +65,24 @@ public class PlantPortraitCapture
         cam.clearFlags = CameraClearFlags.SolidColor;
         cam.backgroundColor = new Color(0f, 0f, 0f, 0f); // transparent
 
+        // Setup light so the capture is bright and clear
+        GameObject lightGo = new GameObject("_PortraitLight");
+        Light light = lightGo.AddComponent<Light>();
+        light.type = LightType.Directional;
+        light.intensity = 1.2f;
+        
         // Position camera to look at the plant from a front-angled view (like PvZ card angle)
         float size = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z) * 1.4f;
         cam.orthographicSize = size;
 
         // Slight top-front angle (15 degrees down, like PvZ 2D art perspective)
-        Vector3 camDir = Quaternion.Euler(20f, 0f, 0f) * Vector3.back;
+        Vector3 camDir = Quaternion.Euler(20f, cameraYAngle, 0f) * Vector3.back;
         camGo.transform.position = bounds.center - camDir * (size * 3f);
         camGo.transform.LookAt(bounds.center);
         cam.targetTexture = rt;
+        
+        // Match light angle with camera for good illumination
+        lightGo.transform.rotation = camGo.transform.rotation;
 
         cam.Render();
 
@@ -86,6 +101,7 @@ public class PlantPortraitCapture
         // Cleanup
         Object.DestroyImmediate(instance);
         Object.DestroyImmediate(camGo);
+        Object.DestroyImmediate(lightGo);
         Object.DestroyImmediate(rt);
         Object.DestroyImmediate(tex);
 
