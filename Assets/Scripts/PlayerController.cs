@@ -83,16 +83,34 @@ public class PlayerController : MonoBehaviour
             currentIndicator.SetActive(false);
             
             Renderer r = currentIndicator.GetComponent<Renderer>();
-            indicatorMaterial = new Material(Shader.Find("Standard"));
             
-            indicatorMaterial.SetFloat("_Mode", 3);
-            indicatorMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            indicatorMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            indicatorMaterial.SetInt("_ZWrite", 0);
-            indicatorMaterial.DisableKeyword("_ALPHATEST_ON");
-            indicatorMaterial.EnableKeyword("_ALPHABLEND_ON");
-            indicatorMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            indicatorMaterial.renderQueue = 3000;
+            Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (shader == null) shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            indicatorMaterial = new Material(shader);
+
+            if (indicatorMaterial.HasProperty("_Surface"))
+            {
+                // URP Transparent
+                indicatorMaterial.SetFloat("_Surface", 1);
+                indicatorMaterial.SetInt("_Blend", 0);
+                indicatorMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                indicatorMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                indicatorMaterial.SetInt("_ZWrite", 0);
+                indicatorMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            }
+            else
+            {
+                // Standard transparent
+                indicatorMaterial.SetFloat("_Mode", 3);
+                indicatorMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                indicatorMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                indicatorMaterial.SetInt("_ZWrite", 0);
+                indicatorMaterial.DisableKeyword("_ALPHATEST_ON");
+                indicatorMaterial.EnableKeyword("_ALPHABLEND_ON");
+                indicatorMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                indicatorMaterial.renderQueue = 3000;
+            }
             
             r.sharedMaterial = indicatorMaterial;
         }
@@ -228,27 +246,43 @@ public class PlayerController : MonoBehaviour
             if (square != null)
             {
                 currentSquare = square;
-                currentIndicator.SetActive(true);
                 currentIndicator.transform.position = square.transform.position + Vector3.up * 0.06f; 
 
                 if (isShovelMode)
                 {
-                    UpdateIndicatorColor(square.isOccupied ? Color.red : Color.gray);
-                    
-                    // Use direct reference — no physics query needed
-                    if (square.isOccupied && square.currentPlant != null)
+                    if (square.isOccupied)
                     {
-                        UpdateTargetedPlant(square.currentPlant);
+                        // Has plant + shovel mode -> red indicator
+                        currentIndicator.SetActive(true);
+                        UpdateIndicatorColor(Color.red);
+                        
+                        if (square.currentPlant != null)
+                        {
+                            UpdateTargetedPlant(square.currentPlant);
+                        }
                     }
                     else
                     {
+                        // No plant + shovel mode -> hidden indicator
+                        currentIndicator.SetActive(false);
                         UpdateTargetedPlant(null);
                     }
                 }
-                else
+                else // Planting mode
                 {
-                    UpdateIndicatorColor(square.isOccupied ? Color.red : Color.yellow);
-                    UpdateTargetedPlant(null);
+                    if (square.isOccupied)
+                    {
+                        // Has plant -> no indicator at all
+                        currentIndicator.SetActive(false);
+                        UpdateTargetedPlant(null);
+                    }
+                    else
+                    {
+                        // No plant -> yellow indicator
+                        currentIndicator.SetActive(true);
+                        UpdateIndicatorColor(Color.yellow);
+                        UpdateTargetedPlant(null);
+                    }
                 }
             }
             else
