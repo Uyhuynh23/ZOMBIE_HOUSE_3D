@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// Represents a single plant card in the PvZ-style HUD.
-/// Handles: portrait, cost display, cooldown overlay, selection highlight, red "not enough sun" flash.
+/// Handles: portrait, cost display, cooldown overlay, selection highlight.
 /// </summary>
 public class PlantCardUI : MonoBehaviour, IPointerClickHandler
 {
@@ -13,7 +13,7 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     public Image portraitImage;         // The plant portrait (RenderTexture capture)
     public Image selectionBorder;       // Gold border shown when selected
     public Image cooldownOverlay;       // Radial360 dark overlay for cooldown
-    public Image insufficientFlash;     // Red overlay that pulses when sun < cost
+    public Image insufficientFlash;     // Not used on the card anymore, kept for backwards compatibility
     public Text  costText;              // Cost number at bottom of card
     public Image sunIcon;               // Small sun icon next to cost (optional)
 
@@ -25,8 +25,6 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     [Header("Visual Settings")]
     public Color selectedBorderColor = new Color(1f, 0.85f, 0f, 1f);   // Gold
     public Color normalBorderColor   = new Color(0f, 0f, 0f, 0f);       // Transparent (hidden)
-    public float flashFrequency = 4f;                                    // Pulses per second
-    public float flashMaxAlpha  = 0.55f;                                 // Max red overlay alpha
     public float selectedScaleBoost = 1.08f;                            // Card scale when selected
 
     // Private state
@@ -34,6 +32,7 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     private RectTransform rt;
     private Vector3 normalScale;
     private bool wasSelected = false;
+    private Color originalCardColor = Color.white;
 
     void Awake()
     {
@@ -45,7 +44,8 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     {
         player = FindObjectOfType<PlayerController>();
         if (selectionBorder != null) selectionBorder.color = normalBorderColor;
-        if (insufficientFlash != null) insufficientFlash.color = new Color(1f, 0f, 0f, 0f);
+        if (insufficientFlash != null) insufficientFlash.gameObject.SetActive(false); // Hide the old flash
+        if (cardBackground != null) originalCardColor = cardBackground.color;
     }
 
     /// <summary>
@@ -59,7 +59,6 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
         if (portraitImage != null && data.portrait != null)
         {
             portraitImage.sprite = data.portrait;
-            portraitImage.color = Color.white;
         }
 
         // Cost text
@@ -86,27 +85,19 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
             rt.localScale = normalScale;
         wasSelected = isSelected;
 
-        // Insufficient sun flash
-        bool isFlashing = notEnoughSun && !isSelected;
-        if (insufficientFlash != null)
+        // Dim card if not affordable or on cooldown
+        bool canAfford = currentSun >= data.cost;
+        bool onCooldown = data.currentCooldown > 0f;
+        Color dimColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+        
+        if (cardBackground != null)
         {
-            if (isFlashing)
-            {
-                float alpha = (Mathf.Sin(Time.time * flashFrequency) * 0.5f + 0.5f) * flashMaxAlpha;
-                insufficientFlash.color = new Color(1f, 0f, 0f, alpha);
-            }
-            else
-            {
-                insufficientFlash.color = new Color(1f, 0f, 0f, 0f);
-            }
+            cardBackground.color = (canAfford && !onCooldown) ? originalCardColor : (originalCardColor * dimColor);
         }
 
-        // Dim portrait if not affordable or on cooldown
         if (portraitImage != null)
         {
-            bool canAfford = currentSun >= data.cost;
-            bool onCooldown = data.currentCooldown > 0f;
-            portraitImage.color = (canAfford && !onCooldown) ? Color.white : new Color(0.55f, 0.55f, 0.55f, 1f);
+            portraitImage.color = (canAfford && !onCooldown) ? Color.white : dimColor;
         }
     }
 

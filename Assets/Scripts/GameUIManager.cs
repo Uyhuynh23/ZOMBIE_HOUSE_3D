@@ -12,12 +12,21 @@ public class GameUIManager : MonoBehaviour
 
     [Header("Plant Cards")]
     public PlantCardUI[] plantCards;    // One per plant (plus optionally shovel)
+    
+    [Header("Sun Flash Settings")]
+    public float flashFrequency = 5f;
+    public Color flashColor = Color.red;
+    private Color originalSunTextColor = Color.white;
 
     private PlayerController player;
 
     void Start()
     {
         player = FindObjectOfType<PlayerController>();
+        if (sunText != null)
+        {
+            originalSunTextColor = sunText.color;
+        }
         if (EconomyManager.Instance != null)
         {
             EconomyManager.Instance.OnSunChanged += UpdateSunText;
@@ -37,6 +46,7 @@ public class GameUIManager : MonoBehaviour
 
         int currentSun = EconomyManager.Instance.currentSun;
         int selectedIndex = player.CurrentPlantIndex;
+        bool selectedIsUnaffordable = false;
 
         for (int i = 0; i < plantCards.Length; i++)
         {
@@ -48,7 +58,27 @@ public class GameUIManager : MonoBehaviour
 
             PlantData data = player.plants[idx];
             bool isSelected = (!player.IsShovelMode) && (idx == selectedIndex);
+            
+            if (isSelected && currentSun < data.cost)
+            {
+                selectedIsUnaffordable = true;
+            }
+            
             card.UpdateCard(data, isSelected, currentSun);
+        }
+        
+        // Flash sun text if selected plant is unaffordable
+        if (sunText != null)
+        {
+            if (selectedIsUnaffordable)
+            {
+                float t = Mathf.Sin(Time.time * flashFrequency) * 0.5f + 0.5f;
+                sunText.color = Color.Lerp(originalSunTextColor, flashColor, t);
+            }
+            else
+            {
+                sunText.color = originalSunTextColor;
+            }
         }
     }
 

@@ -181,9 +181,9 @@ public class UIAndSunGenerator
         // Plant definitions: name, cost, PvZ-inspired background color
         string[] plantNames = { "Peashooter", "Snow Pea", "Sunflower" };
         Color[]  cardColors  = {
-            new Color(0.25f, 0.55f, 0.20f, 1f),  // Peashooter — dark green
-            new Color(0.20f, 0.45f, 0.65f, 1f),  // Snow Pea   — steel blue
-            new Color(0.70f, 0.60f, 0.10f, 1f),  // Sunflower  — golden brown
+            new Color(0.4f, 0.8f, 0.35f, 1f),  // Peashooter — dark green
+            new Color(0.4f, 0.7f, 0.9f, 1f),  // Snow Pea   — steel blue
+            new Color(0.9f, 0.8f, 0.2f, 1f),  // Sunflower  — golden brown
         };
         int[] costs = { 100, 175, 50 };
 
