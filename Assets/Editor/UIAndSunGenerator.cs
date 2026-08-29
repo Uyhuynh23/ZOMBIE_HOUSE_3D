@@ -149,7 +149,7 @@ public class UIAndSunGenerator
         sunTextObj.transform.SetParent(sunDisplay.transform, false);
         Text sunText = sunTextObj.AddComponent<Text>();
         sunText.text = "50";
-        sunText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        sunText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
         sunText.fontSize = 30;
         sunText.fontStyle = FontStyle.Bold;
         sunText.color = Color.white;
@@ -204,7 +204,7 @@ public class UIAndSunGenerator
         hintObj.transform.SetParent(canvasObj.transform, false);
         Text hintText = hintObj.AddComponent<Text>();
         hintText.text = "1/2/3 or Click: Select Plant | 4/R: Shovel | E: Plant/Remove";
-        hintText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        hintText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
         hintText.fontSize = 18;
         hintText.color = new Color(1f, 1f, 1f, 0.7f);
         hintText.alignment = TextAnchor.UpperLeft;
@@ -287,7 +287,7 @@ public class UIAndSunGenerator
         costObj.transform.SetParent(costRow.transform, false);
         Text costText = costObj.AddComponent<Text>();
         costText.text = cost.ToString();
-        costText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        costText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
         costText.fontSize = 22;
         costText.fontStyle = FontStyle.Bold;
         costText.color = Color.white;
@@ -357,7 +357,7 @@ public class UIAndSunGenerator
         labelObj.transform.SetParent(shovelObj.transform, false);
         Text labelText = labelObj.AddComponent<Text>();
         labelText.text = "SHOVEL\n(4/R)";
-        labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        labelText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
         labelText.fontSize = 16;
         labelText.fontStyle = FontStyle.Bold;
         labelText.color = Color.white;
@@ -438,3 +438,4 @@ public class UIAndSunGenerator
         Debug.Log($"[FixPlantColliders] Done! Fixed {fixed_count} plant prefab(s).");
     }
 }
+
