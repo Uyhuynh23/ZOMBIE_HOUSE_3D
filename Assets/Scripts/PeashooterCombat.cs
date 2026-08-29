@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SphereCollider), typeof(CapsuleCollider))]
-public class PeashooterCombat : MonoBehaviour
+public class PeashooterCombat : PlantBase
 {
     [Header("Combat Settings")]
     public float fireRate = 1f;
     public float projectileSpeed = 10f;
     public float aggroRadius = 5f;
+    public float forwardConeThreshold = 0.3f; // dot product threshold (~72 degree cone)
 
     [Header("Body Collider Settings")]
     public float bodyHeight = 1.0f;
@@ -19,26 +20,31 @@ public class PeashooterCombat : MonoBehaviour
 
     private SphereCollider aggroCollider;
     private CapsuleCollider bodyCollider;
-    private List<GameObject> zombiesInRange = new List<GameObject>();
+    private HashSet<GameObject> zombiesInRange = new HashSet<GameObject>();
     private float fireTimer = 0f;
     private Animator animator;
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
 
     void Start()
     {
         animator = GetComponent<Animator>();
 
-        // ── Aggro trigger (SphereCollider) ──
+        // Aggro trigger (SphereCollider)
         aggroCollider = GetComponent<SphereCollider>();
         aggroCollider.isTrigger = true;
         aggroCollider.radius = aggroRadius;
 
-        // ── Physical body (CapsuleCollider) — blocks character movement ──
+        // Physical body (CapsuleCollider) blocks character movement
         bodyCollider = GetComponent<CapsuleCollider>();
         bodyCollider.isTrigger = false;
         bodyCollider.height = bodyHeight;
         bodyCollider.radius = bodyRadius;
         bodyCollider.center = bodyCenter;
-        bodyCollider.direction = 1; // Y-axis (upright capsule)
+        bodyCollider.direction = 1; // Y-axis (upright)
 
         if (spawnPoint == null)
         {
@@ -56,13 +62,24 @@ public class PeashooterCombat : MonoBehaviour
 
     void Update()
     {
-        // Clean up list in case zombies were destroyed
-        zombiesInRange.RemoveAll(z => z == null || !z.activeInHierarchy);
+        // Clean up destroyed zombies
+        zombiesInRange.RemoveWhere(z => z == null || !z.activeInHierarchy);
 
-        if (zombiesInRange.Count > 0)
+        // Check if any zombie is in the forward cone
+        bool hasForwardTarget = false;
+        foreach (var z in zombiesInRange)
         {
-            // Do NOT rotate toward the zombie. The plant's direction is fixed by the ground it was planted on!
-            
+            if (z == null) continue;
+            Vector3 toZombie = (z.transform.position - transform.position).normalized;
+            if (Vector3.Dot(transform.forward, toZombie) >= forwardConeThreshold)
+            {
+                hasForwardTarget = true;
+                break;
+            }
+        }
+
+        if (hasForwardTarget)
+        {
             fireTimer -= Time.deltaTime;
             if (fireTimer <= 0f)
             {
@@ -87,21 +104,17 @@ public class PeashooterCombat : MonoBehaviour
         Rigidbody rb = pea.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // Shoot straight forward relative to the plant's current rotation (which matches the ground's forward)
             Vector3 direction = transform.forward;
-            
-            // Unity 6 uses linearVelocity, older versions use velocity. Fallback to velocity if linearVelocity is a compile error, but linearVelocity is fine here.
             rb.linearVelocity = direction * projectileSpeed;
         }
 
-        // Ensure the projectile has the return script
         PeaProjectile pp = pea.GetComponent<PeaProjectile>();
         if (pp == null)
         {
             pp = pea.AddComponent<PeaProjectile>();
         }
         pp.Initialize();
-        
+
         if (animator != null)
         {
             animator.SetTrigger("Shoot");
@@ -112,10 +125,8 @@ public class PeashooterCombat : MonoBehaviour
     {
         if (other.CompareTag("Zombie"))
         {
-            if (!zombiesInRange.Contains(other.gameObject))
-            {
-                zombiesInRange.Add(other.gameObject);
-            }
+            // Always use root to avoid multi-collider duplication
+            zombiesInRange.Add(other.transform.root.gameObject);
         }
     }
 
@@ -123,7 +134,7 @@ public class PeashooterCombat : MonoBehaviour
     {
         if (other.CompareTag("Zombie"))
         {
-            zombiesInRange.Remove(other.gameObject);
+            zombiesInRange.Remove(other.transform.root.gameObject);
         }
     }
 }

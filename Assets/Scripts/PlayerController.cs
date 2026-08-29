@@ -38,10 +38,10 @@ public class PlayerController : MonoBehaviour
     // Planting delay state
     private bool isPlanting = false;
     private float plantingTimer = 0f;
-    public float plantingDuration = 1.0f; // Seconds the planting animation takes
+    public float plantingDuration = 1.0f;
 
     // Targeting state for shovel flash
-    private GameObject targetedPlant;
+    private PlantBase targetedPlant;
     private Dictionary<Renderer, Color> originalColors = new Dictionary<Renderer, Color>();
     private Dictionary<Renderer, Color> originalBaseColors = new Dictionary<Renderer, Color>();
 
@@ -85,7 +85,6 @@ public class PlayerController : MonoBehaviour
             Renderer r = currentIndicator.GetComponent<Renderer>();
             indicatorMaterial = new Material(Shader.Find("Standard"));
             
-            // Setup transparent material
             indicatorMaterial.SetFloat("_Mode", 3);
             indicatorMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
             indicatorMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
@@ -133,7 +132,6 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.digit2Key.wasPressedThisFrame && plants.Length > 1) SelectPlant(1);
         if (Keyboard.current.digit3Key.wasPressedThisFrame && plants.Length > 2) SelectPlant(2);
 
-        // Shovel Mode on 4 or R
         if (Keyboard.current.digit4Key.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame)
             SetShovelMode(true);
     }
@@ -144,7 +142,7 @@ public class PlayerController : MonoBehaviour
         currentPlantIndex = index;
         Debug.Log("Equipped: " + plants[index].name);
         UpdateIndicatorColor(Color.yellow);
-        UpdateTargetedPlant(null); // Clear shovel target
+        UpdateTargetedPlant(null);
     }
 
     public void SetShovelMode(bool on)
@@ -237,10 +235,10 @@ public class PlayerController : MonoBehaviour
                 {
                     UpdateIndicatorColor(square.isOccupied ? Color.red : Color.gray);
                     
-                    if (square.isOccupied)
+                    // Use direct reference — no physics query needed
+                    if (square.isOccupied && square.currentPlant != null)
                     {
-                        GameObject foundPlant = FindPlantOnSquare(square);
-                        UpdateTargetedPlant(foundPlant);
+                        UpdateTargetedPlant(square.currentPlant);
                     }
                     else
                     {
@@ -268,25 +266,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    GameObject FindPlantOnSquare(PlantableSquare square)
-    {
-        // Half extents 0.3f to keep it strictly inside the 1x1 tile
-        Collider[] hits = Physics.OverlapBox(square.transform.position + Vector3.up * 0.5f, Vector3.one * 0.3f);
-        foreach (var h in hits)
-        {
-            if (h.isTrigger) continue; // Ignore aggro spheres!
-            if (h.gameObject == gameObject) continue; // Ignore player
-            
-            // Check if it's a plant component
-            if (h.GetComponentInParent<PeashooterCombat>() != null || h.GetComponentInParent<SunflowerLogic>() != null)
-            {
-                return h.transform.root.gameObject;
-            }
-        }
-        return null;
-    }
-    
-    void UpdateTargetedPlant(GameObject newTarget)
+    void UpdateTargetedPlant(PlantBase newTarget)
     {
         if (targetedPlant == newTarget) return;
 
@@ -331,7 +311,7 @@ public class PlayerController : MonoBehaviour
     {
         if (isShovelMode && targetedPlant != null)
         {
-            float t = Mathf.Sin(Time.time * 8f) * 0.4f + 0.6f; // Pulse between 0.2 and 1.0 mix
+            float t = Mathf.Sin(Time.time * 8f) * 0.4f + 0.6f;
             
             foreach (var kvp in originalColors)
             {
@@ -358,16 +338,11 @@ public class PlayerController : MonoBehaviour
         {
             if (isShovelMode)
             {
-                if (currentSquare.isOccupied)
+                if (currentSquare.isOccupied && currentSquare.currentPlant != null)
                 {
-                    GameObject plantToDestroy = FindPlantOnSquare(currentSquare);
-                    if (plantToDestroy != null)
-                    {
-                        UpdateTargetedPlant(null); // Clear flash before destroy
-                        Destroy(plantToDestroy);
-                        currentSquare.SetOccupied(false);
-                        Debug.Log("Shoveled plant!");
-                    }
+                    UpdateTargetedPlant(null); // Clear flash before destroy
+                    currentSquare.currentPlant.OnShoveled(); // PlantBase handles cleanup
+                    Debug.Log("Shoveled plant!");
                 }
             }
             else // Planting Mode
@@ -391,7 +366,6 @@ public class PlayerController : MonoBehaviour
                     return;
                 }
 
-                // Proceed with planting
                 if (EconomyManager.Instance != null)
                 {
                     EconomyManager.Instance.SpendSun(activePlant.cost);
@@ -419,8 +393,19 @@ public class PlayerController : MonoBehaviour
                 if (prefab != null)
                 {
                     Quaternion finalRotation = currentSquare.transform.rotation * prefab.transform.rotation;
-                    Instantiate(prefab, currentSquare.transform.position + Vector3.up * 0.05f, finalRotation);
-                    currentSquare.SetOccupied(true);
+                    GameObject planted = Instantiate(prefab, currentSquare.transform.position + Vector3.up * 0.05f, finalRotation);
+                    
+                    // Register plant with the square using PlantBase
+                    PlantBase plantComponent = planted.GetComponent<PlantBase>();
+                    if (plantComponent != null)
+                    {
+                        currentSquare.PlantHere(plantComponent);
+                    }
+                    else
+                    {
+                        // Fallback for prefabs without PlantBase (shouldn't happen)
+                        currentSquare.SetOccupied(true);
+                    }
                 }
             }
             

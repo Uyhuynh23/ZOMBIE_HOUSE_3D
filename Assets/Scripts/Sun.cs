@@ -5,21 +5,27 @@ public class Sun : MonoBehaviour
 {
     public int sunValue = 25;
     public float lifetime = 15f;
+    public float floatAmplitude = 0.15f;
+    public float floatSpeed = 4f;
+
     private float timer;
     private bool collected = false;
+    private Vector3 basePosition;
 
     void Start()
     {
         timer = lifetime;
+        basePosition = transform.position;
+
         SphereCollider col = GetComponent<SphereCollider>();
         col.isTrigger = true;
-        col.radius = 1.5f; // Generous pickup radius
+        col.radius = 1.5f;
     }
 
     void Update()
     {
-        // Simple floating animation
-        transform.position += new Vector3(0, Mathf.Sin(Time.time * 4f) * 0.002f, 0);
+        // Float animation using offset from base position (no drift)
+        transform.position = basePosition + Vector3.up * Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
 
         timer -= Time.deltaTime;
         if (timer <= 0f && !collected)
@@ -32,7 +38,6 @@ public class Sun : MonoBehaviour
     {
         if (collected) return;
 
-        // Player can collect it
         if (other.GetComponent<PlayerController>() != null || other.CompareTag("Player"))
         {
             collected = true;

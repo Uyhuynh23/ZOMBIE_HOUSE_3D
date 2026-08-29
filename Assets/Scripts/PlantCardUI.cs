@@ -9,30 +9,29 @@ using UnityEngine.EventSystems;
 public class PlantCardUI : MonoBehaviour, IPointerClickHandler
 {
     [Header("Card References")]
-    public Image cardBackground;        // The main card image (wood/brown frame)
-    public Image portraitImage;         // The plant portrait (RenderTexture capture)
-    public Image selectionBorder;       // Gold border shown when selected
-    public Image cooldownOverlay;       // Radial360 dark overlay for cooldown
-    public Image insufficientFlash;     // Not used on the card anymore, kept for backwards compatibility
-    public Text  costText;              // Cost number at bottom of card
-    public Image sunIcon;               // Small sun icon next to cost (optional)
+    public Image cardBackground;
+    public Image portraitImage;
+    public Image selectionBorder;
+    public Image cooldownOverlay;
+    public Image insufficientFlash;     // Legacy — kept for backwards compatibility
+    public Text  costText;
+    public Image sunIcon;
 
     [Header("Card Data")]
-    public int plantIndex = -1;         // Which plant in PlayerController.plants[] this card maps to
-    public bool isShovelCard = false;   // Special flag for the shovel button
+    public int plantIndex = -1;
+    public bool isShovelCard = false;
 
-    // Visual settings
     [Header("Visual Settings")]
-    public Color selectedBorderColor = new Color(1f, 0.85f, 0f, 1f);   // Gold
-    public Color normalBorderColor   = new Color(0f, 0f, 0f, 0f);       // Transparent (hidden)
-    public float selectedScaleBoost = 1.08f;                            // Card scale when selected
+    public Color selectedBorderColor = new Color(1f, 0.85f, 0f, 1f);
+    public Color normalBorderColor   = new Color(0f, 0f, 0f, 0f);
+    public float selectedScaleBoost = 1.08f;
 
-    // Private state
     private PlayerController player;
     private RectTransform rt;
     private Vector3 normalScale;
     private bool wasSelected = false;
     private Color originalCardColor = Color.white;
+    private int lastCostSet = -1; // Track to avoid per-frame string alloc
 
     void Awake()
     {
@@ -44,26 +43,25 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     {
         player = FindObjectOfType<PlayerController>();
         if (selectionBorder != null) selectionBorder.color = normalBorderColor;
-        if (insufficientFlash != null) insufficientFlash.gameObject.SetActive(false); // Hide the old flash
+        if (insufficientFlash != null) insufficientFlash.gameObject.SetActive(false);
         if (cardBackground != null) originalCardColor = cardBackground.color;
     }
 
-    /// <summary>
-    /// Called every frame by GameUIManager to push current state.
-    /// </summary>
     public void UpdateCard(PlantData data, bool isSelected, int currentSun)
     {
-        
-
-        // Portrait
+        // Portrait (set sprite only when changed)
         if (portraitImage != null && data.portrait != null)
         {
-            portraitImage.sprite = data.portrait;
+            if (portraitImage.sprite != data.portrait)
+                portraitImage.sprite = data.portrait;
         }
 
-        // Cost text
-        if (costText != null)
+        // Cost text — only update when cost changes (avoids per-frame string alloc)
+        if (costText != null && data.cost != lastCostSet)
+        {
             costText.text = data.cost.ToString();
+            lastCostSet = data.cost;
+        }
 
         // Cooldown overlay
         if (cooldownOverlay != null)
@@ -73,8 +71,6 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
         }
 
         // Selection highlight
-        bool notEnoughSun = (currentSun < data.cost);
-
         if (selectionBorder != null)
             selectionBorder.color = isSelected ? selectedBorderColor : normalBorderColor;
 
@@ -101,9 +97,6 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    /// <summary>
-    /// Click handler to select this plant (or shovel mode) in PlayerController.
-    /// </summary>
     public void OnPointerClick(PointerEventData eventData)
     {
         if (player == null) return;

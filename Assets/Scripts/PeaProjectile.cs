@@ -3,6 +3,7 @@ using UnityEngine;
 public class PeaProjectile : MonoBehaviour
 {
     public float lifetime = 3f;
+    public int damage = 20;
     private float timer;
 
     public void Initialize()
@@ -23,9 +24,13 @@ public class PeaProjectile : MonoBehaviour
     {
         if (other.CompareTag("Zombie"))
         {
-            // Here you would typically call a TakeDamage method on the zombie
-            // other.GetComponent<ZombieHealth>()?.TakeDamage(damageAmount);
-            
+            // Deal damage to the zombie
+            ZombieHealth zh = other.GetComponentInParent<ZombieHealth>();
+            if (zh != null)
+            {
+                zh.TakeDamage(damage);
+            }
+
             ReturnToPool();
         }
     }
