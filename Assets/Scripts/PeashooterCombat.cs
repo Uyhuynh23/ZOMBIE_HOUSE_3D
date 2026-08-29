@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(SphereCollider))]
+[RequireComponent(typeof(SphereCollider), typeof(CapsuleCollider))]
 public class PeashooterCombat : MonoBehaviour
 {
     [Header("Combat Settings")]
@@ -9,10 +9,16 @@ public class PeashooterCombat : MonoBehaviour
     public float projectileSpeed = 10f;
     public float aggroRadius = 5f;
 
+    [Header("Body Collider Settings")]
+    public float bodyHeight = 1.0f;
+    public float bodyRadius = 0.35f;
+    public Vector3 bodyCenter = new Vector3(0f, 0.5f, 0f);
+
     [Header("References")]
     public Transform spawnPoint;
 
     private SphereCollider aggroCollider;
+    private CapsuleCollider bodyCollider;
     private List<GameObject> zombiesInRange = new List<GameObject>();
     private float fireTimer = 0f;
     private Animator animator;
@@ -20,11 +26,19 @@ public class PeashooterCombat : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        
-        // Setup aggro collider if not already set
+
+        // ── Aggro trigger (SphereCollider) ──
         aggroCollider = GetComponent<SphereCollider>();
         aggroCollider.isTrigger = true;
         aggroCollider.radius = aggroRadius;
+
+        // ── Physical body (CapsuleCollider) — blocks character movement ──
+        bodyCollider = GetComponent<CapsuleCollider>();
+        bodyCollider.isTrigger = false;
+        bodyCollider.height = bodyHeight;
+        bodyCollider.radius = bodyRadius;
+        bodyCollider.center = bodyCenter;
+        bodyCollider.direction = 1; // Y-axis (upright capsule)
 
         if (spawnPoint == null)
         {

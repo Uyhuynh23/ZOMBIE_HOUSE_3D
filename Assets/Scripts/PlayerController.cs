@@ -8,6 +8,7 @@ public class PlantData
     public GameObject prefab;
     public int cost;
     public float cooldownTime;
+    public Sprite portrait;                    // Card portrait (captured from 3D model)
     [HideInInspector] public float currentCooldown = 0f;
 }
 
@@ -24,6 +25,10 @@ public class PlayerController : MonoBehaviour
     private int currentPlantIndex = 0;
     private bool isShovelMode = false;
     public float plantingDuration = 1f;
+
+    // ── Public state read by PlantCardUI ──
+    public int CurrentPlantIndex => currentPlantIndex;
+    public bool IsShovelMode => isShovelMode;
 
     [Header("Visual Indicator")]
     public GameObject indicatorPrefab; 
@@ -116,22 +121,28 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.digit1Key.wasPressedThisFrame && plants.Length > 0) SelectPlant(0);
         if (Keyboard.current.digit2Key.wasPressedThisFrame && plants.Length > 1) SelectPlant(1);
         if (Keyboard.current.digit3Key.wasPressedThisFrame && plants.Length > 2) SelectPlant(2);
-        
-        // Shovel Mode on 4
+
+        // Shovel Mode on 4 or R
         if (Keyboard.current.digit4Key.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame)
-        {
-            isShovelMode = true;
-            Debug.Log("Equipped: Shovel");
-            UpdateIndicatorColor(Color.red);
-        }
+            SetShovelMode(true);
     }
 
-    void SelectPlant(int index)
+    public void SelectPlant(int index)
     {
         isShovelMode = false;
         currentPlantIndex = index;
         Debug.Log("Equipped: " + plants[index].name);
         UpdateIndicatorColor(Color.yellow);
+    }
+
+    public void SetShovelMode(bool on)
+    {
+        isShovelMode = on;
+        if (on)
+        {
+            Debug.Log("Equipped: Shovel");
+            UpdateIndicatorColor(Color.red);
+        }
     }
 
     void UpdateIndicatorColor(Color color)

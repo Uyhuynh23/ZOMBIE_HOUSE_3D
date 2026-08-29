@@ -1,14 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Drives the PvZ-style HUD each frame.
+/// Owns the PlantCardUI array and the sun display text.
+/// </summary>
 public class GameUIManager : MonoBehaviour
 {
-    public Text sunText;
-    
-    [Header("Plant Cards (UI Images)")]
-    public Image[] plantCards;
-    public Image[] cooldownOverlays;
-    public Text[] costTexts;
+    [Header("Sun Display")]
+    public Text sunText;                // Top-left sun counter
+
+    [Header("Plant Cards")]
+    public PlantCardUI[] plantCards;    // One per plant (plus optionally shovel)
 
     private PlayerController player;
 
@@ -24,53 +27,34 @@ public class GameUIManager : MonoBehaviour
 
     void UpdateSunText(int sun)
     {
-        if (sunText != null) sunText.text = "Sun: " + sun;
+        if (sunText != null) sunText.text = sun.ToString();
     }
 
     void Update()
     {
         if (player == null || player.plants == null) return;
+        if (EconomyManager.Instance == null) return;
 
-        for (int i = 0; i < plantCards.Length && i < player.plants.Length; i++)
+        int currentSun = EconomyManager.Instance.currentSun;
+        int selectedIndex = player.CurrentPlantIndex;
+
+        for (int i = 0; i < plantCards.Length; i++)
         {
-            PlantData data = player.plants[i];
-            
-            // Update cost text
-            if (costTexts[i] != null) costTexts[i].text = data.cost.ToString();
+            PlantCardUI card = plantCards[i];
+            if (card == null || card.isShovelCard) continue;
 
-            // Update cooldown overlay (fill amount)
-            if (cooldownOverlays[i] != null)
-            {
-                if (data.cooldownTime > 0)
-                {
-                    cooldownOverlays[i].fillAmount = data.currentCooldown / data.cooldownTime;
-                }
-                else
-                {
-                    cooldownOverlays[i].fillAmount = 0;
-                }
-            }
+            int idx = card.plantIndex;
+            if (idx < 0 || idx >= player.plants.Length) continue;
 
-            // Dim card if not enough sun
-            if (EconomyManager.Instance != null)
-            {
-                if (EconomyManager.Instance.currentSun < data.cost)
-                {
-                    plantCards[i].color = new Color(0.5f, 0.5f, 0.5f, 1f);
-                }
-                else
-                {
-                    plantCards[i].color = Color.white;
-                }
-            }
+            PlantData data = player.plants[idx];
+            bool isSelected = (!player.IsShovelMode) && (idx == selectedIndex);
+            card.UpdateCard(data, isSelected, currentSun);
         }
     }
 
     void OnDestroy()
     {
         if (EconomyManager.Instance != null)
-        {
             EconomyManager.Instance.OnSunChanged -= UpdateSunText;
-        }
     }
 }

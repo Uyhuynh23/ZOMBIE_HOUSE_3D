@@ -163,7 +163,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7413449749605851372}
   - component: {fileID: 5144646365435111049}
-  - component: {fileID: 5273651417837771667}
   - component: {fileID: -6338801673608951404}
   - component: {fileID: -1414969983806252636}
   - component: {fileID: -1745018810380484025}
@@ -208,37 +207,12 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
-  m_Radius: 0.4917276
+  m_Radius: 0.35
   m_Height: 1
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0.35}
---- !u!143 &5273651417837771667
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8648567330590244738}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!135 &-6338801673608951404
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -275,6 +249,9 @@ MonoBehaviour:
   fireRate: 1
   projectileSpeed: 10
   aggroRadius: 5
+  bodyHeight: 1
+  bodyRadius: 0.35
+  bodyCenter: {x: 0, y: 0.5, z: 0}
   spawnPoint: {fileID: 0}
 --- !u!95 &-1745018810380484025
 Animator:

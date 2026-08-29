@@ -1,0 +1,129 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+/// <summary>
+/// Represents a single plant card in the PvZ-style HUD.
+/// Handles: portrait, cost display, cooldown overlay, selection highlight, red "not enough sun" flash.
+/// </summary>
+public class PlantCardUI : MonoBehaviour, IPointerClickHandler
+{
+    [Header("Card References")]
+    public Image cardBackground;        // The main card image (wood/brown frame)
+    public Image portraitImage;         // The plant portrait (RenderTexture capture)
+    public Image selectionBorder;       // Gold border shown when selected
+    public Image cooldownOverlay;       // Radial360 dark overlay for cooldown
+    public Image insufficientFlash;     // Red overlay that pulses when sun < cost
+    public Text  costText;              // Cost number at bottom of card
+    public Image sunIcon;               // Small sun icon next to cost (optional)
+
+    [Header("Card Data")]
+    public int plantIndex = -1;         // Which plant in PlayerController.plants[] this card maps to
+    public bool isShovelCard = false;   // Special flag for the shovel button
+
+    // Visual settings
+    [Header("Visual Settings")]
+    public Color selectedBorderColor = new Color(1f, 0.85f, 0f, 1f);   // Gold
+    public Color normalBorderColor   = new Color(0f, 0f, 0f, 0f);       // Transparent (hidden)
+    public float flashFrequency = 4f;                                    // Pulses per second
+    public float flashMaxAlpha  = 0.55f;                                 // Max red overlay alpha
+    public float selectedScaleBoost = 1.08f;                            // Card scale when selected
+
+    // Private state
+    private PlayerController player;
+    private RectTransform rt;
+    private Vector3 normalScale;
+    private bool wasSelected = false;
+
+    void Awake()
+    {
+        rt = GetComponent<RectTransform>();
+        normalScale = rt.localScale;
+    }
+
+    void Start()
+    {
+        player = FindObjectOfType<PlayerController>();
+        if (selectionBorder != null) selectionBorder.color = normalBorderColor;
+        if (insufficientFlash != null) insufficientFlash.color = new Color(1f, 0f, 0f, 0f);
+    }
+
+    /// <summary>
+    /// Called every frame by GameUIManager to push current state.
+    /// </summary>
+    public void UpdateCard(PlantData data, bool isSelected, int currentSun)
+    {
+        if (data == null) return;
+
+        // Portrait
+        if (portraitImage != null && data.portrait != null)
+        {
+            portraitImage.sprite = data.portrait;
+            portraitImage.color = Color.white;
+        }
+
+        // Cost text
+        if (costText != null)
+            costText.text = data.cost.ToString();
+
+        // Cooldown overlay
+        if (cooldownOverlay != null)
+        {
+            float fill = (data.cooldownTime > 0f) ? Mathf.Clamp01(data.currentCooldown / data.cooldownTime) : 0f;
+            cooldownOverlay.fillAmount = fill;
+        }
+
+        // Selection highlight
+        bool notEnoughSun = (currentSun < data.cost);
+
+        if (selectionBorder != null)
+            selectionBorder.color = isSelected ? selectedBorderColor : normalBorderColor;
+
+        // Scale boost when selected
+        if (isSelected && !wasSelected)
+            rt.localScale = normalScale * selectedScaleBoost;
+        else if (!isSelected && wasSelected)
+            rt.localScale = normalScale;
+        wasSelected = isSelected;
+
+        // Insufficient sun flash
+        bool isFlashing = notEnoughSun && !isSelected;
+        if (insufficientFlash != null)
+        {
+            if (isFlashing)
+            {
+                float alpha = (Mathf.Sin(Time.time * flashFrequency) * 0.5f + 0.5f) * flashMaxAlpha;
+                insufficientFlash.color = new Color(1f, 0f, 0f, alpha);
+            }
+            else
+            {
+                insufficientFlash.color = new Color(1f, 0f, 0f, 0f);
+            }
+        }
+
+        // Dim portrait if not affordable or on cooldown
+        if (portraitImage != null)
+        {
+            bool canAfford = currentSun >= data.cost;
+            bool onCooldown = data.currentCooldown > 0f;
+            portraitImage.color = (canAfford && !onCooldown) ? Color.white : new Color(0.55f, 0.55f, 0.55f, 1f);
+        }
+    }
+
+    /// <summary>
+    /// Click handler to select this plant (or shovel mode) in PlayerController.
+    /// </summary>
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (player == null) return;
+
+        if (isShovelCard)
+        {
+            player.SetShovelMode(true);
+        }
+        else if (plantIndex >= 0 && player.plants != null && plantIndex < player.plants.Length)
+        {
+            player.SelectPlant(plantIndex);
+        }
+    }
+}
