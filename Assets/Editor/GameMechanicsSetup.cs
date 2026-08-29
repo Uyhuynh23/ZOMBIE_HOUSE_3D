@@ -146,7 +146,7 @@ public class GameMechanicsSetup
             rt.sizeDelta = new Vector2(300, 50);
 
             // Connect text to EconomyManager via simple script
-            var updater = textObj.AddComponent<SunUIUpdater>();
+            // SunUIUpdater removed — GameUIManager handles sun text now
         }
     }
 }
