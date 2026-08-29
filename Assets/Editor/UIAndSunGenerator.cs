@@ -252,7 +252,7 @@ public class UIAndSunGenerator
         GameObject portraitObj = new GameObject("Portrait");
         portraitObj.transform.SetParent(cardObj.transform, false);
         Image portraitImg = portraitObj.AddComponent<Image>();
-        portraitImg.color = new Color(1f, 1f, 1f, 0.9f);
+        portraitImg.color = Color.white;
         portraitImg.preserveAspect = true;
         RectTransform portRt = portraitImg.GetComponent<RectTransform>();
         portRt.anchorMin = new Vector2(0.05f, 0.30f);
