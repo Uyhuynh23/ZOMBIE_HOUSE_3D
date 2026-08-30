@@ -4532,7 +4532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fe4b1d1443de4a4c9204507ce9b5cc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieSpawner
-  zombiePrefab: {fileID: 920892170}
+  zombiePrefab: {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
   spawnX: 8
   spawnY: 0
   laneApproachJitter: 0.9
