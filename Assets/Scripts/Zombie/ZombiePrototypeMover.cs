@@ -25,9 +25,12 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     [SerializeField] private Vector3 advanceDirection = Vector3.left;
     [Tooltip("X coordinate that counts as the base / lose condition.")]
     [SerializeField] public float baseBoundaryX = -7f;
+    [Tooltip("X coordinate where a diagonal spawn approach becomes a straight lane walk.")]
+    [SerializeField] private float laneEntryX = 6.2f;
+    [SerializeField] private float assignedLaneZ;
 
     [Header("Movement")]
-    [SerializeField, Min(0.1f)] private float moveSpeed = 0.7f;
+    [SerializeField, Min(0.1f)] private float moveSpeed = 0.95f;
     [SerializeField, Min(1f)] private float turnSpeed = 220f;
     [SerializeField, Min(0f)] private float pauseDuration = 0.8f;
     [SerializeField, Min(0.01f)] private float stoppingDistance = 0.04f;
@@ -58,6 +61,7 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     // Lane mode — exposed so ZombieAttack can read it
     private PlantBase blockingPlant;
     public PlantBase BlockingPlant => blockingPlant;
+    public bool IsAtHouse { get; private set; }
 
     public void ClearBlockingPlant()
     {
@@ -81,6 +85,12 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         advanceDirection = direction.normalized;
         baseBoundaryX = baseBoundary;
         moveMode = MoveMode.Lane;
+    }
+
+    public void AssignLane(float laneZ, float entryX = 6.2f)
+    {
+        assignedLaneZ = laneZ;
+        laneEntryX = entryX;
     }
 
     // ──────────────────────────────────────────────────────────
@@ -142,6 +152,12 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private void UpdateLane()
     {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        {
+            SetAnimationSpeed(0f);
+            return;
+        }
+
         // If blocked by a plant that's still alive → stop and let ZombieAttack handle it
         if (blockingPlant != null)
         {
@@ -157,7 +173,7 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         }
 
         // Check for plant obstacle ahead
-        Vector3 sensorCenter = transform.position + Vector3.up * 0.6f + advanceDirection * detectionOffset;
+        Vector3 sensorCenter = transform.position + Vector3.up * 0.78f + advanceDirection * detectionOffset;
         Collider[] hits = Physics.OverlapSphere(sensorCenter, detectionRadius, plantLayerMask);
         foreach (var hit in hits)
         {
@@ -172,16 +188,31 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
             }
         }
 
-        // Reached base boundary?
+        // Reached the house attack line? Stop here; ZombieAttack damages HouseHealth.
         if (transform.position.x <= baseBoundaryX)
         {
             SetAnimationSpeed(0f);
-            GameManager.Instance?.OnZombieReachedBase();
+            IsAtHouse = true;
             return;
         }
 
-        // Walk forward
-        MoveToward(advanceDirection);
+        IsAtHouse = false;
+
+        // Zombies can enter from slightly different directions, then lock to a straight lane.
+        Vector3 moveDirection = advanceDirection;
+        if (transform.position.x > laneEntryX && Mathf.Abs(transform.position.z - assignedLaneZ) > 0.03f)
+        {
+            Vector3 laneEntry = new Vector3(laneEntryX, transform.position.y, assignedLaneZ);
+            moveDirection = (laneEntry - transform.position).normalized;
+        }
+        else
+        {
+            Vector3 snapped = transform.position;
+            snapped.z = Mathf.MoveTowards(snapped.z, assignedLaneZ, moveSpeed * 1.5f * Time.deltaTime);
+            transform.position = snapped;
+        }
+
+        MoveToward(moveDirection);
     }
 
     private void MoveToward(Vector3 direction)
@@ -209,7 +240,7 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f);
-        Vector3 sensorCenter = transform.position + Vector3.up * 0.6f + advanceDirection * detectionOffset;
+        Vector3 sensorCenter = transform.position + Vector3.up * 0.78f + advanceDirection * detectionOffset;
         Gizmos.DrawWireSphere(sensorCenter, detectionRadius);
     }
 }

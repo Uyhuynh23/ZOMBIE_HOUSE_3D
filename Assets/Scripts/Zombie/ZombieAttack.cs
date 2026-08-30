@@ -34,12 +34,28 @@ public class ZombieAttack : MonoBehaviour
 
     private void Update()
     {
-        // Ask the mover what plant it's blocked by
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+            return;
+
+        // Ask the mover what plant it is blocked by.
         currentTarget = mover.BlockingPlant;
 
         if (currentTarget == null)
         {
-            attackTimer = 0f;
+            if (mover.IsAtHouse && HouseHealth.Instance != null)
+            {
+                attackTimer -= Time.deltaTime;
+                if (attackTimer <= 0f)
+                {
+                    HouseHealth.Instance.TakeDamage(damagePerAttack);
+                    TriggerAttackAnimation();
+                    attackTimer = attackInterval;
+                }
+            }
+            else
+            {
+                attackTimer = 0f;
+            }
             return;
         }
 
@@ -66,10 +82,24 @@ public class ZombieAttack : MonoBehaviour
 
         currentTarget.TakeDamage(damagePerAttack);
 
-        if (animator != null)
-            animator.SetTrigger(AttackHash);
+        TriggerAttackAnimation();
 
         Debug.Log($"[ZombieAttack] {gameObject.name} hit {currentTarget.gameObject.name} for {damagePerAttack} dmg");
+    }
+
+    private void TriggerAttackAnimation()
+    {
+        if (animator != null && animator.runtimeAnimatorController != null)
+        {
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            {
+                if (parameter.nameHash == AttackHash && parameter.type == AnimatorControllerParameterType.Trigger)
+                {
+                    animator.SetTrigger(AttackHash);
+                    break;
+                }
+            }
+        }
     }
 
     private void OnDrawGizmosSelected()

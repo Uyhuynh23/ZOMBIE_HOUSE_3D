@@ -26,6 +26,12 @@ public class GameUIManager : MonoBehaviour
     [Tooltip("Panel shown when zombies reach base. Leave null to skip.")]
     public GameObject losePanel;
 
+    [Header("Battle Status")]
+    public Text waveText;
+    public Text zombieText;
+    public Text houseHealthText;
+    public Image houseHealthFill;
+
     private PlayerController player;
 
     private void Awake()
@@ -39,7 +45,7 @@ public class GameUIManager : MonoBehaviour
 
     void Start()
     {
-        player = FindObjectOfType<PlayerController>();
+        player = FindFirstObjectByType<PlayerController>();
         if (sunText != null)
         {
             originalSunTextColor = sunText.color;
@@ -58,6 +64,7 @@ public class GameUIManager : MonoBehaviour
 
     void Update()
     {
+        UpdateBattleStatus();
         if (player == null || player.plants == null) return;
         if (EconomyManager.Instance == null) return;
 
@@ -97,6 +104,33 @@ public class GameUIManager : MonoBehaviour
                 sunText.color = originalSunTextColor;
             }
         }
+
+    }
+
+    private void UpdateBattleStatus()
+    {
+        ZombieSpawner spawner = ZombieSpawner.Instance;
+        if (spawner != null)
+        {
+            if (waveText != null)
+            {
+                string countdown = spawner.NextWaveCountdown > 0.05f
+                    ? $"  starts in {Mathf.CeilToInt(spawner.NextWaveCountdown)}s"
+                    : string.Empty;
+                waveText.text = $"WAVE {spawner.CurrentWaveNumber}/{spawner.TotalWaves}{countdown}";
+            }
+
+            if (zombieText != null)
+                zombieText.text = $"ZOMBIES  {spawner.ActiveZombieCount} active  •  {spawner.RemainingToSpawn} incoming";
+        }
+
+        HouseHealth house = HouseHealth.Instance;
+        if (house != null)
+        {
+            float ratio = house.maxHealth <= 0 ? 0f : (float)house.CurrentHealth / house.maxHealth;
+            if (houseHealthFill != null) houseHealthFill.fillAmount = Mathf.Clamp01(ratio);
+            if (houseHealthText != null) houseHealthText.text = $"HOUSE  {house.CurrentHealth}/{house.maxHealth}";
+        }
     }
 
     /// <summary>Show victory overlay.</summary>
@@ -115,6 +149,7 @@ public class GameUIManager : MonoBehaviour
 
     void OnDestroy()
     {
+        if (Instance == this) Instance = null;
         if (EconomyManager.Instance != null)
             EconomyManager.Instance.OnSunChanged -= UpdateSunText;
     }

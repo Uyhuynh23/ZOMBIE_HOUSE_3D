@@ -116,6 +116,8 @@ public class UIAndSunGenerator
 
         GameUIManager uiManager = canvasObj.AddComponent<GameUIManager>();
 
+        CreateBattleStatus(canvasObj, uiManager, uiFont);
+
         // -- Bottom HUD Panel (dark wood-brown bar) --
         GameObject hudPanel = new GameObject("HUDPanel");
         hudPanel.transform.SetParent(canvasObj.transform, false);
@@ -211,16 +213,113 @@ public class UIAndSunGenerator
         Text hintText = hintObj.AddComponent<Text>();
         hintText.text = "1/2/3 or Click: Select Plant | 4/R: Shovel | E: Plant/Remove";
         hintText.font = uiFont;
-        hintText.fontSize = 20;
+        hintText.fontSize = 16;
         hintText.fontStyle = FontStyle.Bold;
         hintText.color = Color.white;
         hintText.alignment = TextAnchor.UpperLeft;
         RectTransform hRt = hintText.GetComponent<RectTransform>();
-        hRt.anchorMin = new Vector2(0f, 1f);
-        hRt.anchorMax = new Vector2(1f, 1f);
-        hRt.pivot = new Vector2(0f, 1f);
-        hRt.anchoredPosition = new Vector2(10f, -10f);
-        hRt.sizeDelta = new Vector2(0f, 30f);
+        hRt.anchorMin = new Vector2(0f, 0f);
+        hRt.anchorMax = new Vector2(1f, 0f);
+        hRt.pivot = new Vector2(0f, 0f);
+        hRt.anchoredPosition = new Vector2(12f, 155f);
+        hRt.sizeDelta = new Vector2(-24f, 28f);
+
+        CreateEndGamePanels(canvasObj, uiManager, uiFont);
+    }
+
+    private static void CreateBattleStatus(GameObject canvasObj, GameUIManager uiManager, Font uiFont)
+    {
+        GameObject panel = new GameObject("BattleStatus");
+        panel.transform.SetParent(canvasObj.transform, false);
+        Image panelImage = panel.AddComponent<Image>();
+        panelImage.color = new Color(0.035f, 0.06f, 0.055f, 0.9f);
+        RectTransform panelRect = panelImage.rectTransform;
+        panelRect.anchorMin = new Vector2(0.5f, 1f);
+        panelRect.anchorMax = new Vector2(0.5f, 1f);
+        panelRect.pivot = new Vector2(0.5f, 1f);
+        panelRect.anchoredPosition = new Vector2(0f, -12f);
+        panelRect.sizeDelta = new Vector2(620f, 76f);
+
+        uiManager.waveText = CreateText(panel, "WaveText", "WAVE 1/3", uiFont, 25,
+            new Vector2(0.02f, 0.48f), new Vector2(0.49f, 0.96f), TextAnchor.MiddleLeft);
+        uiManager.zombieText = CreateText(panel, "ZombieText", "ZOMBIES  0 active", uiFont, 18,
+            new Vector2(0.02f, 0.04f), new Vector2(0.49f, 0.48f), TextAnchor.MiddleLeft);
+        uiManager.houseHealthText = CreateText(panel, "HouseHealthText", "HOUSE  300/300", uiFont, 20,
+            new Vector2(0.53f, 0.50f), new Vector2(0.98f, 0.94f), TextAnchor.MiddleCenter);
+
+        GameObject healthBack = new GameObject("HouseHealthBar");
+        healthBack.transform.SetParent(panel.transform, false);
+        Image healthBackImage = healthBack.AddComponent<Image>();
+        healthBackImage.color = new Color(0.16f, 0.03f, 0.03f, 1f);
+        RectTransform healthRect = healthBackImage.rectTransform;
+        healthRect.anchorMin = new Vector2(0.55f, 0.14f);
+        healthRect.anchorMax = new Vector2(0.96f, 0.40f);
+        healthRect.offsetMin = Vector2.zero;
+        healthRect.offsetMax = Vector2.zero;
+
+        GameObject healthFill = new GameObject("Fill");
+        healthFill.transform.SetParent(healthBack.transform, false);
+        Image fillImage = healthFill.AddComponent<Image>();
+        fillImage.color = new Color(0.25f, 0.9f, 0.28f, 1f);
+        fillImage.type = Image.Type.Filled;
+        fillImage.fillMethod = Image.FillMethod.Horizontal;
+        fillImage.fillOrigin = 0;
+        fillImage.fillAmount = 1f;
+        RectTransform fillRect = fillImage.rectTransform;
+        fillRect.anchorMin = Vector2.zero;
+        fillRect.anchorMax = Vector2.one;
+        fillRect.offsetMin = new Vector2(3f, 3f);
+        fillRect.offsetMax = new Vector2(-3f, -3f);
+        uiManager.houseHealthFill = fillImage;
+    }
+
+    private static void CreateEndGamePanels(GameObject canvasObj, GameUIManager uiManager, Font uiFont)
+    {
+        uiManager.winPanel = CreateEndPanel(canvasObj, "WinPanel", "WAVE CLEARED!", "The house is safe.",
+            new Color(0.08f, 0.35f, 0.13f, 0.94f), uiFont);
+        uiManager.losePanel = CreateEndPanel(canvasObj, "LosePanel", "HOUSE DESTROYED", "The zombies broke through.",
+            new Color(0.42f, 0.06f, 0.05f, 0.94f), uiFont);
+        uiManager.winPanel.SetActive(false);
+        uiManager.losePanel.SetActive(false);
+    }
+
+    private static GameObject CreateEndPanel(GameObject canvasObj, string name, string title, string subtitle,
+        Color color, Font uiFont)
+    {
+        GameObject panel = new GameObject(name);
+        panel.transform.SetParent(canvasObj.transform, false);
+        Image image = panel.AddComponent<Image>();
+        image.color = color;
+        RectTransform rect = image.rectTransform;
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = new Vector2(540f, 190f);
+
+        CreateText(panel, "Title", title, uiFont, 44,
+            new Vector2(0.04f, 0.48f), new Vector2(0.96f, 0.92f), TextAnchor.MiddleCenter);
+        CreateText(panel, "Subtitle", subtitle, uiFont, 23,
+            new Vector2(0.04f, 0.12f), new Vector2(0.96f, 0.48f), TextAnchor.MiddleCenter);
+        return panel;
+    }
+
+    private static Text CreateText(GameObject parent, string name, string value, Font font, int size,
+        Vector2 anchorMin, Vector2 anchorMax, TextAnchor alignment)
+    {
+        GameObject textObject = new GameObject(name);
+        textObject.transform.SetParent(parent.transform, false);
+        Text text = textObject.AddComponent<Text>();
+        text.text = value;
+        text.font = font;
+        text.fontSize = size;
+        text.fontStyle = FontStyle.Bold;
+        text.color = Color.white;
+        text.alignment = alignment;
+        RectTransform rect = text.rectTransform;
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        return text;
     }
 
     // -----------------------------------------------------------------------------

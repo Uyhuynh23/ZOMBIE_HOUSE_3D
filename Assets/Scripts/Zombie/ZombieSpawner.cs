@@ -37,6 +37,12 @@ public class ZombieSpawner : MonoBehaviour
     public float spawnX = 8f;
     [Tooltip("Y (height) at which zombies are spawned.")]
     public float spawnY = 0f;
+    [Tooltip("Random Z offset before zombies converge into their selected lane.")]
+    public float laneApproachJitter = 0.9f;
+    [Tooltip("Point where zombies finish their diagonal approach and walk straight.")]
+    public float laneEntryX = 6.2f;
+    [Tooltip("X position where zombies stop and attack the house.")]
+    public float houseAttackX = -4.75f;
 
     [Header("Waves")]
     public WaveData[] waves = new WaveData[]
@@ -55,6 +61,9 @@ public class ZombieSpawner : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private List<GameObject> activeZombies = new List<GameObject>();
     private bool allWavesComplete = false;
+    [SerializeField] private float nextWaveCountdown;
+    [SerializeField] private int remainingToSpawn;
+    private int spawnSequence;
 
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
@@ -92,14 +101,20 @@ public class ZombieSpawner : MonoBehaviour
             currentWaveIndex = i;
             WaveData wave = waves[i];
 
-            // Wait before this wave
-            yield return new WaitForSeconds(wave.delayBeforeWave);
+            nextWaveCountdown = Mathf.Max(0f, wave.delayBeforeWave);
+            while (nextWaveCountdown > 0f)
+            {
+                nextWaveCountdown -= Time.deltaTime;
+                yield return null;
+            }
 
             Debug.Log($"[ZombieSpawner] Starting Wave {i + 1} / {waves.Length} — {wave.zombieCount} zombies");
+            remainingToSpawn = wave.zombieCount;
 
             for (int z = 0; z < wave.zombieCount; z++)
             {
                 SpawnZombie();
+                remainingToSpawn--;
                 yield return new WaitForSeconds(wave.spawnInterval);
             }
 
@@ -108,6 +123,8 @@ public class ZombieSpawner : MonoBehaviour
         }
 
         allWavesComplete = true;
+        nextWaveCountdown = 0f;
+        remainingToSpawn = 0;
         Debug.Log("[ZombieSpawner] All waves complete!");
         GameManager.Instance?.OnAllWavesComplete();
     }
@@ -124,12 +141,24 @@ public class ZombieSpawner : MonoBehaviour
             return;
         }
 
-        int lane = Random.Range(0, laneCount);
+        // Deterministic round-robin keeps every lane represented and makes balancing reproducible.
+        int lane = spawnSequence++ % laneCount;
         float laneZ = GridManager.Instance.GetLaneZ(lane);
-        Vector3 spawnPos = new Vector3(spawnX, spawnY, laneZ);
+        Vector3 spawnPos = new Vector3(
+            spawnX + Random.Range(0f, 1.2f),
+            spawnY,
+            laneZ + Random.Range(-laneApproachJitter, laneApproachJitter));
 
         GameObject zombie = Instantiate(zombiePrefab, spawnPos, Quaternion.identity);
         zombie.name = $"Zombie_Wave{currentWaveIndex + 1}";
+        zombie.SetActive(true);
+
+        ZombiePrototypeMover mover = zombie.GetComponent<ZombiePrototypeMover>();
+        if (mover != null)
+        {
+            mover.ConfigureLane(zombie.GetComponentInChildren<Animator>(), Vector3.left, houseAttackX);
+            mover.AssignLane(laneZ, laneEntryX);
+        }
 
         activeZombies.Add(zombie);
         activeZombieCount++;
@@ -153,4 +182,7 @@ public class ZombieSpawner : MonoBehaviour
     public int ActiveZombieCount => activeZombieCount;
     public int CurrentWaveIndex => currentWaveIndex;
     public int TotalWaves => waves.Length;
+    public int CurrentWaveNumber => Mathf.Clamp(currentWaveIndex + 1, 1, Mathf.Max(1, waves.Length));
+    public float NextWaveCountdown => Mathf.Max(0f, nextWaveCountdown);
+    public int RemainingToSpawn => Mathf.Max(0, remainingToSpawn);
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 /// <summary>
 /// Top-level game state machine.
@@ -21,6 +22,9 @@ public class GameManager : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private void Awake()
     {
+        Application.runInBackground = true;
+        Time.timeScale = 1f;
+
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
     }
@@ -45,23 +49,22 @@ public class GameManager : MonoBehaviour
     }
 
     // ──────────────────────────────────────────────────────────
-    // Called by ZombiePrototypeMover when a zombie reaches the base
+    // Called when the house health reaches zero.
     // ──────────────────────────────────────────────────────────
-    public void OnZombieReachedBase()
+    public void OnHouseDestroyed()
     {
         if (currentState != GameState.Playing) return;
 
         currentState = GameState.Lost;
-        Debug.Log("[GameManager] 💀 GAME OVER! A zombie reached the base.");
+        Debug.Log("[GameManager] GAME OVER! The house was destroyed.");
 
         if (GameUIManager.Instance != null)
             GameUIManager.Instance.ShowLoseScreen();
 
-        // Stop time so zombies freeze
         Time.timeScale = 0f;
 
         if (restartDelay > 0f)
-            Invoke(nameof(RestartScene), restartDelay);
+            StartCoroutine(RestartAfterRealtimeDelay());
     }
 
     // ──────────────────────────────────────────────────────────
@@ -69,5 +72,17 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private IEnumerator RestartAfterRealtimeDelay()
+    {
+        yield return new WaitForSecondsRealtime(restartDelay);
+        RestartScene();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+        Time.timeScale = 1f;
     }
 }

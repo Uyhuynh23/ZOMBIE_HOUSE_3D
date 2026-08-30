@@ -42,6 +42,7 @@ public static class ZombiePlantIntegrationSceneBuilder
 
         ConfigureEnvironment();
         CreateGround();
+        CreateHouse();
 
         PlantableSquare[,] grid = CreatePlantGrid(5, 3, 1.55f);
 
@@ -247,7 +248,7 @@ public static class ZombiePlantIntegrationSceneBuilder
         GameObject camObj = new GameObject("Main Camera");
         Camera cam        = camObj.AddComponent<Camera>();
         cam.tag           = "MainCamera";
-        cam.fieldOfView   = 48f;
+        cam.fieldOfView   = 56f;
         cam.clearFlags    = CameraClearFlags.SolidColor;
         cam.backgroundColor = new Color(0.12f, 0.2f, 0.28f);
         camObj.transform.position = new Vector3(0f, 8.2f, -8.8f);
@@ -255,6 +256,13 @@ public static class ZombiePlantIntegrationSceneBuilder
 
         CameraFollow follow = camObj.AddComponent<CameraFollow>();
         follow.target = player;
+        follow.distance = 12.5f;
+        follow.maxDistance = 15f;
+        follow.initialPitch = 42f;
+        follow.targetOffset = new Vector3(3.1f, 0.8f, 0f);
+        follow.smoothTime = 9f;
+        follow.lockCursorDuringPlay = false;
+        follow.collisionMask = 0;
     }
 
     // ──────────────────────────────────────────────────────────
@@ -297,9 +305,9 @@ public static class ZombiePlantIntegrationSceneBuilder
 
         // Collider (physical body)
         CapsuleCollider col = zombie.AddComponent<CapsuleCollider>();
-        col.height = 1.25f;
-        col.radius = 0.3f;
-        col.center = new Vector3(0f, 0.625f, 0f);
+        col.height = 1.7f;
+        col.radius = 0.4f;
+        col.center = new Vector3(0f, 0.85f, 0f);
 
         // Rigidbody — kinematic so we control movement ourselves
         Rigidbody rb      = zombie.AddComponent<Rigidbody>();
@@ -309,6 +317,7 @@ public static class ZombiePlantIntegrationSceneBuilder
         // Health
         ZombieHealth health = zombie.AddComponent<ZombieHealth>();
         health.maxHealth    = 100;
+        zombie.AddComponent<ZombieHealthBar>();
 
         // Movement (Lane mode by default)
         ZombiePrototypeMover mover = zombie.AddComponent<ZombiePrototypeMover>();
@@ -325,7 +334,7 @@ public static class ZombiePlantIntegrationSceneBuilder
             visual.transform.SetParent(zombie.transform, false);
             visual.transform.localRotation = Quaternion.identity;
             ZombiePrototypeSceneBuilder.ApplyZombieMaterial(visual);
-            ZombiePrototypeSceneBuilder.FitZombieVisual(visual, 1.15f);
+            ZombiePrototypeSceneBuilder.FitZombieVisual(visual, 1.65f);
 
             Animator animator = visual.GetComponent<Animator>();
             if (animator == null) animator = visual.AddComponent<Animator>();
@@ -338,7 +347,7 @@ public static class ZombiePlantIntegrationSceneBuilder
             GameObject fallback = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             fallback.name = "Zombie Visual (fallback)";
             fallback.transform.SetParent(zombie.transform, false);
-            fallback.transform.localPosition = new Vector3(0f, 0.625f, 0f);
+            fallback.transform.localPosition = new Vector3(0f, 0.85f, 0f);
             fallback.GetComponent<Renderer>().sharedMaterial =
                 CreateMaterial("ZombieFallback_Mat", new Color(0.2f, 0.7f, 0.25f));
             Object.DestroyImmediate(fallback.GetComponent<Collider>());
@@ -356,12 +365,38 @@ public static class ZombiePlantIntegrationSceneBuilder
         spawner.zombiePrefab      = zombieTemplate;
         spawner.spawnX            = 8f;
         spawner.spawnY            = 0f;
+        spawner.laneApproachJitter = 0.9f;
+        spawner.laneEntryX         = 6.2f;
+        spawner.houseAttackX       = -4.65f;
         spawner.waves = new ZombieSpawner.WaveData[]
         {
-            new ZombieSpawner.WaveData { zombieCount = 3, spawnInterval = 2.5f, delayBeforeWave = 8f  },
-            new ZombieSpawner.WaveData { zombieCount = 5, spawnInterval = 1.8f, delayBeforeWave = 12f },
-            new ZombieSpawner.WaveData { zombieCount = 8, spawnInterval = 1.2f, delayBeforeWave = 12f },
+            new ZombieSpawner.WaveData { zombieCount = 3, spawnInterval = 2.2f, delayBeforeWave = 4f  },
+            new ZombieSpawner.WaveData { zombieCount = 5, spawnInterval = 1.7f, delayBeforeWave = 7f },
+            new ZombieSpawner.WaveData { zombieCount = 7, spawnInterval = 1.2f, delayBeforeWave = 7f },
         };
+    }
+
+    private static void CreateHouse()
+    {
+        GameObject house = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        house.name = "House Base";
+        house.transform.position = new Vector3(-5.55f, 1f, 0f);
+        house.transform.localScale = new Vector3(1.15f, 2f, 5.8f);
+        house.GetComponent<Renderer>().sharedMaterial = CreateMaterial(
+            "HouseBase_Mat", new Color(0.48f, 0.19f, 0.08f));
+
+        HouseHealth health = house.AddComponent<HouseHealth>();
+        health.maxHealth = 300;
+
+        GameObject roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        roof.name = "House Roof";
+        roof.transform.SetParent(house.transform, false);
+        roof.transform.localPosition = new Vector3(0f, 0.68f, 0f);
+        roof.transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+        roof.transform.localScale = new Vector3(0.72f, 0.72f, 1.06f);
+        roof.GetComponent<Renderer>().sharedMaterial = CreateMaterial(
+            "HouseRoof_Mat", new Color(0.22f, 0.08f, 0.04f));
+        Object.DestroyImmediate(roof.GetComponent<Collider>());
     }
 
     // ──────────────────────────────────────────────────────────
