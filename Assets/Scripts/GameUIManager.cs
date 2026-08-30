@@ -7,6 +7,8 @@ using UnityEngine.UI;
 /// </summary>
 public class GameUIManager : MonoBehaviour
 {
+    public static GameUIManager Instance { get; private set; }
+
     [Header("Sun Display")]
     public Text sunText;                // Top-left sun counter
 
@@ -18,7 +20,22 @@ public class GameUIManager : MonoBehaviour
     public Color flashColor = Color.red;
     private Color originalSunTextColor = Color.white;
 
+    [Header("End-Game Panels (optional)")]
+    [Tooltip("Panel shown when player wins. Leave null to skip.")]
+    public GameObject winPanel;
+    [Tooltip("Panel shown when zombies reach base. Leave null to skip.")]
+    public GameObject losePanel;
+
     private PlayerController player;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else { Destroy(gameObject); return; }
+
+        if (winPanel != null) winPanel.SetActive(false);
+        if (losePanel != null) losePanel.SetActive(false);
+    }
 
     void Start()
     {
@@ -80,6 +97,20 @@ public class GameUIManager : MonoBehaviour
                 sunText.color = originalSunTextColor;
             }
         }
+    }
+
+    /// <summary>Show victory overlay.</summary>
+    public void ShowWinScreen()
+    {
+        if (winPanel != null) winPanel.SetActive(true);
+        else Debug.Log("[UI] YOU WIN!");
+    }
+
+    /// <summary>Show game-over overlay.</summary>
+    public void ShowLoseScreen()
+    {
+        if (losePanel != null) losePanel.SetActive(true);
+        else Debug.Log("[UI] GAME OVER!");
     }
 
     void OnDestroy()

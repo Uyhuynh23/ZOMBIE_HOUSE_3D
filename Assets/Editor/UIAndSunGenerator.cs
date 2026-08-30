@@ -3,11 +3,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Tools > Generate UI and Better Sun  — rebuilds the full PvZ-style HUD.
-/// Tools > Fix Plant Colliders         — patches prefabs with correct colliders.
+/// Tools > Generate UI and Better Sun  â€” rebuilds the full PvZ-style HUD.
+/// Tools > Fix Plant Colliders         â€” patches prefabs with correct colliders.
 /// </summary>
 public class UIAndSunGenerator
 {
+    private const string RobotoBoldPath = "Assets/Fonts/Roboto/static/Roboto-Bold.ttf";
+
     // -----------------------------------------------------------------------------
     //  MAIN ENTRY: regenerate Sun prefab + PvZ HUD
     // -----------------------------------------------------------------------------
@@ -91,7 +93,7 @@ public class UIAndSunGenerator
     // -----------------------------------------------------------------------------
     //  PVZ-STYLE HUD
     // -----------------------------------------------------------------------------
-    static void GenerateFullUI()
+    public static void GenerateFullUI()
     {
         // Remove old canvas
         GameObject oldCanvas = GameObject.Find("UI_Canvas");
@@ -102,11 +104,15 @@ public class UIAndSunGenerator
         Canvas canvas = canvasObj.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;
+        canvas.pixelPerfect = true;
         CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.referenceResolution = new Vector2(1280, 720);
         scaler.matchWidthOrHeight = 0.5f;
+        scaler.referencePixelsPerUnit = 100f;
         canvasObj.AddComponent<GraphicRaycaster>();
+
+        Font uiFont = LoadUIFont();
 
         GameUIManager uiManager = canvasObj.AddComponent<GameUIManager>();
 
@@ -120,7 +126,7 @@ public class UIAndSunGenerator
         hudRt.anchorMax = new Vector2(1f, 0f);
         hudRt.pivot = new Vector2(0.5f, 0f);
         hudRt.anchoredPosition = Vector2.zero;
-        hudRt.sizeDelta = new Vector2(0f, 130f);
+        hudRt.sizeDelta = new Vector2(0f, 150f);
 
         // -- Sun Counter (left side of HUD) --
         GameObject sunDisplay = new GameObject("SunDisplay");
@@ -130,7 +136,7 @@ public class UIAndSunGenerator
         sdRt.anchorMax = new Vector2(0f, 0.5f);
         sdRt.pivot = new Vector2(0f, 0.5f);
         sdRt.anchoredPosition = new Vector2(10f, 0f);
-        sdRt.sizeDelta = new Vector2(120f, 100f);
+        sdRt.sizeDelta = new Vector2(135f, 115f);
 
         // Sun icon (circle)
         GameObject sunCircle = new GameObject("SunCircle");
@@ -142,15 +148,15 @@ public class UIAndSunGenerator
         scRt.anchorMax = new Vector2(0.5f, 0.55f);
         scRt.pivot = new Vector2(0.5f, 0.5f);
         scRt.anchoredPosition = Vector2.zero;
-        scRt.sizeDelta = new Vector2(60f, 60f);
+        scRt.sizeDelta = new Vector2(70f, 70f);
 
         // Sun text
         GameObject sunTextObj = new GameObject("SunText");
         sunTextObj.transform.SetParent(sunDisplay.transform, false);
         Text sunText = sunTextObj.AddComponent<Text>();
         sunText.text = "50";
-        sunText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
-        sunText.fontSize = 30;
+        sunText.font = uiFont;
+        sunText.fontSize = 34;
         sunText.fontStyle = FontStyle.Bold;
         sunText.color = Color.white;
         sunText.alignment = TextAnchor.MiddleCenter;
@@ -170,7 +176,7 @@ public class UIAndSunGenerator
         ccRt.anchorMax = new Vector2(0.5f, 0.5f);
         ccRt.pivot = new Vector2(0.5f, 0.5f);
         ccRt.anchoredPosition = new Vector2(0f, 0f);
-        ccRt.sizeDelta = new Vector2(400f, 120f);
+        ccRt.sizeDelta = new Vector2(450f, 140f);
 
         HorizontalLayoutGroup hlg = cardsContainer.AddComponent<HorizontalLayoutGroup>();
         hlg.childControlWidth = false;
@@ -181,9 +187,9 @@ public class UIAndSunGenerator
         // Plant definitions: name, cost, PvZ-inspired background color
         string[] plantNames = { "Peashooter", "Snow Pea", "Sunflower" };
         Color[]  cardColors  = {
-            new Color(0.4f, 0.8f, 0.35f, 1f),  // Peashooter — dark green
-            new Color(0.4f, 0.7f, 0.9f, 1f),  // Snow Pea   — steel blue
-            new Color(0.9f, 0.8f, 0.2f, 1f),  // Sunflower  — golden brown
+            new Color(0.4f, 0.8f, 0.35f, 1f),  // Peashooter â€” dark green
+            new Color(0.4f, 0.7f, 0.9f, 1f),  // Snow Pea   â€” steel blue
+            new Color(0.9f, 0.8f, 0.2f, 1f),  // Sunflower  â€” golden brown
         };
         int[] costs = { 100, 175, 50 };
 
@@ -191,22 +197,23 @@ public class UIAndSunGenerator
 
         for (int i = 0; i < plantNames.Length; i++)
         {
-            cards[i] = CreatePlantCard(cardsContainer, i, plantNames[i], costs[i], cardColors[i]);
+            cards[i] = CreatePlantCard(cardsContainer, i, plantNames[i], costs[i], cardColors[i], uiFont);
         }
 
         uiManager.plantCards = cards;
 
         // -- Shovel Button (right side of HUD) --
-        CreateShovelButton(hudPanel, uiManager);
+        CreateShovelButton(hudPanel, uiManager, uiFont);
 
         // -- Controls hint (top-left, small) --
         GameObject hintObj = new GameObject("ControlsHint");
         hintObj.transform.SetParent(canvasObj.transform, false);
         Text hintText = hintObj.AddComponent<Text>();
         hintText.text = "1/2/3 or Click: Select Plant | 4/R: Shovel | E: Plant/Remove";
-        hintText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
-        hintText.fontSize = 18;
-        hintText.color = new Color(1f, 1f, 1f, 0.7f);
+        hintText.font = uiFont;
+        hintText.fontSize = 20;
+        hintText.fontStyle = FontStyle.Bold;
+        hintText.color = Color.white;
         hintText.alignment = TextAnchor.UpperLeft;
         RectTransform hRt = hintText.GetComponent<RectTransform>();
         hRt.anchorMin = new Vector2(0f, 1f);
@@ -219,13 +226,13 @@ public class UIAndSunGenerator
     // -----------------------------------------------------------------------------
     //  CARD BUILDER
     // -----------------------------------------------------------------------------
-    static PlantCardUI CreatePlantCard(GameObject parent, int index, string plantName, int cost, Color cardColor)
+    static PlantCardUI CreatePlantCard(GameObject parent, int index, string plantName, int cost, Color cardColor, Font uiFont)
     {
         // -- Card root --
         GameObject cardObj = new GameObject("Card_" + plantName);
         cardObj.transform.SetParent(parent.transform, false);
         RectTransform cardRt = cardObj.AddComponent<RectTransform>();
-        cardRt.sizeDelta = new Vector2(90f, 115f);
+        cardRt.sizeDelta = new Vector2(100f, 130f);
 
         PlantCardUI cardUI = cardObj.AddComponent<PlantCardUI>();
         cardUI.plantIndex = index;
@@ -287,8 +294,8 @@ public class UIAndSunGenerator
         costObj.transform.SetParent(costRow.transform, false);
         Text costText = costObj.AddComponent<Text>();
         costText.text = cost.ToString();
-        costText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
-        costText.fontSize = 22;
+        costText.font = uiFont;
+        costText.fontSize = 24;
         costText.fontStyle = FontStyle.Bold;
         costText.color = Color.white;
         costText.alignment = TextAnchor.MiddleLeft;
@@ -334,7 +341,7 @@ public class UIAndSunGenerator
     // -----------------------------------------------------------------------------
     //  SHOVEL BUTTON
     // -----------------------------------------------------------------------------
-    static void CreateShovelButton(GameObject hudPanel, GameUIManager uiManager)
+    static void CreateShovelButton(GameObject hudPanel, GameUIManager uiManager, Font uiFont)
     {
         GameObject shovelObj = new GameObject("ShovelButton");
         shovelObj.transform.SetParent(hudPanel.transform, false);
@@ -343,7 +350,7 @@ public class UIAndSunGenerator
         sRt.anchorMax = new Vector2(1f, 0.5f);
         sRt.pivot = new Vector2(1f, 0.5f);
         sRt.anchoredPosition = new Vector2(-12f, 0f);
-        sRt.sizeDelta = new Vector2(80f, 95f);
+        sRt.sizeDelta = new Vector2(90f, 110f);
 
         Image shovelBg = shovelObj.AddComponent<Image>();
         shovelBg.color = new Color(0.45f, 0.25f, 0.08f, 1f);
@@ -357,8 +364,8 @@ public class UIAndSunGenerator
         labelObj.transform.SetParent(shovelObj.transform, false);
         Text labelText = labelObj.AddComponent<Text>();
         labelText.text = "SHOVEL\n(4/R)";
-        labelText.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/Roboto/static/Roboto-Bold.ttf");
-        labelText.fontSize = 16;
+        labelText.font = uiFont;
+        labelText.fontSize = 18;
         labelText.fontStyle = FontStyle.Bold;
         labelText.color = Color.white;
         labelText.alignment = TextAnchor.MiddleCenter;
@@ -367,6 +374,14 @@ public class UIAndSunGenerator
         lRt.anchorMax = Vector2.one;
         lRt.sizeDelta = Vector2.zero;
         lRt.anchoredPosition = Vector2.zero;
+    }
+
+    private static Font LoadUIFont()
+    {
+        Font font = AssetDatabase.LoadAssetAtPath<Font>(RobotoBoldPath);
+        if (font == null)
+            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        return font;
     }
 
     // -----------------------------------------------------------------------------
@@ -438,4 +453,3 @@ public class UIAndSunGenerator
         Debug.Log($"[FixPlantColliders] Done! Fixed {fixed_count} plant prefab(s).");
     }
 }
-

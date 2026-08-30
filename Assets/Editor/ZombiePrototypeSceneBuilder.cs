@@ -139,13 +139,17 @@ public static class ZombiePrototypeSceneBuilder
         pointB.transform.position = new Vector3(0.65f, 0f, 1.8f);
 
         ZombiePrototypeMover mover = zombie.AddComponent<ZombiePrototypeMover>();
-        mover.Configure(animator, pointA.transform, pointB.transform);
+        mover.ConfigurePatrol(animator, pointA.transform, pointB.transform);
     }
 
-    private static RuntimeAnimatorController CreateZombieAnimatorController()
+    internal static RuntimeAnimatorController CreateZombieAnimatorController()
     {
         EnsureFolder("Assets", "Zombie");
         EnsureFolder(ZombieFolder, "Animations");
+
+        AnimatorController existingController = AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimatorControllerPath);
+        if (existingController != null)
+            return existingController;
 
         AnimationClip[] sourceClips = AssetDatabase.LoadAllAssetsAtPath(ZombieModelPath)
             .OfType<AnimationClip>()
@@ -161,7 +165,6 @@ public static class ZombiePrototypeSceneBuilder
         AnimationClip idleClip = CopyLoopingClip(idleSource, IdleClipPath, "Zombie_Idle");
         AnimationClip walkClip = CopyLoopingClip(walkSource, WalkClipPath, "Zombie_Walk");
 
-        AssetDatabase.DeleteAsset(AnimatorControllerPath);
         AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(AnimatorControllerPath);
         controller.AddParameter("MoveSpeed", AnimatorControllerParameterType.Float);
 
@@ -238,7 +241,7 @@ public static class ZombiePrototypeSceneBuilder
         pointLight.range = range;
     }
 
-    private static void ApplyZombieMaterial(GameObject model)
+    internal static void ApplyZombieMaterial(GameObject model)
     {
         Texture2D zombieTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(ZombieTexturePath);
         Material zombieMaterial = CreateMaterial("Zombie_Body_Mat", Color.white);
@@ -255,7 +258,7 @@ public static class ZombiePrototypeSceneBuilder
         }
     }
 
-    private static void FitZombieVisual(GameObject model, float targetHeight)
+    internal static void FitZombieVisual(GameObject model, float targetHeight)
     {
         Renderer[] renderers = model.GetComponentsInChildren<Renderer>();
         if (renderers.Length == 0)
