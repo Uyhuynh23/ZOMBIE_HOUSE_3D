@@ -60,7 +60,7 @@ public static class MapZombieIntegrationSceneBuilder
             GroundPoint(terrain, center + new Vector3(-4.5f, 0f, -4.5f), 0.18f));
         player.transform.SetParent(integrationRoot.transform);
 
-        CreateOverviewCamera(integrationRoot.transform, center);
+        CreatePlayerCamera(integrationRoot.transform, player.transform);
         CreateManagers(integrationRoot.transform, routes);
         CreateShowcasePlants(showcaseSquares);
         CreateEventSystem(integrationRoot.transform);
@@ -256,17 +256,32 @@ public static class MapZombieIntegrationSceneBuilder
         }
     }
 
-    private static void CreateOverviewCamera(Transform parent, Vector3 center)
+    private static void CreatePlayerCamera(Transform parent, Transform player)
     {
         GameObject cameraObject = new GameObject("Main Camera");
         cameraObject.transform.SetParent(parent);
         Camera camera = cameraObject.AddComponent<Camera>();
         camera.tag = "MainCamera";
-        camera.fieldOfView = 52f;
-        camera.nearClipPlane = 0.1f;
-        camera.farClipPlane = 500f;
-        camera.transform.position = center + new Vector3(0f, 55f, -48f);
-        camera.transform.LookAt(center + Vector3.up * 0.5f);
+        camera.fieldOfView = 60f;
+        camera.nearClipPlane = 0.3f;
+        camera.farClipPlane = 1000f;
+
+        Vector3 targetOffset = new Vector3(0f, 1.5f, 0f);
+        Quaternion initialRotation = Quaternion.Euler(34f, player.eulerAngles.y, 0f);
+        camera.transform.position = player.position + targetOffset + initialRotation * Vector3.back * 6f;
+        camera.transform.rotation = initialRotation;
+
+        CameraFollow follow = cameraObject.AddComponent<CameraFollow>();
+        follow.target = player;
+        follow.targetOffset = targetOffset;
+        follow.distance = 6f;
+        follow.minDistance = 1.5f;
+        follow.maxDistance = 10f;
+        follow.initialPitch = 34f;
+        follow.mouseSensitivity = 1f;
+        follow.smoothTime = 15f;
+        follow.lockCursorDuringPlay = false;
+        follow.collisionMask = ~0;
     }
 
     private static void CreateEventSystem(Transform parent)
