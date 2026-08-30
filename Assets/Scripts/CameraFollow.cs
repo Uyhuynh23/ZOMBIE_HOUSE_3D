@@ -1,30 +1,94 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CameraFollow : MonoBehaviour
 {
     [Header("Target Settings")]
-    [Tooltip("Drag your Player object here")]
-    public Transform target; 
-    
-    [Header("Camera Settings")]
-    [Tooltip("How far away the camera should be (X, Y, Z)")]
-    public Vector3 offset = new Vector3(0f, 6f, -8f); 
-    
-    [Tooltip("How fast the camera catches up to the player")]
-    public float smoothSpeed = 5f;
+    public Transform target;
+    public Vector3 targetOffset = new Vector3(0f, 1.5f, 0f);
 
-    void LateUpdate() // LateUpdate is best for cameras so it moves AFTER the player moves
+    [Header("Camera Controls")]
+    public float distance = 6f;
+    public float minDistance = 1.5f;
+    public float maxDistance = 10f;
+    
+    [Tooltip("Adjust mouse look sensitivity")]
+    public float mouseSensitivity = 1f;
+    public float smoothTime = 15f;
+
+    [Header("Collision")]
+    public float collisionRadius = 0.3f;
+    public LayerMask collisionMask = ~0; // Everything
+
+    private float pitch = 15f; // Slight downward angle initially
+    private float yaw = 0f;
+
+    // Pitch limits
+    private float minPitch = -10f;
+    private float maxPitch = 70f;
+
+    void Start()
     {
-        if (target == null)
-            return; // Do nothing if we haven't assigned the player yet
-
-        // 1. Calculate where the camera SHOULD be
-        Vector3 desiredPosition = target.position + offset;
+        // Hide and lock cursor for standard third-person feel
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         
-        // 2. Smoothly move the camera from its current position to the desired position
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+        if (target != null)
+        {
+            yaw = target.eulerAngles.y;
+        }
+    }
 
-        // 3. Make sure the camera is always pointing at the player (slightly above their feet so it looks at their body/head)
-        transform.LookAt(target.position + Vector3.up * 1.5f); 
+    void LateUpdate()
+    {
+        if (target == null) return;
+
+        // Unlock cursor if Escape is pressed (for debugging/editor)
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            // Lock again on click
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        // Only rotate camera if cursor is locked (standard UX)
+        if (Cursor.lockState == CursorLockMode.Locked && Mouse.current != null)
+        {
+            Vector2 delta = Mouse.current.delta.ReadValue();
+            yaw += delta.x * mouseSensitivity * 0.2f;
+            pitch -= delta.y * mouseSensitivity * 0.2f;
+            pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+        }
+
+        // Desired rotation
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
+
+        // Calculate desired distance with collision handling
+        Vector3 lookAtPos = target.position + targetOffset;
+        Vector3 direction = rotation * Vector3.back;
+        
+        float currentDistance = distance;
+        
+        // SphereCast from target to desired camera pos
+        if (Physics.SphereCast(lookAtPos, collisionRadius, direction, out RaycastHit hit, distance, collisionMask))
+        {
+            // Filter out hits against the player itself
+            if (hit.transform != target && !hit.transform.IsChildOf(target))
+            {
+                currentDistance = Mathf.Clamp(hit.distance, minDistance, distance);
+            }
+        }
+
+        // Final calculated position
+        Vector3 finalPosition = lookAtPos + direction * currentDistance;
+
+        // Smoothly interpolate position and rotation
+        transform.position = Vector3.Lerp(transform.position, finalPosition, smoothTime * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, smoothTime * Time.deltaTime);
     }
 }
