@@ -41,9 +41,9 @@ public static class ZombiePrefabBuilder
             root.tag = "Zombie";
 
             CapsuleCollider bodyCollider = root.AddComponent<CapsuleCollider>();
-            bodyCollider.height = 1.7f;
-            bodyCollider.radius = 0.4f;
-            bodyCollider.center = new Vector3(0f, 0.85f, 0f);
+            bodyCollider.height = 2.1f;
+            bodyCollider.radius = 0.48f;
+            bodyCollider.center = new Vector3(0f, 1.05f, 0f);
 
             Rigidbody body = root.AddComponent<Rigidbody>();
             body.useGravity = false;
@@ -63,7 +63,8 @@ public static class ZombiePrefabBuilder
             visual.transform.localRotation = Quaternion.identity;
 
             ZombiePrototypeSceneBuilder.ApplyZombieMaterial(visual);
-            ZombiePrototypeSceneBuilder.FitZombieVisual(visual, 1.65f);
+            // Keep the zombie visually comparable to the 1.5x plant models on the map.
+            ZombiePrototypeSceneBuilder.FitZombieVisual(visual, 2.1f);
 
             Animator animator = visual.GetComponent<Animator>();
             if (animator == null)

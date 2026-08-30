@@ -157,7 +157,7 @@ public static class ZombiePlantIntegrationSceneBuilder
     // ──────────────────────────────────────────────────────────
     // Player character
     // ──────────────────────────────────────────────────────────
-    private static GameObject CreatePlayer(Vector3 squarePosition)
+    internal static GameObject CreatePlayer(Vector3 squarePosition)
     {
         GameObject player = new GameObject("Player Character");
         player.transform.position = squarePosition + new Vector3(0f, 0.2f, 0f);
@@ -354,7 +354,7 @@ public static class ZombiePlantIntegrationSceneBuilder
     // ──────────────────────────────────────────────────────────
     // EventSystem
     // ──────────────────────────────────────────────────────────
-    private static void CreateEventSystem()
+    internal static void CreateEventSystem()
     {
         GameObject es = new GameObject("EventSystem");
         es.AddComponent<EventSystem>();

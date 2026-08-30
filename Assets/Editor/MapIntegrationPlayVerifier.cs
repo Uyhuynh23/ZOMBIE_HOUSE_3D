@@ -3,20 +3,24 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// Repeatable Play Mode smoke test for the four-road map integration.
+/// It records gameplay state and Game-view screenshots at useful combat timestamps.
+/// </summary>
 [InitializeOnLoad]
-public static class ZombieIntegrationPlayVerifier
+public static class MapIntegrationPlayVerifier
 {
-    private const string TriggerPath = "/private/tmp/zombie_house_verify.trigger";
-    private const string ReportPath = "/private/tmp/zombie_house_verify.txt";
-    private const string ScreenshotPrefix = "/private/tmp/zombie_house_verify";
-    private const string RunningKey = "ZombieHouse.IntegrationVerificationRunning";
+    private const string TriggerPath = "/private/tmp/zombie_house_map_verify.trigger";
+    private const string ReportPath = "/private/tmp/zombie_house_map_verify.txt";
+    private const string ScreenshotPrefix = "/private/tmp/zombie_house_map_verify";
+    private const string RunningKey = "ZombieHouse.MapIntegrationVerificationRunning";
 
     private static double playStartedAt;
     private static bool capturedSixSeconds;
     private static bool capturedFourteenSeconds;
-    private static bool capturedThirtyTwoSeconds;
+    private static bool capturedTwentyFourSeconds;
 
-    static ZombieIntegrationPlayVerifier()
+    static MapIntegrationPlayVerifier()
     {
         EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
         EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
@@ -27,40 +31,38 @@ public static class ZombieIntegrationPlayVerifier
             return;
         }
 
-        if (!File.Exists(TriggerPath)) return;
+        if (!File.Exists(TriggerPath))
+            return;
 
         File.Delete(TriggerPath);
         EditorApplication.delayCall += Run;
     }
 
+    [MenuItem("Zombie House/Verify Map Integration Play Mode")]
+    public static void Run()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            return;
+
+        File.WriteAllText(ReportPath, "Zombie House map integration verification\n");
+        MapZombieIntegrationSceneBuilder.Build();
+        ResetCaptures();
+        SessionState.SetBool(RunningKey, true);
+        EditorApplication.isPlaying = true;
+    }
+
     private static void ResumeAfterDomainReload()
     {
-        if (!EditorApplication.isPlaying) return;
+        if (!EditorApplication.isPlaying)
+            return;
 
         EditorApplication.isPaused = false;
         Time.timeScale = 1f;
         playStartedAt = EditorApplication.timeSinceStartup;
-        capturedSixSeconds = false;
-        capturedFourteenSeconds = false;
-        capturedThirtyTwoSeconds = false;
+        ResetCaptures();
         EditorApplication.update -= Tick;
         EditorApplication.update += Tick;
         AppendSnapshot("Resumed after domain reload");
-    }
-
-    [MenuItem("Zombie House/Verify Integration Play Mode")]
-    public static void Run()
-    {
-        if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-
-        File.WriteAllText(ReportPath, "Zombie House integration verification\n");
-        ZombiePlantIntegrationSceneBuilder.Build();
-
-        capturedSixSeconds = false;
-        capturedFourteenSeconds = false;
-        capturedThirtyTwoSeconds = false;
-        SessionState.SetBool(RunningKey, true);
-        EditorApplication.isPlaying = true;
     }
 
     private static void OnPlayModeStateChanged(PlayModeStateChange state)
@@ -80,10 +82,9 @@ public static class ZombieIntegrationPlayVerifier
         else if (state == PlayModeStateChange.EnteredEditMode)
         {
             EditorApplication.update -= Tick;
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             SessionState.SetBool(RunningKey, false);
             File.AppendAllText(ReportPath, "Verification finished and Play Mode exited.\n");
-            Debug.Log("[ZombieIntegrationVerifier] Finished. Report: " + ReportPath);
+            Debug.Log("[MapIntegrationVerifier] Finished. Report: " + ReportPath);
         }
     }
 
@@ -103,16 +104,21 @@ public static class ZombieIntegrationPlayVerifier
             Capture("14s");
         }
 
-        if (!capturedThirtyTwoSeconds && elapsed >= 32d)
+        if (!capturedTwentyFourSeconds && elapsed >= 24d)
         {
-            capturedThirtyTwoSeconds = true;
-            Capture("32s");
+            capturedTwentyFourSeconds = true;
+            Capture("24s");
         }
 
-        if (elapsed >= 34d)
-        {
+        if (elapsed >= 26d)
             EditorApplication.isPlaying = false;
-        }
+    }
+
+    private static void ResetCaptures()
+    {
+        capturedSixSeconds = false;
+        capturedFourteenSeconds = false;
+        capturedTwentyFourSeconds = false;
     }
 
     private static void Capture(string label)
@@ -126,10 +132,18 @@ public static class ZombieIntegrationPlayVerifier
         ZombieHealth[] zombies = Object.FindObjectsByType<ZombieHealth>(FindObjectsSortMode.None)
             .Where(item => item.gameObject.activeInHierarchy)
             .ToArray();
-        string zombieHealth = zombies.Length == 0
+        PlantBase[] plants = Object.FindObjectsByType<PlantBase>(FindObjectsSortMode.None)
+            .Where(item => item.gameObject.activeInHierarchy)
+            .ToArray();
+
+        string zombieState = zombies.Length == 0
             ? "none"
             : string.Join(", ", zombies.Select(item =>
                 $"{item.name}:{item.currentHealth}/{item.maxHealth}@({item.transform.position.x:F1},{item.transform.position.z:F1})"));
+        string plantState = plants.Length == 0
+            ? "none"
+            : string.Join(", ", plants.Select(item =>
+                $"{item.name}:{item.currentHealth}/{item.maxHealth}"));
         string houseHealth = HouseHealth.Instance == null
             ? "missing"
             : $"{HouseHealth.Instance.CurrentHealth}/{HouseHealth.Instance.maxHealth}";
@@ -139,6 +153,6 @@ public static class ZombieIntegrationPlayVerifier
               $"active={ZombieSpawner.Instance.ActiveZombieCount}, incoming={ZombieSpawner.Instance.RemainingToSpawn}";
 
         File.AppendAllText(ReportPath,
-            $"[{label}] spawner {spawner}; house={houseHealth}; zombies={zombieHealth}\n");
+            $"[{label}] spawner {spawner}; house={houseHealth}; plants={plantState}; zombies={zombieState}\n");
     }
 }

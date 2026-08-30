@@ -4,7 +4,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(ZombieHealth))]
 public sealed class ZombieHealthBar : MonoBehaviour
 {
-    [SerializeField] private Vector3 worldOffset = new Vector3(0f, 1.9f, 0f);
+    [SerializeField] private Vector3 worldOffset = new Vector3(0f, 2.3f, 0f);
     private ZombieHealth health;
     private RectTransform fill;
     private Transform canvasTransform;

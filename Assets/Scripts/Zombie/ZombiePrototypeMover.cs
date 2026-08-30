@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public sealed class ZombiePrototypeMover : MonoBehaviour
 {
-    public enum MoveMode { Patrol, Lane }
+    public enum MoveMode { Patrol, Lane, Route }
 
     // ──────────────────────────────────────────────────────────
     // Inspector
@@ -28,6 +28,10 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     [Tooltip("X coordinate where a diagonal spawn approach becomes a straight lane walk.")]
     [SerializeField] private float laneEntryX = 6.2f;
     [SerializeField] private float assignedLaneZ;
+
+    [Header("Map Route")]
+    [SerializeField] private ZombieRoute assignedRoute;
+    [SerializeField] private int routePointIndex;
 
     [Header("Movement")]
     [SerializeField, Min(0.1f)] private float moveSpeed = 0.95f;
@@ -93,6 +97,16 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         laneEntryX = entryX;
     }
 
+    public void ConfigureRoute(Animator targetAnimator, ZombieRoute route, float speed)
+    {
+        animator = targetAnimator;
+        assignedRoute = route;
+        routePointIndex = 1;
+        moveMode = MoveMode.Route;
+        if (speed > 0f)
+            moveSpeed = speed;
+    }
+
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
     // ──────────────────────────────────────────────────────────
@@ -114,6 +128,8 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     {
         if (moveMode == MoveMode.Patrol)
             UpdatePatrol();
+        else if (moveMode == MoveMode.Route)
+            UpdateRoute();
         else
             UpdateLane();
     }
@@ -213,6 +229,101 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         }
 
         MoveToward(moveDirection);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Route mode (four-direction map integration)
+    // ──────────────────────────────────────────────────────────
+    private void UpdateRoute()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        {
+            SetAnimationSpeed(0f);
+            return;
+        }
+
+        if (assignedRoute == null || assignedRoute.WaypointCount < 2)
+        {
+            SetAnimationSpeed(0f);
+            return;
+        }
+
+        while (routePointIndex < assignedRoute.WaypointCount)
+        {
+            Transform point = assignedRoute.GetWaypoint(routePointIndex);
+            if (point == null)
+            {
+                routePointIndex++;
+                continue;
+            }
+
+            Vector3 toTarget = point.position - transform.position;
+            toTarget.y = 0f;
+            if (toTarget.sqrMagnitude > 0.12f * 0.12f)
+                break;
+
+            transform.position = new Vector3(point.position.x, point.position.y, point.position.z);
+            routePointIndex++;
+        }
+
+        if (routePointIndex >= assignedRoute.WaypointCount)
+        {
+            IsAtHouse = true;
+            SetAnimationSpeed(0f);
+            return;
+        }
+
+        IsAtHouse = false;
+        Transform target = assignedRoute.GetWaypoint(routePointIndex);
+        Vector3 moveDirection = target.position - transform.position;
+        moveDirection.y = 0f;
+        if (moveDirection.sqrMagnitude < 0.001f)
+            return;
+        moveDirection.Normalize();
+
+        if (TryBlockOnPlant(moveDirection))
+        {
+            SetAnimationSpeed(0f);
+            return;
+        }
+
+        Vector3 grounded = transform.position;
+        grounded.y = Mathf.MoveTowards(grounded.y, target.position.y, moveSpeed * Time.deltaTime);
+        transform.position = grounded;
+        MoveToward(moveDirection);
+    }
+
+    private bool TryBlockOnPlant(Vector3 movementDirection)
+    {
+        if (blockingPlant != null)
+        {
+            if (!blockingPlant.gameObject.activeInHierarchy || blockingPlant.currentHealth <= 0)
+                blockingPlant = null;
+            else
+                return true;
+        }
+
+        movementDirection.y = 0f;
+        if (movementDirection.sqrMagnitude < 0.001f)
+            return false;
+        movementDirection.Normalize();
+
+        Vector3 sensorCenter = transform.position + Vector3.up * 0.78f + movementDirection * detectionOffset;
+        Collider[] hits = Physics.OverlapSphere(sensorCenter, detectionRadius, plantLayerMask);
+        foreach (Collider hit in hits)
+        {
+            if (hit.isTrigger)
+                continue;
+
+            PlantBase plant = hit.GetComponentInParent<PlantBase>();
+            if (plant == null)
+                continue;
+
+            blockingPlant = plant;
+            return true;
+        }
+
+        return false;
     }
 
     private void MoveToward(Vector3 direction)
