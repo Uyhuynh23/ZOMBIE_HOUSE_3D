@@ -23,6 +23,7 @@ public class PeashooterCombat : PlantBase
     private HashSet<GameObject> zombiesInRange = new HashSet<GameObject>();
     private float fireTimer = 0f;
     private Animator animator;
+    private GameObject currentTarget;
 
     protected override void Awake()
     {
@@ -66,19 +67,22 @@ public class PeashooterCombat : PlantBase
         zombiesInRange.RemoveWhere(z => z == null || !z.activeInHierarchy);
 
         // Check if any zombie is in the forward cone
-        bool hasForwardTarget = false;
+        currentTarget = null;
+        float closestDistance = float.MaxValue;
         foreach (var z in zombiesInRange)
         {
             if (z == null) continue;
-            Vector3 toZombie = (z.transform.position - transform.position).normalized;
-            if (Vector3.Dot(transform.forward, toZombie) >= forwardConeThreshold)
+            Vector3 toZombie = z.transform.position - transform.position;
+            float laneDistance = Mathf.Abs(toZombie.z);
+            bool isAhead = toZombie.x > 0.15f;
+            if (isAhead && laneDistance <= 0.85f && toZombie.sqrMagnitude < closestDistance)
             {
-                hasForwardTarget = true;
-                break;
+                closestDistance = toZombie.sqrMagnitude;
+                currentTarget = z;
             }
         }
 
-        if (hasForwardTarget)
+        if (currentTarget != null)
         {
             fireTimer -= Time.deltaTime;
             if (fireTimer <= 0f)
@@ -104,7 +108,10 @@ public class PeashooterCombat : PlantBase
         Rigidbody rb = pea.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            Vector3 direction = transform.forward;
+            Vector3 direction = currentTarget != null
+                ? currentTarget.transform.position + Vector3.up * 0.9f - spawnPoint.position
+                : transform.right;
+            direction.Normalize();
             rb.linearVelocity = direction * projectileSpeed;
         }
 

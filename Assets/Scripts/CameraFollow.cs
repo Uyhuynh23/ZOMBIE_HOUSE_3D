@@ -15,12 +15,14 @@ public class CameraFollow : MonoBehaviour
     [Tooltip("Adjust mouse look sensitivity")]
     public float mouseSensitivity = 1f;
     public float smoothTime = 15f;
+    public float initialPitch = 34f;
+    public bool lockCursorDuringPlay = false;
 
     [Header("Collision")]
     public float collisionRadius = 0.3f;
     public LayerMask collisionMask = ~0; // Everything
 
-    private float pitch = 15f; // Slight downward angle initially
+    private float pitch;
     private float yaw = 0f;
 
     // Pitch limits
@@ -29,9 +31,9 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
-        // Hide and lock cursor for standard third-person feel
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        pitch = initialPitch;
+        Cursor.lockState = lockCursorDuringPlay ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !lockCursorDuringPlay;
         
         if (target != null)
         {
@@ -49,15 +51,9 @@ public class CameraFollow : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
-        else if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            // Lock again on click
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-
-        // Only rotate camera if cursor is locked (standard UX)
-        if (Cursor.lockState == CursorLockMode.Locked && Mouse.current != null)
+        bool canRotate = Mouse.current != null &&
+            (Cursor.lockState == CursorLockMode.Locked || Mouse.current.rightButton.isPressed);
+        if (canRotate)
         {
             Vector2 delta = Mouse.current.delta.ReadValue();
             yaw += delta.x * mouseSensitivity * 0.2f;
@@ -75,7 +71,9 @@ public class CameraFollow : MonoBehaviour
         float currentDistance = distance;
         
         // SphereCast from target to desired camera pos
-        if (Physics.SphereCast(lookAtPos, collisionRadius, direction, out RaycastHit hit, distance, collisionMask))
+        if (collisionMask.value != 0 && Physics.SphereCast(
+            lookAtPos, collisionRadius, direction, out RaycastHit hit, distance,
+            collisionMask, QueryTriggerInteraction.Ignore))
         {
             // Filter out hits against the player itself
             if (hit.transform != target && !hit.transform.IsChildOf(target))
