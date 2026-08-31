@@ -21,6 +21,13 @@ public class PlayerController : MonoBehaviour
     private float turnSmoothVelocity;
     private float velocityY = 0f;
 
+    [Header("Map Boundaries")]
+    public bool useBounds = false;
+    public float minX = -100f;
+    public float maxX = 100f;
+    public float minZ = -100f;
+    public float maxZ = 100f;
+
     [Header("Planting System")]
     public PlantData[] plants;
     private int currentPlantIndex = 0;
@@ -141,6 +148,26 @@ public class PlayerController : MonoBehaviour
         CheckCurrentSquare();
         HandleActionInput();
         UpdateTargetFlash();
+        ApplyBoundaries();
+    }
+
+    void ApplyBoundaries()
+    {
+        if (useBounds)
+        {
+            Vector3 pos = transform.position;
+            pos.x = Mathf.Clamp(pos.x, minX, maxX);
+            pos.z = Mathf.Clamp(pos.z, minZ, maxZ);
+            
+            // Only force position if it actually exceeded the bounds
+            if (pos != transform.position)
+            {
+                // Temporarily disable the CharacterController to teleport it safely
+                controller.enabled = false;
+                transform.position = pos;
+                controller.enabled = true;
+            }
+        }
     }
 
     void HandleSelectionInput()

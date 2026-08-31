@@ -22,6 +22,13 @@ public class CameraFollow : MonoBehaviour
     public float collisionRadius = 0.3f;
     public LayerMask collisionMask = ~0; // Everything
 
+    [Header("Map Boundaries")]
+    public bool useBounds = false;
+    public float minX = -100f;
+    public float maxX = 100f;
+    public float minZ = -100f;
+    public float maxZ = 100f;
+
     private float pitch;
     private float yaw = 0f;
 
@@ -84,6 +91,13 @@ public class CameraFollow : MonoBehaviour
 
         // Final calculated position
         Vector3 finalPosition = lookAtPos + direction * currentDistance;
+        
+        // Clamp camera position to map boundaries if enabled
+        if (useBounds)
+        {
+            finalPosition.x = Mathf.Clamp(finalPosition.x, minX, maxX);
+            finalPosition.z = Mathf.Clamp(finalPosition.z, minZ, maxZ);
+        }
 
         // Smoothly interpolate position and rotation
         transform.position = Vector3.Lerp(transform.position, finalPosition, smoothTime * Time.deltaTime);

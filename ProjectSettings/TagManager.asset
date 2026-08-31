@@ -6,14 +6,15 @@ TagManager:
   tags:
   - PlantableNode
   - Zombie
+  - LocationMarker
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
+  - LocationMarker
   - 
   - 
   - 
