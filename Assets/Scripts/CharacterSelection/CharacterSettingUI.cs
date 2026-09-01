@@ -31,6 +31,9 @@ public class CharacterSettingUI : MonoBehaviour
     public Button shieldPrevBtn;
     public Button shieldNextBtn;
 
+    [Header("3D Portrait Renderer")]
+    public PortraitRenderer portraitRenderer;
+
     private CharacterData[] characters;
     private EquipmentData[] allEquipment;
     private Transform previewSpot;
@@ -48,10 +51,12 @@ public class CharacterSettingUI : MonoBehaviour
 
     private List<EquipmentData> currentWeapons = new List<EquipmentData>();
     private List<EquipmentData> currentShields = new List<EquipmentData>();
+    private Dictionary<GameObject, EquipmentData> buttonEquipmentMap = new Dictionary<GameObject, EquipmentData>();
 
     private int weaponStartIndex = 0;
     private int shieldStartIndex = 0;
     private const int ItemsPerPage = 3;
+
 
     private CanvasGroup weaponsCanvasGroup;
     private CanvasGroup shieldsCanvasGroup;
@@ -62,9 +67,23 @@ public class CharacterSettingUI : MonoBehaviour
         this.allEquipment = allEquipment;
         this.previewSpot = previewSpot;
 
+        // Auto-find or create PortraitRenderer if not assigned
+        if (portraitRenderer == null)
+        {
+            portraitRenderer = FindObjectOfType<PortraitRenderer>();
+            if (portraitRenderer == null)
+            {
+                GameObject prObj = new GameObject("PortraitRenderer");
+                prObj.transform.position = new Vector3(1000f, 1000f, 1000f);
+                portraitRenderer = prObj.AddComponent<PortraitRenderer>();
+                portraitRenderer.InitializeRenderer();
+            }
+        }
+
         // Ensure templates are disabled
         if (characterCardTemplate != null) characterCardTemplate.SetActive(false);
         if (equipmentButtonTemplate != null) equipmentButtonTemplate.SetActive(false);
+
 
         // Setup CanvasGroups for smooth transitions
         if (weaponsGridContainer != null)
@@ -120,13 +139,25 @@ public class CharacterSettingUI : MonoBehaviour
             Text nameTxt = card.transform.Find("Text_Name")?.GetComponent<Text>();
             if (nameTxt != null) nameTxt.text = charData.characterName.ToUpper();
 
-            Transform portrait = card.transform.Find("Portrait");
+            // 3D Portrait for Character
+            Sprite charPortrait = (portraitRenderer != null) ? portraitRenderer.GetCharacterPortrait(charData) : charData.portrait;
+            Image portrait = card.transform.Find("Portrait")?.GetComponent<Image>();
             if (portrait != null)
             {
-                portrait.gameObject.SetActive(false);
+                if (charPortrait != null)
+                {
+                    portrait.sprite = charPortrait;
+                    portrait.enabled = true;
+                    portrait.gameObject.SetActive(true);
+                }
+                else
+                {
+                    portrait.gameObject.SetActive(false);
+                }
             }
 
             Button btn = card.GetComponent<Button>();
+
             if (btn != null)
             {
                 btn.onClick.RemoveAllListeners();
@@ -309,18 +340,22 @@ public class CharacterSettingUI : MonoBehaviour
 
     void UpdateEquipmentButtonData(GameObject btnObj, EquipmentData equip)
     {
-        btnObj.name = $"Btn_{equip.equipmentName}";
+        btnObj.name = $"Btn_{equip.name}_{equip.equipmentName}";
+        buttonEquipmentMap[btnObj] = equip;
 
         Text nameTxt = btnObj.transform.Find("Text_Name")?.GetComponent<Text>();
         if (nameTxt != null) nameTxt.gameObject.SetActive(false);
 
+        // 3D Portrait for Equipment
+        Sprite equipPortrait = (portraitRenderer != null) ? portraitRenderer.GetEquipmentPortrait(equip) : equip.icon;
         Image icon = btnObj.transform.Find("Icon")?.GetComponent<Image>();
         if (icon != null)
         {
-            if (equip.icon != null)
+            if (equipPortrait != null)
             {
-                icon.sprite = equip.icon;
+                icon.sprite = equipPortrait;
                 icon.enabled = true;
+                icon.gameObject.SetActive(true);
             }
             else
             {
@@ -368,15 +403,21 @@ public class CharacterSettingUI : MonoBehaviour
         foreach (var btnObj in buttons)
         {
             if (btnObj == null || !btnObj.activeSelf) continue;
-            Transform check = btnObj.transform.Find("Checkmark");
-            bool isSelected = (equipped != null && btnObj.name == $"Btn_{equipped.equipmentName}");
             
+            bool isSelected = false;
+            if (equipped != null && buttonEquipmentMap.TryGetValue(btnObj, out EquipmentData boundEquip))
+            {
+                isSelected = (boundEquip == equipped);
+            }
+
+            Transform check = btnObj.transform.Find("Checkmark");
             if (check != null) check.gameObject.SetActive(isSelected);
             
             Outline outline = btnObj.GetComponent<Outline>();
             if (outline != null) outline.effectColor = isSelected ? selectedBorderColor : normalBorderColor;
         }
     }
+
 
     void HighlightCharacterButton(int selectedIndex)
     {

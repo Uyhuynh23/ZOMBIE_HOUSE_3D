@@ -122,8 +122,17 @@ ehthumbs_vista.db
 /[Aa]ssets/URP GanzSe Free Camping Props/
 /[Aa]ssets/URP GanzSe Free Camping Props.meta
 
-/[Aa]ssets/KayKit_Character_Pack_Adventures/
-/[Aa]ssets/KayKit_Character_Pack_Adventures.meta
+# Whitelist FBX, GLTF/GLB models, textures, materials, and meta files for KayKit Pack so characters and equipment work for all devs
+/[Aa]ssets/KayKit_Character_Pack_Adventures/*
+!/[Aa]ssets/KayKit_Character_Pack_Adventures/**/
+!/[Aa]ssets/KayKit_Character_Pack_Adventures/**/*.meta
+!/[Aa]ssets/KayKit_Character_Pack_Adventures/**/*.fbx
+!/[Aa]ssets/KayKit_Character_Pack_Adventures/**/*.gltf
+!/[Aa]ssets/KayKit_Character_Pack_Adventures/**/*.glb
+!/[Aa]ssets/KayKit_Character_Pack_Adventures/**/*.png
+!/[Aa]ssets/KayKit_Character_Pack_Adventures/**/*.mat
+!/[Aa]ssets/KayKit_Character_Pack_Adventures.meta
+
 
 /[Aa]ssets/Cartoon_Farm_Crops/
 /[Aa]ssets/Cartoon_Farm_Crops.meta

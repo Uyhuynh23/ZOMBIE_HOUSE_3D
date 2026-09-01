@@ -15,4 +15,11 @@ public class CharacterData : ScriptableObject
 
     [Header("Allowed Equipment")]
     public List<EquipmentType> allowedEquipmentTypes = new List<EquipmentType>();
+
+    [Header("3D Portrait Preview Settings")]
+    public Vector3 previewRotation = new Vector3(0, 165f, 0);
+    public Vector3 previewOffset = new Vector3(0, -0.65f, 0);
+    public float previewScale = 1.0f;
+    public float cameraOrthographicSize = 0.65f;
 }
+

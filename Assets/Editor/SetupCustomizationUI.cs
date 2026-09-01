@@ -13,7 +13,11 @@ public class SetupCustomizationUI : EditorWindow
     private void OnGUI()
     {
         GUILayout.Label("Update Character Setting UI Hierarchy", EditorStyles.boldLabel);
-        if (GUILayout.Button("Update Hierarchy"))
+        GUILayout.Space(5);
+        GUILayout.Label("Creates or updates the PortraitRenderer and UI templates.", EditorStyles.wordWrappedMiniLabel);
+        GUILayout.Space(10);
+
+        if (GUILayout.Button("Update Hierarchy & 3D Portrait Renderer", GUILayout.Height(30)))
         {
             UpdateHierarchy();
         }
@@ -30,161 +34,85 @@ public class SetupCustomizationUI : EditorWindow
 
         Undo.RecordObject(ui.gameObject, "Update UI Hierarchy");
 
-        if (ui.weaponsGridContainer != null)
+        // 1. Setup PortraitRenderer in the scene if missing
+        PortraitRenderer pr = FindObjectOfType<PortraitRenderer>(true);
+        if (pr == null)
         {
-            // Fix WeaponsGrid RectTransform to take top half of RightPanel
-            RectTransform wGridRect = ui.weaponsGridContainer.GetComponent<RectTransform>();
-            wGridRect.anchorMin = new Vector2(0.15f, 0.5f);
-            wGridRect.anchorMax = new Vector2(0.85f, 0.8f);
-            wGridRect.anchoredPosition = Vector2.zero;
-            wGridRect.sizeDelta = Vector2.zero;
-
-            CreateCarouselControls("Weapon", ui.weaponsGridContainer, out Button wPrev, out Button wNext, 0.65f);
-            ui.weaponPrevBtn = wPrev;
-            ui.weaponNextBtn = wNext;
-
-            GridLayoutGroup grid = ui.weaponsGridContainer.GetComponent<GridLayoutGroup>();
-            if (grid != null)
-            {
-                grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-                grid.constraintCount = 3;
-                grid.cellSize = new Vector2(80, 80);
-                grid.spacing = new Vector2(10, 10);
-            }
-            
-            // Try to find missing title for Weapons
-            Transform wTitle = ui.weaponsGridContainer.parent.Find("W_Title");
-            if (wTitle != null)
-            {
-                RectTransform tRect = wTitle.GetComponent<RectTransform>();
-                tRect.anchorMin = new Vector2(0, 0.85f);
-                tRect.anchorMax = new Vector2(1, 0.95f);
-                tRect.anchoredPosition = Vector2.zero;
-                tRect.sizeDelta = Vector2.zero;
-                
-                Text tTxt = wTitle.GetComponent<Text>();
-                if (tTxt != null) tTxt.text = "WEAPONS";
-            }
+            GameObject prObj = new GameObject("PortraitRenderer");
+            prObj.transform.position = new Vector3(1000f, 1000f, 1000f);
+            pr = prObj.AddComponent<PortraitRenderer>();
+            pr.InitializeRenderer();
+            Undo.RegisterCreatedObjectUndo(prObj, "Create PortraitRenderer");
         }
-
-        if (ui.shieldsGridContainer != null)
+        else
         {
-            // Fix ShieldsGrid RectTransform to take bottom half
-            RectTransform sGridRect = ui.shieldsGridContainer.GetComponent<RectTransform>();
-            sGridRect.anchorMin = new Vector2(0.15f, 0.1f);
-            sGridRect.anchorMax = new Vector2(0.85f, 0.4f);
-            sGridRect.anchoredPosition = Vector2.zero;
-            sGridRect.sizeDelta = Vector2.zero;
-
-            CreateCarouselControls("Shield", ui.shieldsGridContainer, out Button sPrev, out Button sNext, 0.25f);
-            ui.shieldPrevBtn = sPrev;
-            ui.shieldNextBtn = sNext;
-
-            GridLayoutGroup grid = ui.shieldsGridContainer.GetComponent<GridLayoutGroup>();
-            if (grid != null)
-            {
-                grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-                grid.constraintCount = 3;
-                grid.cellSize = new Vector2(80, 80);
-                grid.spacing = new Vector2(10, 10);
-            }
-            
-            // Title for Shields
-            Transform sTitle = ui.shieldsGridContainer.parent.Find("S_Title");
-            if (sTitle != null)
-            {
-                RectTransform tRect = sTitle.GetComponent<RectTransform>();
-                tRect.anchorMin = new Vector2(0, 0.45f);
-                tRect.anchorMax = new Vector2(1, 0.55f);
-                tRect.anchoredPosition = Vector2.zero;
-                tRect.sizeDelta = Vector2.zero;
-            }
+            pr.InitializeRenderer();
         }
+        ui.portraitRenderer = pr;
 
-        // Left Panel Setup
+        // 2. Configure Left Panel Character Template
         if (ui.characterCardTemplate != null)
         {
             if (ui.characterCardTemplate.GetComponent<Image>() == null)
             {
                 Undo.AddComponent<Image>(ui.characterCardTemplate);
             }
-            
-            Transform portrait = ui.characterCardTemplate.transform.Find("Portrait");
-            if (portrait != null)
+
+            // Ensure Portrait child exists on characterCardTemplate
+            Transform portraitTrans = ui.characterCardTemplate.transform.Find("Portrait");
+            if (portraitTrans == null)
             {
-                portrait.gameObject.SetActive(false);
+                GameObject pObj = new GameObject("Portrait", typeof(RectTransform), typeof(Image));
+                pObj.transform.SetParent(ui.characterCardTemplate.transform, false);
+                pObj.transform.SetAsFirstSibling();
+                
+                RectTransform pRect = pObj.GetComponent<RectTransform>();
+                pRect.anchorMin = new Vector2(0.05f, 0.1f);
+                pRect.anchorMax = new Vector2(0.35f, 0.9f);
+                pRect.anchoredPosition = Vector2.zero;
+                pRect.sizeDelta = Vector2.zero;
+
+                Image pImg = pObj.GetComponent<Image>();
+                pImg.preserveAspect = true;
+                
+                Undo.RegisterCreatedObjectUndo(pObj, "Create Character Card Portrait");
+            }
+            else
+            {
+                portraitTrans.gameObject.SetActive(true);
             }
         }
 
+        // 3. Configure Right Panel Equipment Template
         if (ui.equipmentButtonTemplate != null)
         {
             if (ui.equipmentButtonTemplate.GetComponent<Image>() == null)
             {
                 Undo.AddComponent<Image>(ui.equipmentButtonTemplate);
             }
+
+            Transform iconTrans = ui.equipmentButtonTemplate.transform.Find("Icon");
+            if (iconTrans == null)
+            {
+                GameObject iconObj = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                iconObj.transform.SetParent(ui.equipmentButtonTemplate.transform, false);
+                
+                RectTransform iRect = iconObj.GetComponent<RectTransform>();
+                iRect.anchorMin = new Vector2(0.1f, 0.1f);
+                iRect.anchorMax = new Vector2(0.9f, 0.9f);
+                iRect.anchoredPosition = Vector2.zero;
+                iRect.sizeDelta = Vector2.zero;
+
+                Image iImg = iconObj.GetComponent<Image>();
+                iImg.preserveAspect = true;
+
+                Undo.RegisterCreatedObjectUndo(iconObj, "Create Equipment Icon");
+            }
         }
 
         EditorUtility.SetDirty(ui);
-        Debug.Log("Customization UI Hierarchy updated successfully. Layout has been fixed for weapons and arrows.");
-    }
+        if (pr != null) EditorUtility.SetDirty(pr);
 
-    private void CreateCarouselControls(string prefix, Transform container, out Button prevBtn, out Button nextBtn, float yAnchor)
-    {
-        Transform parent = container.parent;
-
-        Transform prev = parent.Find(prefix + "PrevBtn");
-        if (prev == null)
-        {
-            GameObject prevObj = new GameObject(prefix + "PrevBtn", typeof(RectTransform), typeof(Image), typeof(Button));
-            prevObj.transform.SetParent(parent, false);
-            prevBtn = prevObj.GetComponent<Button>();
-            
-            GameObject txtObj = new GameObject("Text", typeof(RectTransform), typeof(Text));
-            txtObj.transform.SetParent(prevObj.transform, false);
-            Text txt = txtObj.GetComponent<Text>();
-            txt.text = "<";
-            txt.alignment = TextAnchor.MiddleCenter;
-            txt.color = Color.black;
-            
-            Undo.RegisterCreatedObjectUndo(prevObj, "Create Prev Btn");
-        }
-        else
-        {
-            prevBtn = prev.GetComponent<Button>();
-        }
-
-        Transform next = parent.Find(prefix + "NextBtn");
-        if (next == null)
-        {
-            GameObject nextObj = new GameObject(prefix + "NextBtn", typeof(RectTransform), typeof(Image), typeof(Button));
-            nextObj.transform.SetParent(parent, false);
-            nextBtn = nextObj.GetComponent<Button>();
-            
-            GameObject txtObj = new GameObject("Text", typeof(RectTransform), typeof(Text));
-            txtObj.transform.SetParent(nextObj.transform, false);
-            Text txt = txtObj.GetComponent<Text>();
-            txt.text = ">";
-            txt.alignment = TextAnchor.MiddleCenter;
-            txt.color = Color.black;
-
-            Undo.RegisterCreatedObjectUndo(nextObj, "Create Next Btn");
-        }
-        else
-        {
-            nextBtn = next.GetComponent<Button>();
-        }
-
-        // Anchor the buttons relative to the RightPanel, properly positioned to the left and right of the grid
-        RectTransform prevRect = prevBtn.GetComponent<RectTransform>();
-        prevRect.anchorMin = new Vector2(0.02f, yAnchor);
-        prevRect.anchorMax = new Vector2(0.12f, yAnchor);
-        prevRect.anchoredPosition = Vector2.zero;
-        prevRect.sizeDelta = new Vector2(0, 40);
-
-        RectTransform nextRect = nextBtn.GetComponent<RectTransform>();
-        nextRect.anchorMin = new Vector2(0.88f, yAnchor);
-        nextRect.anchorMax = new Vector2(0.98f, yAnchor);
-        nextRect.anchoredPosition = Vector2.zero;
-        nextRect.sizeDelta = new Vector2(0, 40);
+        Debug.Log("Customization UI & 3D Portrait Renderer setup completed successfully!");
     }
 }
