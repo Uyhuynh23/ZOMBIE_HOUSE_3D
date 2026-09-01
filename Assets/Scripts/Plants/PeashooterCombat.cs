@@ -9,6 +9,8 @@ public class PeashooterCombat : PlantBase
     public float projectileSpeed = 10f;
     public float aggroRadius = 5f;
     public float forwardConeThreshold = 0.3f; // dot product threshold (~72 degree cone)
+    [Tooltip("The imported peashooter faces local +X. Rotate the plant root to aim this axis down any map road.")]
+    public Vector3 localAimAxis = Vector3.right;
 
     [Header("Body Collider Settings")]
     public float bodyHeight = 1.0f;
@@ -73,8 +75,12 @@ public class PeashooterCombat : PlantBase
         {
             if (z == null) continue;
             Vector3 toZombie = z.transform.position - transform.position;
-            float laneDistance = Mathf.Abs(toZombie.z);
-            bool isAhead = toZombie.x > 0.15f;
+            toZombie.y = 0f;
+            Vector3 worldAim = transform.TransformDirection(localAimAxis).normalized;
+            Vector3 worldSide = Vector3.Cross(Vector3.up, worldAim).normalized;
+            float laneDistance = Mathf.Abs(Vector3.Dot(toZombie, worldSide));
+            bool isAhead = toZombie.sqrMagnitude > 0.001f &&
+                           Vector3.Dot(toZombie.normalized, worldAim) > forwardConeThreshold;
             if (isAhead && laneDistance <= 0.85f && toZombie.sqrMagnitude < closestDistance)
             {
                 closestDistance = toZombie.sqrMagnitude;
@@ -110,7 +116,7 @@ public class PeashooterCombat : PlantBase
         {
             Vector3 direction = currentTarget != null
                 ? currentTarget.transform.position + Vector3.up * 0.9f - spawnPoint.position
-                : transform.right;
+                : transform.TransformDirection(localAimAxis);
             direction.Normalize();
             rb.linearVelocity = direction * projectileSpeed;
         }

@@ -32,6 +32,14 @@ public class ZombieSpawner : MonoBehaviour
     [Tooltip("Root zombie prefab to instantiate. Must have ZombieHealth, ZombiePrototypeMover, ZombieAttack.")]
     public GameObject zombiePrefab;
 
+    [Header("Map Routes (optional)")]
+    [Tooltip("When assigned, zombies round-robin across these waypoint routes instead of the legacy X/Z grid lanes.")]
+    public ZombieRoute[] routes;
+    [Tooltip("Movement speed used for the larger four-road map.")]
+    [Min(0.1f)] public float routeMoveSpeed = 2.5f;
+    [Tooltip("Small side offset at spawn so a wave does not look perfectly mechanical.")]
+    [Min(0f)] public float routeSpawnJitter = 0.35f;
+
     [Header("Spawn Position")]
     [Tooltip("X position where zombies spawn (right side of the map).")]
     public float spawnX = 8f;
@@ -82,7 +90,7 @@ public class ZombieSpawner : MonoBehaviour
             return;
         }
 
-        if (GridManager.Instance == null)
+        if (!HasUsableRoutes() && GridManager.Instance == null)
         {
             Debug.LogError("[ZombieSpawner] GridManager not found in scene!");
             return;
@@ -134,6 +142,12 @@ public class ZombieSpawner : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private void SpawnZombie()
     {
+        if (HasUsableRoutes())
+        {
+            SpawnZombieOnRoute();
+            return;
+        }
+
         int laneCount = GridManager.Instance.LaneCount;
         if (laneCount == 0)
         {
@@ -164,6 +178,45 @@ public class ZombieSpawner : MonoBehaviour
         activeZombieCount++;
 
         Debug.Log($"[ZombieSpawner] Spawned zombie in lane {lane} at Z={laneZ:F2}");
+    }
+
+    private void SpawnZombieOnRoute()
+    {
+        ZombieRoute route = routes[spawnSequence++ % routes.Length];
+        Transform spawnPoint = route.SpawnPoint;
+        Transform nextPoint = route.GetWaypoint(1);
+
+        Vector3 forward = nextPoint != null
+            ? (nextPoint.position - spawnPoint.position).normalized
+            : Vector3.forward;
+        Vector3 side = Vector3.Cross(Vector3.up, forward).normalized;
+        Vector3 spawnPosition = spawnPoint.position + side * Random.Range(-routeSpawnJitter, routeSpawnJitter);
+
+        GameObject zombie = Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
+        zombie.name = $"Zombie_Wave{currentWaveIndex + 1}_{route.name}";
+        zombie.SetActive(true);
+
+        ZombiePrototypeMover mover = zombie.GetComponent<ZombiePrototypeMover>();
+        if (mover != null)
+            mover.ConfigureRoute(zombie.GetComponentInChildren<Animator>(), route, routeMoveSpeed);
+
+        activeZombies.Add(zombie);
+        activeZombieCount++;
+        Debug.Log($"[ZombieSpawner] Spawned zombie on route {route.name}");
+    }
+
+    private bool HasUsableRoutes()
+    {
+        if (routes == null || routes.Length == 0)
+            return false;
+
+        foreach (ZombieRoute route in routes)
+        {
+            if (route == null || route.WaypointCount < 2)
+                return false;
+        }
+
+        return true;
     }
 
     // ──────────────────────────────────────────────────────────

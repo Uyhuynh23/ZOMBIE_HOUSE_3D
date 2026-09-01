@@ -13,6 +13,8 @@ public static class ZombiePrototypeSceneBuilder
     private const string ZombieTexturePath = "Assets/ThirdParty/CartoonZombie/zombie_tex.png";
     private const string ZombieFolder = "Assets/Zombie";
     private const string ZombieAnimationFolder = ZombieFolder + "/Animations";
+    private const string ZombieMaterialFolder = ZombieFolder + "/Materials";
+    private const string ZombieMaterialPath = ZombieMaterialFolder + "/Zombie_Body_Mat.mat";
     private const string IdleClipPath = ZombieAnimationFolder + "/Zombie_Idle.anim";
     private const string WalkClipPath = ZombieAnimationFolder + "/Zombie_Walk.anim";
     private const string AnimatorControllerPath = ZombieAnimationFolder + "/ZombiePrototype.controller";
@@ -244,7 +246,7 @@ public static class ZombiePrototypeSceneBuilder
     internal static void ApplyZombieMaterial(GameObject model)
     {
         Texture2D zombieTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(ZombieTexturePath);
-        Material zombieMaterial = CreateMaterial("Zombie_Body_Mat", Color.white);
+        Material zombieMaterial = LoadOrCreateZombieMaterial();
         if (zombieTexture != null)
         {
             zombieMaterial.mainTexture = zombieTexture;
@@ -252,10 +254,27 @@ public static class ZombiePrototypeSceneBuilder
                 zombieMaterial.SetTexture("_BaseMap", zombieTexture);
         }
 
+        EditorUtility.SetDirty(zombieMaterial);
+        AssetDatabase.SaveAssets();
+
         foreach (Renderer renderer in model.GetComponentsInChildren<Renderer>())
         {
             renderer.sharedMaterial = zombieMaterial;
         }
+    }
+
+    private static Material LoadOrCreateZombieMaterial()
+    {
+        EnsureFolder("Assets", "Zombie");
+        EnsureFolder(ZombieFolder, "Materials");
+
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(ZombieMaterialPath);
+        if (material != null)
+            return material;
+
+        material = CreateMaterial("Zombie_Body_Mat", Color.white);
+        AssetDatabase.CreateAsset(material, ZombieMaterialPath);
+        return material;
     }
 
     internal static void FitZombieVisual(GameObject model, float targetHeight)

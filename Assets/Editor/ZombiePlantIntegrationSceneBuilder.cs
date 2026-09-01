@@ -30,7 +30,6 @@ public static class ZombiePlantIntegrationSceneBuilder
     private const string SnowPeaPath            = "Assets/Prefabs/PeaShooterFroze.prefab";
     private const string SunflowerPath          = "Assets/Prefabs/Sunflower.prefab";
     private const string PeaProjectilePath      = "Assets/Prefabs/Pea_Prefab.prefab";
-    private const string ZombieModelPath        = "Assets/ThirdParty/CartoonZombie/Zombie_low.fbx";
 
     // ──────────────────────────────────────────────────────────
     // Entry point
@@ -55,8 +54,8 @@ public static class ZombiePlantIntegrationSceneBuilder
         // Pre-plant a Peashooter for demo
         CreateShowcasePlant(grid[2, 1]);
 
-        // Build the zombie prefab and wire spawner
-        GameObject zombiePrefab = BuildZombiePrefab();
+        // Use a persistent prefab asset so this scene keeps working after Git merges.
+        GameObject zombiePrefab = ZombiePrefabBuilder.LoadOrCreatePrefab();
         WireSpawner(gameManagerGO, zombiePrefab);
 
         CreateEventSystem();
@@ -158,7 +157,7 @@ public static class ZombiePlantIntegrationSceneBuilder
     // ──────────────────────────────────────────────────────────
     // Player character
     // ──────────────────────────────────────────────────────────
-    private static GameObject CreatePlayer(Vector3 squarePosition)
+    internal static GameObject CreatePlayer(Vector3 squarePosition)
     {
         GameObject player = new GameObject("Player Character");
         player.transform.position = squarePosition + new Vector3(0f, 0.2f, 0f);
@@ -293,70 +292,6 @@ public static class ZombiePlantIntegrationSceneBuilder
     }
 
     // ──────────────────────────────────────────────────────────
-    // Zombie prefab (built in-scene as prototype, no asset save needed)
-    // ──────────────────────────────────────────────────────────
-    private static GameObject BuildZombiePrefab()
-    {
-        // We build a hidden "template" GO that the spawner will Instantiate at runtime.
-        // This avoids the need to save a prefab asset — the spawner receives it directly.
-        GameObject zombie = new GameObject("ZombiePrefab_Template");
-        zombie.tag = "Zombie";
-        zombie.SetActive(false); // hidden; spawner will clone it
-
-        // Collider (physical body)
-        CapsuleCollider col = zombie.AddComponent<CapsuleCollider>();
-        col.height = 1.7f;
-        col.radius = 0.4f;
-        col.center = new Vector3(0f, 0.85f, 0f);
-
-        // Rigidbody — kinematic so we control movement ourselves
-        Rigidbody rb      = zombie.AddComponent<Rigidbody>();
-        rb.useGravity      = false;
-        rb.isKinematic     = true;
-
-        // Health
-        ZombieHealth health = zombie.AddComponent<ZombieHealth>();
-        health.maxHealth    = 100;
-        zombie.AddComponent<ZombieHealthBar>();
-
-        // Movement (Lane mode by default)
-        ZombiePrototypeMover mover = zombie.AddComponent<ZombiePrototypeMover>();
-
-        // Attack
-        zombie.AddComponent<ZombieAttack>();
-
-        // Try loading the 3-D zombie model
-        GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(ZombieModelPath);
-        if (model != null)
-        {
-            GameObject visual = (GameObject)PrefabUtility.InstantiatePrefab(model);
-            visual.name = "Zombie Visual";
-            visual.transform.SetParent(zombie.transform, false);
-            visual.transform.localRotation = Quaternion.identity;
-            ZombiePrototypeSceneBuilder.ApplyZombieMaterial(visual);
-            ZombiePrototypeSceneBuilder.FitZombieVisual(visual, 1.65f);
-
-            Animator animator = visual.GetComponent<Animator>();
-            if (animator == null) animator = visual.AddComponent<Animator>();
-            animator.runtimeAnimatorController = ZombiePrototypeSceneBuilder.CreateZombieAnimatorController();
-            animator.applyRootMotion = false;
-        }
-        else
-        {
-            // Fallback: simple coloured capsule
-            GameObject fallback = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            fallback.name = "Zombie Visual (fallback)";
-            fallback.transform.SetParent(zombie.transform, false);
-            fallback.transform.localPosition = new Vector3(0f, 0.85f, 0f);
-            fallback.GetComponent<Renderer>().sharedMaterial =
-                CreateMaterial("ZombieFallback_Mat", new Color(0.2f, 0.7f, 0.25f));
-            Object.DestroyImmediate(fallback.GetComponent<Collider>());
-        }
-
-        return zombie;
-    }
-
-    // ──────────────────────────────────────────────────────────
     // Wire ZombieSpawner onto the GameManager object
     // ──────────────────────────────────────────────────────────
     private static void WireSpawner(GameObject gameManagerGO, GameObject zombieTemplate)
@@ -419,7 +354,7 @@ public static class ZombiePlantIntegrationSceneBuilder
     // ──────────────────────────────────────────────────────────
     // EventSystem
     // ──────────────────────────────────────────────────────────
-    private static void CreateEventSystem()
+    internal static void CreateEventSystem()
     {
         GameObject es = new GameObject("EventSystem");
         es.AddComponent<EventSystem>();

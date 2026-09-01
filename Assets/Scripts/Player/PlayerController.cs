@@ -19,6 +19,14 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5f;
     public float turnSmoothTime = 0.1f;
     private float turnSmoothVelocity;
+    private float velocityY = 0f;
+
+    [Header("Map Boundaries")]
+    public bool useBounds = false;
+    public float minX = -100f;
+    public float maxX = 100f;
+    public float minZ = -100f;
+    public float maxZ = 100f;
 
     [Header("Planting System")]
     public PlantData[] plants;
@@ -140,6 +148,26 @@ public class PlayerController : MonoBehaviour
         CheckCurrentSquare();
         HandleActionInput();
         UpdateTargetFlash();
+        ApplyBoundaries();
+    }
+
+    void ApplyBoundaries()
+    {
+        if (useBounds)
+        {
+            Vector3 pos = transform.position;
+            pos.x = Mathf.Clamp(pos.x, minX, maxX);
+            pos.z = Mathf.Clamp(pos.z, minZ, maxZ);
+            
+            // Only force position if it actually exceeded the bounds
+            if (pos != transform.position)
+            {
+                // Temporarily disable the CharacterController to teleport it safely
+                controller.enabled = false;
+                transform.position = pos;
+                controller.enabled = true;
+            }
+        }
     }
 
     void HandleSelectionInput()
@@ -204,6 +232,15 @@ public class PlayerController : MonoBehaviour
 
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
+        if (controller.isGrounded && velocityY < 0f)
+        {
+            velocityY = -2f; // Stick to ground
+        }
+        
+        velocityY += -9.81f * 2f * Time.deltaTime; // Apply gravity
+
+        Vector3 move = Vector3.zero;
+
         if (direction.magnitude >= 0.1f)
         {
             if (Camera.main != null)
@@ -221,7 +258,7 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0f, smoothedAngle, 0f);
             }
 
-            controller.Move(direction * moveSpeed * Time.deltaTime);
+            move = direction * moveSpeed;
             if (animator != null) animator.SetBool("IsMoving", true);
         }
         else
@@ -229,10 +266,8 @@ public class PlayerController : MonoBehaviour
             if (animator != null) animator.SetBool("IsMoving", false);
         }
 
-        if (!controller.isGrounded)
-        {
-            controller.Move(Vector3.down * 9.81f * Time.deltaTime);
-        }
+        move.y = velocityY;
+        controller.Move(move * Time.deltaTime);
     }
 
     void CheckCurrentSquare()
