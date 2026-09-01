@@ -45,7 +45,6 @@ public class GameUIManager : MonoBehaviour
 
     void Start()
     {
-        player = FindFirstObjectByType<PlayerController>();
         if (sunText != null)
         {
             originalSunTextColor = sunText.color;
@@ -65,6 +64,13 @@ public class GameUIManager : MonoBehaviour
     void Update()
     {
         UpdateBattleStatus();
+        
+        // Lazy lookup for player
+        if (player == null)
+        {
+            player = Object.FindFirstObjectByType<PlayerController>();
+        }
+
         if (player == null || player.plants == null) return;
         if (EconomyManager.Instance == null) return;
 

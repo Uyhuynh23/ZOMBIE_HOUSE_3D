@@ -527,7 +527,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 67851351}
-  - component: {fileID: 67851350}
   - component: {fileID: 67851349}
   - component: {fileID: 67851352}
   m_Layer: 0
@@ -551,18 +550,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectPoolManager
   peaPrefab: {fileID: 4432440020889067532, guid: a80b9d4032459304c83ca4aa6610c36e, type: 3}
   initialPoolSize: 50
---- !u!114 &67851350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 67851348}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 704d76dd8052ab840a6bd8ea00527f49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GridManager
 --- !u!4 &67851351
 Transform:
   m_ObjectHideFlags: 0
@@ -2894,6 +2881,8 @@ MonoBehaviour:
   maxDistance: 10
   mouseSensitivity: 1
   smoothTime: 15
+  initialPitch: 34
+  lockCursorDuringPlay: 0
   collisionRadius: 0.3
   collisionMask:
     serializedVersion: 2
@@ -8390,6 +8379,12 @@ MonoBehaviour:
   - {fileID: 1151066645}
   flashFrequency: 5
   flashColor: {r: 1, g: 0, b: 0, a: 1}
+  winPanel: {fileID: 0}
+  losePanel: {fileID: 0}
+  waveText: {fileID: 0}
+  zombieText: {fileID: 0}
+  houseHealthText: {fileID: 0}
+  houseHealthFill: {fileID: 0}
 --- !u!114 &1190624703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11126,6 +11121,72 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e289bf5debb17f6459818c207d781953, type: 3}
+--- !u!1 &1511742626
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1511742628}
+  - component: {fileID: 1511742627}
+  m_Layer: 0
+  m_Name: PlayerSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1511742627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511742626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a4617fb63e5054ab9229b8cdec4c52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
+  spawnPoint: {fileID: 1548087159}
+  defaultCharacter: {fileID: 11400000, guid: 5a9509e7c538ece4f862845480f14045, type: 2}
+  plantLoadout:
+  - name: Peashooter
+    prefab: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
+    cost: 100
+    cooldownTime: 2
+    currentCooldown: 0
+    portrait: {fileID: 0}
+  - name: Snow Pea
+    prefab: {fileID: 7642659562126309205, guid: 9ea3bfddd74f86a45a38dde67c4048ef, type: 3}
+    cost: 175
+    cooldownTime: 2
+    currentCooldown: 0
+    portrait: {fileID: 0}
+  - name: Sunflower
+    prefab: {fileID: 6914172321322698958, guid: 0b11f6dd5afd92b409f5f5b65ef2710d, type: 3}
+    cost: 50
+    cooldownTime: 3
+    currentCooldown: 0
+    portrait: {fileID: 0}
+  cameraFollow: {fileID: 330585548}
+--- !u!4 &1511742628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511742626}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1513726548
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11297,6 +11358,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff62b58c5a9ea164fa8ddf8038e10cd1, type: 3}
+--- !u!1 &1548087158
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1548087159}
+  m_Layer: 0
+  m_Name: PlayerSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1548087159
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548087158}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 12.011, y: 0.78, z: -2.836}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1550280617
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15305,6 +15397,10 @@ PrefabInstance:
       value: Knight
       objectReference: {fileID: 0}
     - target: {fileID: 6918325262496768956, guid: 602930db617e2a64bb7d321706c6dee6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6918325262496768956, guid: 602930db617e2a64bb7d321706c6dee6, type: 3}
       propertyPath: m_TagString
       value: Zombie
       objectReference: {fileID: 0}
@@ -15579,3 +15675,5 @@ SceneRoots:
   - {fileID: 1077390972}
   - {fileID: 1261686847}
   - {fileID: 1190624706}
+  - {fileID: 1548087159}
+  - {fileID: 1511742628}
