@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 971568356a482f54a9c79d354f6de479, type: 3}
+  m_Name: Knight_Data
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterName: Knight
+  characterClass: 0
+  characterPrefab: {fileID: 6918325262496768956, guid: 602930db617e2a64bb7d321706c6dee6, type: 3}
+  portrait: {fileID: 0}
+  defaultRightHand: {fileID: 11400000, guid: 890446227a5c79f499f5d00f5932d269, type: 2}
+  defaultLeftHand: {fileID: 11400000, guid: eac173aedbf968d44986b3794388634f, type: 2}
+  allowedEquipmentTypes: 000000000100000002000000

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 971568356a482f54a9c79d354f6de479, type: 3}
+  m_Name: Mage_Data
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterName: Mage
+  characterClass: 2
+  characterPrefab: {fileID: 7648291232458048736, guid: 4a7a802d147d57b4fbdaa87dc0d94adc, type: 3}
+  portrait: {fileID: 0}
+  defaultRightHand: {fileID: 11400000, guid: bd7c163502edb194fab20a11bb40fac7, type: 2}
+  defaultLeftHand: {fileID: 11400000, guid: e8182ea76b2e1b64099126b60d391e5e, type: 2}
+  allowedEquipmentTypes: 030000000400000002000000
