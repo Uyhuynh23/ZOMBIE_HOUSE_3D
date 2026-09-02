@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 781a80bb206aa6944aa41ad40aef44e0, type: 3}
       propertyPath: m_TagString
-      value: Zombie
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 781a80bb206aa6944aa41ad40aef44e0, type: 3}
       propertyPath: m_Controller

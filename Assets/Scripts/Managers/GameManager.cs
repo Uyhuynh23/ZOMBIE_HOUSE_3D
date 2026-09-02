@@ -41,11 +41,24 @@ public class GameManager : MonoBehaviour
         currentState = GameState.Won;
         Debug.Log("[GameManager] 🎉 YOU WIN! All waves cleared.");
 
+        bool hasNextRound = false;
+        if (GameDataCarrier.Instance != null && GameDataCarrier.Instance.HasNextRound)
+        {
+            hasNextRound = true;
+        }
+
         if (GameUIManager.Instance != null)
-            GameUIManager.Instance.ShowWinScreen();
+        {
+            GameUIManager.Instance.ShowWinScreen(hasNextRound);
+        }
 
         if (restartDelay > 0f)
-            Invoke(nameof(RestartScene), restartDelay);
+        {
+            if (hasNextRound)
+                Invoke(nameof(LoadNextRound), restartDelay);
+            else
+                Invoke(nameof(ReturnToMainMenu), restartDelay);
+        }
     }
 
     // ──────────────────────────────────────────────────────────
@@ -59,25 +72,43 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] GAME OVER! The house was destroyed.");
 
         if (GameUIManager.Instance != null)
+        {
             GameUIManager.Instance.ShowLoseScreen();
+        }
 
         Time.timeScale = 0f;
 
-        if (restartDelay > 0f)
-            StartCoroutine(RestartAfterRealtimeDelay());
+        // Will not auto-restart, UI buttons will handle Restart/Return to Main Menu
     }
 
     // ──────────────────────────────────────────────────────────
-    private void RestartScene()
+    public void RestartScene()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private IEnumerator RestartAfterRealtimeDelay()
+    public void LoadNextRound()
     {
-        yield return new WaitForSecondsRealtime(restartDelay);
-        RestartScene();
+        Time.timeScale = 1f;
+        if (GameDataCarrier.Instance != null && GameDataCarrier.Instance.HasNextRound)
+        {
+            string nextScene = GameDataCarrier.Instance.GetNextRoundScene();
+            GameDataCarrier.Instance.SetRound(GameDataCarrier.Instance.currentRound + 1);
+            SceneManager.LoadScene(nextScene);
+        }
+        else
+        {
+            ReturnToMainMenu();
+        }
+    }
+
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        string sceneName = GameDataCarrier.MainMenuSceneName;
+        if (string.IsNullOrEmpty(sceneName)) sceneName = "MainMenu";
+        SceneManager.LoadScene(sceneName);
     }
 
     private void OnDestroy()

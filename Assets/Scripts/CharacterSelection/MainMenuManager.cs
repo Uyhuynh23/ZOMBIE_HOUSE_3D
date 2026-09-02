@@ -16,9 +16,9 @@ public class MainMenuManager : MonoBehaviour
     [Tooltip("Scene names for each round. Index 0 = Round 1, etc.")]
     public string[] roundSceneNames = new string[]
     {
-        "Peashooter_Test",
-        "Map1",
-        "SampleMap"
+        "Map_Day",
+        "Map_Cloudy",
+        "Map_Night"
     };
 
     [Header("Data")]
@@ -112,6 +112,10 @@ public class MainMenuManager : MonoBehaviour
         int index = roundNumber - 1;
         if (index >= 0 && index < roundSceneNames.Length)
         {
+            if (GameDataCarrier.Instance != null)
+            {
+                GameDataCarrier.Instance.SetRound(roundNumber);
+            }
             SceneManager.LoadScene(roundSceneNames[index]);
         }
         else

@@ -28,9 +28,11 @@ public class ZombieSpawner : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     // Inspector
     // ──────────────────────────────────────────────────────────
-    [Header("Zombie Prefab")]
-    [Tooltip("Root zombie prefab to instantiate. Must have ZombieHealth, ZombiePrototypeMover, ZombieAttack.")]
+    [Header("Enemy Prefabs")]
+    [Tooltip("Primary zombie prefab (kept for backward compatibility). Must have ZombieHealth, ZombiePrototypeMover, ZombieAttack.")]
     public GameObject zombiePrefab;
+    [Tooltip("List of enemy prefabs to spawn (e.g. Zombie, Spider). If populated, spawner picks from this list. If empty, falls back to zombiePrefab.")]
+    public GameObject[] enemyPrefabs;
 
     [Header("Map Routes (optional)")]
     [Tooltip("When assigned, zombies round-robin across these waypoint routes instead of the legacy X/Z grid lanes.")]
@@ -84,9 +86,9 @@ public class ZombieSpawner : MonoBehaviour
 
     private void Start()
     {
-        if (zombiePrefab == null)
+        if (zombiePrefab == null && (enemyPrefabs == null || enemyPrefabs.Length == 0))
         {
-            Debug.LogError("[ZombieSpawner] zombiePrefab is not assigned!");
+            Debug.LogError("[ZombieSpawner] No enemy prefabs assigned!");
             return;
         }
 
@@ -97,6 +99,23 @@ public class ZombieSpawner : MonoBehaviour
         }
 
         StartCoroutine(RunWaves());
+    }
+
+    private GameObject GetRandomEnemyPrefab()
+    {
+        if (enemyPrefabs != null && enemyPrefabs.Length > 0)
+        {
+            List<GameObject> valid = new List<GameObject>();
+            for (int i = 0; i < enemyPrefabs.Length; i++)
+            {
+                if (enemyPrefabs[i] != null) valid.Add(enemyPrefabs[i]);
+            }
+            if (valid.Count > 0)
+            {
+                return valid[Random.Range(0, valid.Count)];
+            }
+        }
+        return zombiePrefab;
     }
 
     // ──────────────────────────────────────────────────────────
@@ -163,8 +182,11 @@ public class ZombieSpawner : MonoBehaviour
             spawnY,
             laneZ + Random.Range(-laneApproachJitter, laneApproachJitter));
 
-        GameObject zombie = Instantiate(zombiePrefab, spawnPos, Quaternion.identity);
-        zombie.name = $"Zombie_Wave{currentWaveIndex + 1}";
+        GameObject prefabToSpawn = GetRandomEnemyPrefab();
+        if (prefabToSpawn == null) return;
+
+        GameObject zombie = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
+        zombie.name = $"{prefabToSpawn.name}_Wave{currentWaveIndex + 1}";
         zombie.SetActive(true);
 
         ZombiePrototypeMover mover = zombie.GetComponent<ZombiePrototypeMover>();
@@ -177,7 +199,7 @@ public class ZombieSpawner : MonoBehaviour
         activeZombies.Add(zombie);
         activeZombieCount++;
 
-        Debug.Log($"[ZombieSpawner] Spawned zombie in lane {lane} at Z={laneZ:F2}");
+        Debug.Log($"[ZombieSpawner] Spawned {prefabToSpawn.name} in lane {lane} at Z={laneZ:F2}");
     }
 
     private void SpawnZombieOnRoute()
@@ -192,8 +214,11 @@ public class ZombieSpawner : MonoBehaviour
         Vector3 side = Vector3.Cross(Vector3.up, forward).normalized;
         Vector3 spawnPosition = spawnPoint.position + side * Random.Range(-routeSpawnJitter, routeSpawnJitter);
 
-        GameObject zombie = Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
-        zombie.name = $"Zombie_Wave{currentWaveIndex + 1}_{route.name}";
+        GameObject prefabToSpawn = GetRandomEnemyPrefab();
+        if (prefabToSpawn == null) return;
+
+        GameObject zombie = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+        zombie.name = $"{prefabToSpawn.name}_Wave{currentWaveIndex + 1}_{route.name}";
         zombie.SetActive(true);
 
         ZombiePrototypeMover mover = zombie.GetComponent<ZombiePrototypeMover>();
@@ -202,7 +227,7 @@ public class ZombieSpawner : MonoBehaviour
 
         activeZombies.Add(zombie);
         activeZombieCount++;
-        Debug.Log($"[ZombieSpawner] Spawned zombie on route {route.name}");
+        Debug.Log($"[ZombieSpawner] Spawned {prefabToSpawn.name} on route {route.name}");
     }
 
     private bool HasUsableRoutes()

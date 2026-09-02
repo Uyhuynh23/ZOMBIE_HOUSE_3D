@@ -13,6 +13,16 @@ public class GameDataCarrier : MonoBehaviour
     public EquipmentData equippedRightHand;
     public EquipmentData equippedLeftHand;
 
+    [Header("Round Tracking")]
+    public int currentRound = 1; // 1-3
+    public string[] roundSceneNames = new string[]
+    {
+        "Map_Day",
+        "Map_Cloudy",
+        "Map_Night"
+    };
+    public const string MainMenuSceneName = "MainMenu";
+
     private void Awake()
     {
         if (Instance == null)
@@ -37,6 +47,31 @@ public class GameDataCarrier : MonoBehaviour
             equippedRightHand = character.defaultRightHand;
             equippedLeftHand = character.defaultLeftHand;
         }
+    }
+
+    /// <summary>
+    /// Set the current round (1-based index).
+    /// </summary>
+    public void SetRound(int round)
+    {
+        currentRound = Mathf.Clamp(round, 1, roundSceneNames.Length);
+    }
+
+    public string GetCurrentRoundScene()
+    {
+        int index = currentRound - 1;
+        if (index >= 0 && index < roundSceneNames.Length)
+            return roundSceneNames[index];
+        return null;
+    }
+
+    public bool HasNextRound => currentRound < roundSceneNames.Length;
+
+    public string GetNextRoundScene()
+    {
+        if (HasNextRound)
+            return roundSceneNames[currentRound]; // Since currentRound is 1-based, index `currentRound` is the next round.
+        return null;
     }
 
     /// <summary>

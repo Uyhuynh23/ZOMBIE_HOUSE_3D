@@ -4569,6 +4569,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieSpawner
   zombiePrefab: {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
+  enemyPrefabs:
+  - {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
+  - {fileID: 8236233150771389117, guid: 7e4c39129df8464ca5d2b1f8c857731a, type: 3}
   routes:
   - {fileID: 401093844}
   - {fileID: 1670245879}

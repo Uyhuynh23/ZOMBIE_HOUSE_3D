@@ -53,6 +53,21 @@ public class PlayerController : MonoBehaviour
     private Dictionary<Renderer, Color> originalColors = new Dictionary<Renderer, Color>();
     private Dictionary<Renderer, Color> originalBaseColors = new Dictionary<Renderer, Color>();
 
+    [Header("Combat")]
+    [Tooltip("Melee damage dealt per attack swing")]
+    public int attackDamage = 35;
+    [Tooltip("Cooldown between melee attacks in seconds")]
+    public float attackCooldown = 0.5f;
+    [Tooltip("Range ahead of the player to check for enemies")]
+    public float attackRange = 1.6f;
+    [Tooltip("Radius of the melee attack hit sphere")]
+    public float attackRadius = 1.0f;
+    [Tooltip("Layer mask for enemy colliders")]
+    public LayerMask enemyLayerMask = ~0;
+
+    private float attackTimer = 0f;
+    private static readonly int AttackHash = Animator.StringToHash("Attack");
+
     public int CurrentPlantIndex => currentPlantIndex;
     public bool IsShovelMode => isShovelMode;
 
@@ -143,7 +158,13 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        if (attackTimer > 0f)
+        {
+            attackTimer -= Time.deltaTime;
+        }
+
         HandleMovement();
+        HandleAttackInput();
         HandleSelectionInput();
         CheckCurrentSquare();
         HandleActionInput();
@@ -480,5 +501,60 @@ public class PlayerController : MonoBehaviour
             
             isPlanting = false;
         }
+    }
+
+    void HandleAttackInput()
+    {
+        bool attackPressed = false;
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            attackPressed = true;
+        }
+        else if (Keyboard.current != null && (Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.fKey.wasPressedThisFrame || Keyboard.current.jKey.wasPressedThisFrame))
+        {
+            attackPressed = true;
+        }
+
+        if (attackPressed && attackTimer <= 0f && !isPlanting)
+        {
+            PerformAttack();
+        }
+    }
+
+    void PerformAttack()
+    {
+        attackTimer = attackCooldown;
+
+        if (animator != null)
+        {
+            animator.SetTrigger(AttackHash);
+        }
+
+        // Perform forward sphere overlap to detect enemies
+        Vector3 hitOrigin = transform.position + transform.forward * attackRange * 0.5f + Vector3.up * 0.7f;
+        Collider[] hits = Physics.OverlapSphere(hitOrigin, attackRadius, enemyLayerMask);
+
+        HashSet<ZombieHealth> damagedEnemies = new HashSet<ZombieHealth>();
+
+        foreach (Collider hit in hits)
+        {
+            if (hit.CompareTag("Zombie"))
+            {
+                ZombieHealth enemyHealth = hit.GetComponentInParent<ZombieHealth>();
+                if (enemyHealth != null && !damagedEnemies.Contains(enemyHealth))
+                {
+                    damagedEnemies.Add(enemyHealth);
+                    enemyHealth.TakeDamage(attackDamage);
+                    Debug.Log($"[PlayerCombat] Hit {enemyHealth.gameObject.name} for {attackDamage} damage! HP left: {enemyHealth.currentHealth}");
+                }
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.magenta;
+        Vector3 hitOrigin = transform.position + transform.forward * attackRange * 0.5f + Vector3.up * 0.7f;
+        Gizmos.DrawWireSphere(hitOrigin, attackRadius);
     }
 }

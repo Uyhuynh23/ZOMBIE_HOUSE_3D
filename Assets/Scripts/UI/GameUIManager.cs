@@ -27,6 +27,7 @@ public class GameUIManager : MonoBehaviour
     public GameObject losePanel;
 
     [Header("Battle Status")]
+    public Text roundText;
     public Text waveText;
     public Text zombieText;
     public Text houseHealthText;
@@ -115,6 +116,11 @@ public class GameUIManager : MonoBehaviour
 
     private void UpdateBattleStatus()
     {
+        if (roundText != null && GameDataCarrier.Instance != null)
+        {
+            roundText.text = $"ROUND {GameDataCarrier.Instance.currentRound} / {GameDataCarrier.Instance.roundSceneNames.Length}";
+        }
+
         ZombieSpawner spawner = ZombieSpawner.Instance;
         if (spawner != null)
         {
@@ -140,10 +146,28 @@ public class GameUIManager : MonoBehaviour
     }
 
     /// <summary>Show victory overlay.</summary>
-    public void ShowWinScreen()
+    public void ShowWinScreen(bool hasNextRound = false)
     {
-        if (winPanel != null) winPanel.SetActive(true);
-        else Debug.Log("[UI] YOU WIN!");
+        if (winPanel != null)
+        {
+            winPanel.SetActive(true);
+            Text titleText = winPanel.GetComponentInChildren<Text>();
+            if (titleText != null)
+            {
+                if (hasNextRound)
+                {
+                    titleText.text = "Round Complete!\nNext round starting...";
+                }
+                else
+                {
+                    titleText.text = "Victory!\nAll rounds cleared!";
+                }
+            }
+        }
+        else
+        {
+            Debug.Log(hasNextRound ? "[UI] Round Complete!" : "[UI] YOU WIN! All rounds cleared!");
+        }
     }
 
     /// <summary>Show game-over overlay.</summary>
