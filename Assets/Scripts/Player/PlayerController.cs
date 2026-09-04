@@ -456,6 +456,7 @@ public class PlayerController : MonoBehaviour
                 {
                     UpdateTargetedPlant(null); // Clear flash before destroy
                     currentSquare.currentPlant.OnShoveled(); // PlantBase handles cleanup
+                    AudioManager.PlaySfx(AudioCue.PlantRemoved);
                     Debug.Log("Shoveled plant!");
                 }
             }
@@ -520,6 +521,8 @@ public class PlayerController : MonoBehaviour
                         // Fallback for prefabs without PlantBase (shouldn't happen)
                         currentSquare.SetOccupied(true);
                     }
+
+                    AudioManager.PlaySfx(AudioCue.PlantPlaced);
                 }
             }
             
@@ -565,6 +568,8 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetTrigger(AttackHash);
         }
+
+        AudioManager.PlaySfx(AudioCue.PlayerAttack);
 
         // Wait until the downward chop connects in the animation before dealing damage
         yield return new WaitForSeconds(attackDamageDelay);

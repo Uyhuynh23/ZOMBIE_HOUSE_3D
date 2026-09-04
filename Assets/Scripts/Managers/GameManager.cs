@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.Playing) return;
 
         currentState = GameState.Won;
+        AudioManager.PlaySfx(AudioCue.Win);
         Debug.Log("[GameManager] 🎉 YOU WIN! All waves cleared.");
 
         bool hasNextRound = false;
@@ -69,6 +70,7 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.Playing) return;
 
         currentState = GameState.Lost;
+        AudioManager.PlaySfx(AudioCue.Lose);
         Debug.Log("[GameManager] GAME OVER! The house was destroyed.");
 
         if (GameUIManager.Instance != null)
