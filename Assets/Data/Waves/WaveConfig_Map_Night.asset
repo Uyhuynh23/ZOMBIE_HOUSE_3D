@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0615264d74b8d0b4285f4e15abc9e3a9, type: 3}
+  m_Name: WaveConfig_Map_Night
+  m_EditorClassIdentifier: Assembly-CSharp::MapWaveConfig
+  mapName: Round 3 - Night
+  routeMoveSpeed: 2.95
+  routeSpawnJitter: 0.35
+  allowedEnemyPrefabs:
+  - {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
+  - {fileID: 8236233150771389117, guid: 7e4c39129df8464ca5d2b1f8c857731a, type: 3}
+  waves:
+  - zombieCount: 8
+    spawnInterval: 1.2
+    delayBeforeWave: 3
+  - zombieCount: 12
+    spawnInterval: 1
+    delayBeforeWave: 5
+  - zombieCount: 16
+    spawnInterval: 0.85
+    delayBeforeWave: 5
+  - zombieCount: 20
+    spawnInterval: 0.75
+    delayBeforeWave: 5.5
+  - zombieCount: 25
+    spawnInterval: 0.65
+    delayBeforeWave: 6
