@@ -56,8 +56,13 @@ public class PlayerController : MonoBehaviour
     [Header("Combat")]
     [Tooltip("Melee damage dealt per attack swing")]
     public int attackDamage = 35;
-    [Tooltip("Cooldown between melee attacks in seconds")]
-    public float attackCooldown = 0.5f;
+    [Tooltip("Total duration of the attack animation lock / cooldown in seconds")]
+    public float attackDuration = 0.85f;
+    [Tooltip("Delay in seconds from the start of the attack animation until damage lands (impact moment)")]
+    public float attackDamageDelay = 0.38f;
+    [Tooltip("Movement speed multiplier while performing an attack swing (0 = rooted, 0.15 = slow step)")]
+    [Range(0f, 1f)]
+    public float attackMovementMultiplier = 0.15f;
     [Tooltip("Range ahead of the player to check for enemies")]
     public float attackRange = 1.6f;
     [Tooltip("Radius of the melee attack hit sphere")]
@@ -66,10 +71,13 @@ public class PlayerController : MonoBehaviour
     public LayerMask enemyLayerMask = ~0;
 
     private float attackTimer = 0f;
+    private bool isAttacking = false;
+    private Coroutine attackCoroutine = null;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
 
     public int CurrentPlantIndex => currentPlantIndex;
     public bool IsShovelMode => isShovelMode;
+    public bool IsAttacking => isAttacking;
 
     void Start()
     {
@@ -82,6 +90,16 @@ public class PlayerController : MonoBehaviour
         {
             SelectPlant(0);
         }
+    }
+
+    void OnDisable()
+    {
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+        isAttacking = false;
     }
 
     void SetupIndicator()
@@ -165,10 +183,15 @@ public class PlayerController : MonoBehaviour
 
         HandleMovement();
         HandleAttackInput();
-        HandleSelectionInput();
-        CheckCurrentSquare();
-        HandleActionInput();
-        UpdateTargetFlash();
+
+        if (!isAttacking)
+        {
+            HandleSelectionInput();
+            CheckCurrentSquare();
+            HandleActionInput();
+            UpdateTargetFlash();
+        }
+
         ApplyBoundaries();
     }
 
@@ -279,8 +302,9 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0f, smoothedAngle, 0f);
             }
 
-            move = direction * moveSpeed;
-            if (animator != null) animator.SetBool("IsMoving", true);
+            float speed = isAttacking ? moveSpeed * attackMovementMultiplier : moveSpeed;
+            move = direction * speed;
+            if (animator != null) animator.SetBool("IsMoving", !isAttacking);
         }
         else
         {
@@ -505,6 +529,9 @@ public class PlayerController : MonoBehaviour
 
     void HandleAttackInput()
     {
+        if (isAttacking || attackTimer > 0f || isPlanting)
+            return;
+
         bool attackPressed = false;
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -515,22 +542,49 @@ public class PlayerController : MonoBehaviour
             attackPressed = true;
         }
 
-        if (attackPressed && attackTimer <= 0f && !isPlanting)
+        if (attackPressed)
         {
-            PerformAttack();
+            StartAttack();
         }
     }
 
-    void PerformAttack()
+    void StartAttack()
     {
-        attackTimer = attackCooldown;
+        if (attackCoroutine != null)
+            StopCoroutine(attackCoroutine);
+
+        attackCoroutine = StartCoroutine(AttackSequence());
+    }
+
+    private System.Collections.IEnumerator AttackSequence()
+    {
+        isAttacking = true;
+        attackTimer = attackDuration;
 
         if (animator != null)
         {
             animator.SetTrigger(AttackHash);
         }
 
-        // Perform forward sphere overlap to detect enemies
+        // Wait until the downward chop connects in the animation before dealing damage
+        yield return new WaitForSeconds(attackDamageDelay);
+
+        // Deal damage at the exact moment of impact
+        ApplyMeleeDamage();
+
+        // Wait for the remaining recovery duration of the attack animation
+        float recoveryTime = Mathf.Max(0f, attackDuration - attackDamageDelay);
+        if (recoveryTime > 0f)
+        {
+            yield return new WaitForSeconds(recoveryTime);
+        }
+
+        isAttacking = false;
+        attackCoroutine = null;
+    }
+
+    void ApplyMeleeDamage()
+    {
         Vector3 hitOrigin = transform.position + transform.forward * attackRange * 0.5f + Vector3.up * 0.7f;
         Collider[] hits = Physics.OverlapSphere(hitOrigin, attackRadius, enemyLayerMask);
 

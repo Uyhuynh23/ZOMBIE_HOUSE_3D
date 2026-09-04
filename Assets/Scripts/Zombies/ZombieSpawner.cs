@@ -54,6 +54,10 @@ public class ZombieSpawner : MonoBehaviour
     [Tooltip("X position where zombies stop and attack the house.")]
     public float houseAttackX = -4.75f;
 
+    [Header("Wave Configuration (Optional ScriptableObject)")]
+    [Tooltip("If assigned, waves and speed settings will be loaded from this config. Otherwise uses the inspector waves below.")]
+    public MapWaveConfig waveConfig;
+
     [Header("Waves")]
     public WaveData[] waves = new WaveData[]
     {
@@ -82,6 +86,18 @@ public class ZombieSpawner : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
+
+        if (waveConfig != null)
+        {
+            if (waveConfig.waves != null && waveConfig.waves.Length > 0)
+                waves = waveConfig.waves;
+            if (waveConfig.routeMoveSpeed > 0f)
+                routeMoveSpeed = waveConfig.routeMoveSpeed;
+            if (waveConfig.routeSpawnJitter >= 0f)
+                routeSpawnJitter = waveConfig.routeSpawnJitter;
+            if (waveConfig.allowedEnemyPrefabs != null && waveConfig.allowedEnemyPrefabs.Length > 0)
+                enemyPrefabs = waveConfig.allowedEnemyPrefabs;
+        }
     }
 
     private void Start()
