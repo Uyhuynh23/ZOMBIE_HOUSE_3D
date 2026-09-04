@@ -432,6 +432,7 @@ public class PlayerController : MonoBehaviour
                 {
                     UpdateTargetedPlant(null); // Clear flash before destroy
                     currentSquare.currentPlant.OnShoveled(); // PlantBase handles cleanup
+                    AudioManager.PlaySfx(AudioCue.PlantRemoved);
                     Debug.Log("Shoveled plant!");
                 }
             }
@@ -496,6 +497,8 @@ public class PlayerController : MonoBehaviour
                         // Fallback for prefabs without PlantBase (shouldn't happen)
                         currentSquare.SetOccupied(true);
                     }
+
+                    AudioManager.PlaySfx(AudioCue.PlantPlaced);
                 }
             }
             
@@ -529,6 +532,8 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetTrigger(AttackHash);
         }
+
+        AudioManager.PlaySfx(AudioCue.PlayerAttack);
 
         // Perform forward sphere overlap to detect enemies
         Vector3 hitOrigin = transform.position + transform.forward * attackRange * 0.5f + Vector3.up * 0.7f;

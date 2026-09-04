@@ -29,6 +29,7 @@ public class PeaProjectile : MonoBehaviour
             if (zh != null)
             {
                 zh.TakeDamage(damage);
+                AudioManager.PlaySfx(AudioCue.ProjectileHit);
             }
 
             ReturnToPool();

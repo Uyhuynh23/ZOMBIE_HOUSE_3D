@@ -28,6 +28,7 @@ public sealed class HouseHealth : MonoBehaviour
         if (currentHealth <= 0 || amount <= 0) return;
 
         currentHealth = Mathf.Max(0, currentHealth - amount);
+        AudioManager.PlaySfx(AudioCue.HouseHit);
         HealthChanged?.Invoke(currentHealth, maxHealth);
         Debug.Log($"[HouseHealth] House HP: {currentHealth}/{maxHealth}");
 

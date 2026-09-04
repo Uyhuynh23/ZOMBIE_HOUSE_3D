@@ -128,6 +128,8 @@ public class PeashooterCombat : PlantBase
         }
         pp.Initialize();
 
+        AudioManager.PlaySfx(AudioCue.PeashooterShot);
+
         if (animator != null)
         {
             animator.SetTrigger("Shoot");

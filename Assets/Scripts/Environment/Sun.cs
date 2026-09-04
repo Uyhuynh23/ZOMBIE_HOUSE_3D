@@ -45,6 +45,7 @@ public class Sun : MonoBehaviour
             {
                 EconomyManager.Instance.AddSun(sunValue);
             }
+            AudioManager.PlaySfx(AudioCue.SunCollect);
             Destroy(gameObject);
         }
     }
