@@ -1,10 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// Handles zombie melee attack against plants.
-/// Attach to the zombie root. Works alongside ZombiePrototypeMover.
+/// Handles zombie melee attack against plants and the player's house.
+/// Works with both EnemyNavAgent (NavMesh mode) and ZombiePrototypeMover (legacy mode).
 /// </summary>
-[RequireComponent(typeof(ZombiePrototypeMover))]
 public class ZombieAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
@@ -15,34 +14,51 @@ public class ZombieAttack : MonoBehaviour
     public float attackInterval = 1.2f;
 
     [Tooltip("Max distance to keep attacking a plant")]
-    public float attackRange = 1.0f;
+    public float attackRange = 1.8f;
 
     [Header("Animation")]
     [SerializeField] private Animator animator;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
 
+    // ──────────────────────────────────────────────────────────
+    // References — supports both AI modes
+    // ──────────────────────────────────────────────────────────
+    private EnemyNavAgent navAgent;           // NavMesh mode
+    private ZombiePrototypeMover legacyMover; // Legacy mode
+
     private PlantBase currentTarget;
-    private float attackTimer = 0f;
-    private ZombiePrototypeMover mover;
+    private float attackTimer;
 
     private void Awake()
     {
-        mover = GetComponent<ZombiePrototypeMover>();
+        navAgent    = GetComponent<EnemyNavAgent>();
+        legacyMover = GetComponent<ZombiePrototypeMover>();
+
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
     }
 
     private void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        if (GameManager.Instance != null &&
+            GameManager.Instance.CurrentState != GameManager.GameState.Playing)
             return;
 
-        // Ask the mover what plant it is blocked by.
-        currentTarget = mover.BlockingPlant;
+        // Pull state from whichever AI is active
+        PlantBase blockingPlant = navAgent != null  ? navAgent.BlockingPlant
+                                : legacyMover != null ? legacyMover.BlockingPlant
+                                : null;
+
+        bool isAtHouse = navAgent != null      ? navAgent.IsAtHouse
+                       : legacyMover != null   ? legacyMover.IsAtHouse
+                       : false;
+
+        currentTarget = blockingPlant;
 
         if (currentTarget == null)
         {
-            if (mover.IsAtHouse && HouseHealth.Instance != null)
+            // Attack house if at destination
+            if (isAtHouse && HouseHealth.Instance != null)
             {
                 attackTimer -= Time.deltaTime;
                 if (attackTimer <= 0f)
@@ -59,12 +75,12 @@ public class ZombieAttack : MonoBehaviour
             return;
         }
 
-        // Check still in range (plant might have been removed)
+        // Check still in range (plant might have been destroyed)
         float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
         if (dist > attackRange + 0.5f)
         {
             currentTarget = null;
-            mover.ClearBlockingPlant();
+            ClearBlockingPlant();
             return;
         }
 
@@ -81,23 +97,31 @@ public class ZombieAttack : MonoBehaviour
         if (currentTarget == null) return;
 
         currentTarget.TakeDamage(damagePerAttack);
-
         TriggerAttackAnimation();
 
-        Debug.Log($"[ZombieAttack] {gameObject.name} hit {currentTarget.gameObject.name} for {damagePerAttack} dmg");
+        if (currentTarget.currentHealth <= 0)
+        {
+            currentTarget = null;
+            ClearBlockingPlant();
+        }
+    }
+
+    private void ClearBlockingPlant()
+    {
+        if (navAgent != null)    navAgent.ClearBlockingPlant();
+        if (legacyMover != null) legacyMover.ClearBlockingPlant();
     }
 
     private void TriggerAttackAnimation()
     {
-        if (animator != null && animator.runtimeAnimatorController != null)
+        if (animator == null || animator.runtimeAnimatorController == null) return;
+
+        foreach (AnimatorControllerParameter p in animator.parameters)
         {
-            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            if (p.nameHash == AttackHash && p.type == AnimatorControllerParameterType.Trigger)
             {
-                if (parameter.nameHash == AttackHash && parameter.type == AnimatorControllerParameterType.Trigger)
-                {
-                    animator.SetTrigger(AttackHash);
-                    break;
-                }
+                animator.SetTrigger(AttackHash);
+                break;
             }
         }
     }

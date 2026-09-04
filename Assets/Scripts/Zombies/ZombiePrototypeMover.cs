@@ -110,10 +110,13 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
     // ──────────────────────────────────────────────────────────
+    private Rigidbody rb;
+
     private void Awake()
     {
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Start()
@@ -134,17 +137,27 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
             UpdateLane();
     }
 
+    private void OnCollisionStay(Collision collision)
+    {
+        // Fallback for house detection in case baseBoundaryX isn't perfect
+        if (collision.gameObject.name.IndexOf("house", System.StringComparison.OrdinalIgnoreCase) >= 0 ||
+            collision.gameObject.GetComponentInParent<HouseHealth>() != null)
+        {
+            IsAtHouse = true;
+        }
+    }
+
     // ──────────────────────────────────────────────────────────
     // Patrol mode (original ZombiePrototype behaviour)
     // ──────────────────────────────────────────────────────────
     private void UpdatePatrol()
     {
-        if (currentTarget == null) { SetAnimationSpeed(0f); return; }
+        if (currentTarget == null) { StopMovement(); return; }
 
         if (pauseTimer > 0f)
         {
             pauseTimer -= Time.deltaTime;
-            SetAnimationSpeed(0f);
+            StopMovement();
             return;
         }
 
@@ -156,7 +169,7 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
             transform.position = new Vector3(currentTarget.position.x, transform.position.y, currentTarget.position.z);
             currentTarget = currentTarget == patrolPointA ? patrolPointB : patrolPointA;
             pauseTimer = pauseDuration;
-            SetAnimationSpeed(0f);
+            StopMovement();
             return;
         }
 
@@ -170,20 +183,17 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
         {
-            SetAnimationSpeed(0f);
+            StopMovement();
             return;
         }
 
-        // If blocked by a plant that's still alive → stop and let ZombieAttack handle it
         if (blockingPlant != null)
         {
             if (blockingPlant == null || !blockingPlant.gameObject.activeInHierarchy || blockingPlant.currentHealth <= 0)
-            {
-                blockingPlant = null; // plant is dead, resume walking
-            }
+                blockingPlant = null;
             else
             {
-                SetAnimationSpeed(0f);
+                StopMovement();
                 return;
             }
         }
@@ -193,29 +203,26 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(sensorCenter, detectionRadius, plantLayerMask);
         foreach (var hit in hits)
         {
-            // Only physical (non-trigger) colliders count as blockers
             if (hit.isTrigger) continue;
             PlantBase plant = hit.GetComponentInParent<PlantBase>();
             if (plant != null)
             {
                 blockingPlant = plant;
-                SetAnimationSpeed(0f);
+                StopMovement();
                 return;
             }
         }
 
-        // Reached the house attack line? Stop here; ZombieAttack damages HouseHealth.
         if (transform.position.x <= baseBoundaryX)
         {
-            SetAnimationSpeed(0f);
+            StopMovement();
             IsAtHouse = true;
             return;
         }
 
         IsAtHouse = false;
-
-        // Zombies can enter from slightly different directions, then lock to a straight lane.
         Vector3 moveDirection = advanceDirection;
+        
         if (transform.position.x > laneEntryX && Mathf.Abs(transform.position.z - assignedLaneZ) > 0.03f)
         {
             Vector3 laneEntry = new Vector3(laneEntryX, transform.position.y, assignedLaneZ);
@@ -223,9 +230,13 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         }
         else
         {
-            Vector3 snapped = transform.position;
-            snapped.z = Mathf.MoveTowards(snapped.z, assignedLaneZ, moveSpeed * 1.5f * Time.deltaTime);
-            transform.position = snapped;
+            // Instead of directly setting transform.position, we move towards the Z axis gracefully
+            float zDiff = assignedLaneZ - transform.position.z;
+            if (Mathf.Abs(zDiff) > 0.05f)
+            {
+                moveDirection.z += Mathf.Sign(zDiff) * 0.5f;
+                moveDirection.Normalize();
+            }
         }
 
         MoveToward(moveDirection);
@@ -238,13 +249,13 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     {
         if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
         {
-            SetAnimationSpeed(0f);
+            StopMovement();
             return;
         }
 
         if (assignedRoute == null || assignedRoute.WaypointCount < 2)
         {
-            SetAnimationSpeed(0f);
+            StopMovement();
             return;
         }
 
@@ -262,14 +273,13 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
             if (toTarget.sqrMagnitude > 0.12f * 0.12f)
                 break;
 
-            transform.position = new Vector3(point.position.x, point.position.y, point.position.z);
             routePointIndex++;
         }
 
         if (routePointIndex >= assignedRoute.WaypointCount)
         {
             IsAtHouse = true;
-            SetAnimationSpeed(0f);
+            StopMovement();
             return;
         }
 
@@ -277,19 +287,18 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         Transform target = assignedRoute.GetWaypoint(routePointIndex);
         Vector3 moveDirection = target.position - transform.position;
         moveDirection.y = 0f;
+        
         if (moveDirection.sqrMagnitude < 0.001f)
             return;
+            
         moveDirection.Normalize();
 
         if (TryBlockOnPlant(moveDirection))
         {
-            SetAnimationSpeed(0f);
+            StopMovement();
             return;
         }
 
-        Vector3 grounded = transform.position;
-        grounded.y = Mathf.MoveTowards(grounded.y, target.position.y, moveSpeed * Time.deltaTime);
-        transform.position = grounded;
         MoveToward(moveDirection);
     }
 
@@ -304,42 +313,64 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         }
 
         movementDirection.y = 0f;
-        if (movementDirection.sqrMagnitude < 0.001f)
-            return false;
+        if (movementDirection.sqrMagnitude < 0.001f) return false;
         movementDirection.Normalize();
 
         Vector3 sensorCenter = transform.position + Vector3.up * 0.78f + movementDirection * detectionOffset;
         Collider[] hits = Physics.OverlapSphere(sensorCenter, detectionRadius, plantLayerMask);
         foreach (Collider hit in hits)
         {
-            if (hit.isTrigger)
-                continue;
-
+            if (hit.isTrigger) continue;
             PlantBase plant = hit.GetComponentInParent<PlantBase>();
-            if (plant == null)
-                continue;
-
-            blockingPlant = plant;
-            return true;
+            if (plant != null)
+            {
+                blockingPlant = plant;
+                return true;
+            }
         }
-
         return false;
     }
 
     private void MoveToward(Vector3 direction)
     {
         direction.y = 0f;
-        if (direction.sqrMagnitude < 0.001f) { SetAnimationSpeed(0f); return; }
+        if (direction.sqrMagnitude < 0.001f) { StopMovement(); return; }
 
         Vector3 facingDir = visualFacesBackward ? -direction : direction;
         Quaternion targetRot = Quaternion.LookRotation(facingDir, Vector3.up);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, turnSpeed * Time.deltaTime);
 
         float alignment = Vector3.Dot(transform.forward, facingDir);
-        if (alignment > 0.75f)
-            transform.position += direction * moveSpeed * Time.deltaTime;
-
-        SetAnimationSpeed(1f);
+        if (alignment > 0.5f)
+        {
+            if (rb != null && !rb.isKinematic)
+            {
+                Vector3 vel = direction * moveSpeed;
+                vel.y = rb.linearVelocity.y; // Preserve gravity
+                rb.linearVelocity = vel;
+            }
+            else
+            {
+                transform.position += direction * moveSpeed * Time.deltaTime;
+            }
+            
+            // Sync animation speed proportionally to move speed to prevent sliding.
+            // Assuming 0.95f is the base walk speed for normal animation speed.
+            SetAnimationSpeed(moveSpeed / 0.95f);
+        }
+        else
+        {
+            StopMovement();
+        }
+    }
+    
+    private void StopMovement()
+    {
+        if (rb != null && !rb.isKinematic)
+        {
+            rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
+        }
+        SetAnimationSpeed(0f);
     }
 
     private void SetAnimationSpeed(float value)

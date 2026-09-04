@@ -298,11 +298,7 @@ public static class ZombiePlantIntegrationSceneBuilder
     {
         ZombieSpawner spawner     = gameManagerGO.AddComponent<ZombieSpawner>();
         spawner.zombiePrefab      = zombieTemplate;
-        spawner.spawnX            = 8f;
-        spawner.spawnY            = 0f;
-        spawner.laneApproachJitter = 0.9f;
-        spawner.laneEntryX         = 6.2f;
-        spawner.houseAttackX       = -4.65f;
+        // Legacy lane fields removed — ZombieSpawner now uses NavMesh spawnPoints.
         spawner.waves = new ZombieSpawner.WaveData[]
         {
             new ZombieSpawner.WaveData { zombieCount = 3, spawnInterval = 2.2f, delayBeforeWave = 4f  },

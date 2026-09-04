@@ -2,8 +2,9 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Health component for zombies. Attach to the root of each zombie prefab.
-/// Fires OnZombieDied so other systems (spawner, game manager) can react.
+/// Health component for all enemy types (Zombie, Spider).
+/// Fires OnZombieDied so spawner and game manager can react.
+/// Triggers hit stagger on EnemyNavAgent when damaged.
 /// </summary>
 public class ZombieHealth : MonoBehaviour
 {
@@ -14,14 +15,20 @@ public class ZombieHealth : MonoBehaviour
     [Header("Death FX (optional)")]
     [Tooltip("If assigned, instantiated at death position.")]
     public GameObject deathFXPrefab;
-    [Tooltip("Seconds before the object is destroyed / returned to pool after death.")]
+    [Tooltip("Seconds before the object is destroyed after death.")]
     public float deathDelay = 0.5f;
 
-    /// <summary>Fired when this zombie dies. Passes the zombie's root GameObject.</summary>
+    /// <summary>Fired when this enemy dies. Passes the root GameObject.</summary>
     public static event Action<GameObject> OnZombieDied;
     public event Action<int, int> HealthChanged;
 
-    private bool isDead = false;
+    private bool isDead;
+    private EnemyNavAgent navAgent;
+
+    private void Awake()
+    {
+        navAgent = GetComponent<EnemyNavAgent>();
+    }
 
     private void OnEnable()
     {
@@ -42,7 +49,9 @@ public class ZombieHealth : MonoBehaviour
 
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Max(0, amount));
         HealthChanged?.Invoke(currentHealth, maxHealth);
-        Debug.Log($"[ZombieHealth] {gameObject.name} HP: {currentHealth}/{maxHealth}");
+
+        // Trigger hit stagger (slow down briefly)
+        navAgent?.TriggerHitStagger();
 
         if (currentHealth <= 0)
             Die();
@@ -53,19 +62,25 @@ public class ZombieHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
+        // Notify nav agent to stop
+        navAgent?.OnDeath();
+
+        // FX
         if (deathFXPrefab != null)
             Instantiate(deathFXPrefab, transform.position, Quaternion.identity);
 
+        // Events
         OnZombieDied?.Invoke(gameObject);
-
-        // Notify spawner so it can update its active zombie count
         ZombieSpawner.Instance?.OnZombieDied(gameObject);
 
-        foreach (Collider bodyCollider in GetComponentsInChildren<Collider>())
-            bodyCollider.enabled = false;
+        // Disable all colliders so corpse doesn't block
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+            col.enabled = false;
 
-        ZombiePrototypeMover mover = GetComponent<ZombiePrototypeMover>();
-        if (mover != null) mover.enabled = false;
+        // Disable legacy mover if present
+        ZombiePrototypeMover legacyMover = GetComponent<ZombiePrototypeMover>();
+        if (legacyMover != null) legacyMover.enabled = false;
+
         ZombieAttack attack = GetComponent<ZombieAttack>();
         if (attack != null) attack.enabled = false;
 

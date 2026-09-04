@@ -90,6 +90,36 @@ public class PlayerController : MonoBehaviour
         {
             SelectPlant(0);
         }
+
+        // Snap to terrain on spawn so the character doesn't float
+        SnapToGround();
+    }
+
+    /// <summary>Teleport the character down onto the terrain/collider beneath it at spawn.</summary>
+    void SnapToGround()
+    {
+        // Try terrain first (cheap)
+        Terrain terrain = Terrain.activeTerrain;
+        if (terrain != null)
+        {
+            Vector3 pos = transform.position;
+            float terrainY = terrain.SampleHeight(pos) + terrain.transform.position.y;
+            if (Mathf.Abs(pos.y - terrainY) < 10f) // only snap if reasonably close
+            {
+                controller.enabled = false;
+                transform.position = new Vector3(pos.x, terrainY, pos.z);
+                controller.enabled = true;
+                return;
+            }
+        }
+
+        // Fallback: raycast downward
+        if (Physics.Raycast(transform.position + Vector3.up * 2f, Vector3.down, out RaycastHit hit, 20f))
+        {
+            controller.enabled = false;
+            transform.position = hit.point;
+            controller.enabled = true;
+        }
     }
 
     void OnDisable()
@@ -278,10 +308,10 @@ public class PlayerController : MonoBehaviour
 
         if (controller.isGrounded && velocityY < 0f)
         {
-            velocityY = -2f; // Stick to ground
+            velocityY = -4f; // Stronger ground stick force
         }
         
-        velocityY += -9.81f * 2f * Time.deltaTime; // Apply gravity
+        velocityY += -9.81f * 4f * Time.deltaTime; // Stronger gravity so feet stay grounded
 
         Vector3 move = Vector3.zero;
 
