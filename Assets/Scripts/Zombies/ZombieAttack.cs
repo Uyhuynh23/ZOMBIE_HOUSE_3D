@@ -48,6 +48,7 @@ public class ZombieAttack : MonoBehaviour
                 if (attackTimer <= 0f)
                 {
                     HouseHealth.Instance.TakeDamage(damagePerAttack);
+                    AudioManager.PlaySfx(AudioCue.ZombieAttack);
                     TriggerAttackAnimation();
                     attackTimer = attackInterval;
                 }
@@ -81,6 +82,7 @@ public class ZombieAttack : MonoBehaviour
         if (currentTarget == null) return;
 
         currentTarget.TakeDamage(damagePerAttack);
+        AudioManager.PlaySfx(AudioCue.ZombieAttack);
 
         TriggerAttackAnimation();
 

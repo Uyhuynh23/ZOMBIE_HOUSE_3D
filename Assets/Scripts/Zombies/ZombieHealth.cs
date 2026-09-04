@@ -53,6 +53,8 @@ public class ZombieHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
+        AudioManager.PlaySfx(AudioCue.ZombieDeath);
+
         if (deathFXPrefab != null)
             Instantiate(deathFXPrefab, transform.position, Quaternion.identity);
 
