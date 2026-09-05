@@ -140,8 +140,8 @@ public static class GameMapsIntegrationBuilder
         // 8. Minimap System
         EnsureMinimapSystem();
 
-        // 9. 3D In-Game Instruction Board
-        EnsureInstructionBoard(integrationRoot.transform, terrain, center);
+        // 9. 3D In-Game Instruction Board (Tutorial map only; removed from main maps)
+        // EnsureInstructionBoard(integrationRoot.transform, terrain, center);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);

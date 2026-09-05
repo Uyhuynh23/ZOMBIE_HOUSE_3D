@@ -39,8 +39,8 @@ public class TutorialManager : MonoBehaviour
     public GameObject sunPrefab;
     public GameObject zombiePrefab;
     public Transform[] sunSpawnPoints;
-    public float zombieSpawnInterval = 4.0f;
-    public int tutorialZombieCount = 3;
+    public float zombieSpawnInterval = 2.0f;
+    public int tutorialZombieCount = 5;
 
     [Header("End-Tutorial UI")]
     public GameObject completionPanel;
@@ -65,6 +65,12 @@ public class TutorialManager : MonoBehaviour
     private int initialSun = 0;
     private bool hasPlantedSunflower = false;
     private bool hasPlantedPeashooter = false;
+
+    // Transition guards to prevent multi-coroutine duplicate spawning
+    private bool isTransitioningToPhase2 = false;
+    private bool isTransitioningToPhase3 = false;
+    private bool hasStartedPhase3 = false;
+    private bool isCompletingTutorial = false;
 
     private List<ZombieHealth> activeTutorialZombies = new List<ZombieHealth>();
     private bool isSpawningZombies = false;
@@ -345,8 +351,9 @@ public class TutorialManager : MonoBehaviour
         }
 
         // Check completion
-        if (hasMoved && hasAttacked && hasReachedWaypoint1)
+        if (hasMoved && hasAttacked && hasReachedWaypoint1 && !isTransitioningToPhase2)
         {
+            isTransitioningToPhase2 = true;
             StartCoroutine(TransitionToPhase2());
         }
     }
@@ -464,8 +471,9 @@ public class TutorialManager : MonoBehaviour
 
         RefreshPhase2UI();
 
-        if (hasPlantedSunflower && hasPlantedPeashooter)
+        if (hasPlantedSunflower && hasPlantedPeashooter && !isTransitioningToPhase3)
         {
+            isTransitioningToPhase3 = true;
             StartCoroutine(TransitionToPhase3());
         }
     }
@@ -513,6 +521,9 @@ public class TutorialManager : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private void StartPhase3()
     {
+        if (hasStartedPhase3) return;
+        hasStartedPhase3 = true;
+
         currentPhase = TutorialPhase.ZombieDefense;
 
         // Activate BattleStatus for combat wave
@@ -550,12 +561,15 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator SpawnTutorialZombieWave()
     {
+        if (isSpawningZombies) yield break;
         isSpawningZombies = true;
         activeTutorialZombies.Clear();
 
         for (int i = 0; i < tutorialZombieCount; i++)
         {
-            yield return new WaitForSeconds(i == 0 ? 1.5f : zombieSpawnInterval);
+            // First zombie appears after 1 second, then each subsequent zombie appears at different times (every zombieSpawnInterval seconds)
+            float delay = (i == 0) ? 1.0f : zombieSpawnInterval;
+            yield return new WaitForSeconds(delay);
 
             if (zombiePrefab != null && tutorialRoute != null)
             {
@@ -603,8 +617,9 @@ public class TutorialManager : MonoBehaviour
             SetObjectiveBanner("CHECKPOINT 3: REPEL THE ZOMBIE WAVE",
                 $"[ ] Defend the Baker's House   •   {zCheck} Defeat Zombies ({eliminated}/{tutorialZombieCount})");
 
-            if (!isSpawningZombies && activeTutorialZombies.Count == 0)
+            if (!isSpawningZombies && activeTutorialZombies.Count == 0 && !isCompletingTutorial)
             {
+                isCompletingTutorial = true;
                 StartCoroutine(CompleteTutorial());
             }
         }
@@ -615,8 +630,9 @@ public class TutorialManager : MonoBehaviour
         // Clean up any destroyed zombies
         activeTutorialZombies.RemoveAll(z => z == null || z.currentHealth <= 0);
 
-        if (!isSpawningZombies && activeTutorialZombies.Count == 0)
+        if (!isSpawningZombies && activeTutorialZombies.Count == 0 && !isCompletingTutorial)
         {
+            isCompletingTutorial = true;
             StartCoroutine(CompleteTutorial());
         }
     }

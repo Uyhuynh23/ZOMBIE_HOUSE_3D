@@ -103,6 +103,8 @@ public static class TutorialSceneBuilder
         manager.houseHealth = houseHealth;
         manager.sunPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SunPrefabPath);
         manager.zombiePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ZombiePrefabPath);
+        manager.tutorialZombieCount = 5;
+        manager.zombieSpawnInterval = 2.0f;
         manager.completionPanel = completionPanel;
         manager.titleFont = LoadShlopFont();
         manager.bodyFont = LoadUIFont();

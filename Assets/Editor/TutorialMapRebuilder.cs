@@ -32,11 +32,8 @@ public static class TutorialMapRebuilder
             // 2. Rebuild Tutorial Map with large fonts, enlarged easel, and HUD banner
             TutorialSceneBuilder.BuildTutorialMap();
 
-            // 3. Re-integrate all game maps
-            GameMapsIntegrationBuilder.IntegrateAllMaps();
-
-            File.WriteAllText(ResultFile, "SUCCESS: Tutorial Map and 3D Instruction Board rebuilt with large text.");
-            Debug.Log("[TutorialMapRebuilder] 🎉 All maps and 3D instruction boards successfully rebuilt with large text!");
+            File.WriteAllText(ResultFile, "SUCCESS: Tutorial Map rebuilt.");
+            Debug.Log("[TutorialMapRebuilder] 🎉 Tutorial Map successfully rebuilt!");
         }
         catch (System.Exception ex)
         {
