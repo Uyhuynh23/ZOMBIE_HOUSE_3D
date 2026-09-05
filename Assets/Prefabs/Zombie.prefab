@@ -71,7 +71,7 @@ GameObject:
   - component: {fileID: 5626393623733027271}
   - component: {fileID: 3337898163312115057}
   - component: {fileID: 4134723519740722352}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: MinimapIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}

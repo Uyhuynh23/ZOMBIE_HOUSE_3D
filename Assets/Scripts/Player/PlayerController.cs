@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Planting System")]
     public PlantData[] plants;
+    [Tooltip("New plants are resized to this fraction of the player's CharacterController height.")]
+    [Min(0.1f)] public float plantedHeightRelativeToPlayer = 1.25f;
     private int currentPlantIndex = 0;
     
     [Header("References")]
@@ -40,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     private Animator animator;
     private PlantableSquare currentSquare;
+    private PlantableSquare plantingSquare;
     
     private bool isShovelMode = false;
 
@@ -347,58 +350,38 @@ public class PlayerController : MonoBehaviour
 
     void CheckCurrentSquare()
     {
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
-        
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 2f))
-        {
-            PlantableSquare square = hit.collider.GetComponent<PlantableSquare>();
-            
-            if (square != null)
-            {
-                currentSquare = square;
-                currentIndicator.transform.position = square.transform.position + Vector3.up * 0.06f; 
+        PlantableSquare square = FindPlantableSquareBelow();
 
-                if (isShovelMode)
+        if (square != null)
+        {
+            currentSquare = square;
+            currentIndicator.transform.position = square.transform.position + Vector3.up * 0.06f;
+
+            if (isShovelMode)
+            {
+                if (square.isOccupied)
                 {
-                    if (square.isOccupied)
-                    {
-                        // Has plant + shovel mode -> red indicator
-                        currentIndicator.SetActive(true);
-                        UpdateIndicatorColor(Color.red);
-                        
-                        if (square.currentPlant != null)
-                        {
-                            UpdateTargetedPlant(square.currentPlant);
-                        }
-                    }
-                    else
-                    {
-                        // No plant + shovel mode -> hidden indicator
-                        currentIndicator.SetActive(false);
-                        UpdateTargetedPlant(null);
-                    }
+                    currentIndicator.SetActive(true);
+                    UpdateIndicatorColor(Color.red);
+                    UpdateTargetedPlant(square.currentPlant);
                 }
-                else // Planting mode
+                else
                 {
-                    if (square.isOccupied)
-                    {
-                        // Has plant -> no indicator at all
-                        currentIndicator.SetActive(false);
-                        UpdateTargetedPlant(null);
-                    }
-                    else
-                    {
-                        // No plant -> yellow indicator
-                        currentIndicator.SetActive(true);
-                        UpdateIndicatorColor(Color.yellow);
-                        UpdateTargetedPlant(null);
-                    }
+                    currentIndicator.SetActive(false);
+                    UpdateTargetedPlant(null);
                 }
             }
             else
             {
-                currentSquare = null;
-                currentIndicator.SetActive(false);
+                if (square.isOccupied)
+                {
+                    currentIndicator.SetActive(false);
+                }
+                else
+                {
+                    currentIndicator.SetActive(true);
+                    UpdateIndicatorColor(Color.yellow);
+                }
                 UpdateTargetedPlant(null);
             }
         }
@@ -408,6 +391,60 @@ public class PlayerController : MonoBehaviour
             currentIndicator.SetActive(false);
             UpdateTargetedPlant(null);
         }
+    }
+
+    /// <summary>
+    /// Finds the plantable square at the player's feet. This explicitly
+    /// includes trigger colliders: PlantableSquare is intentionally a trigger
+    /// so it never blocks player movement.
+    /// </summary>
+    PlantableSquare FindPlantableSquareBelow()
+    {
+        // A downward ray starting inside a trigger may not return that trigger.
+        // Check a small area at the player's feet first, which works while the
+        // player is standing directly on a plantable square.
+        float feetY = controller != null ? controller.bounds.min.y + 0.2f : transform.position.y + 0.2f;
+        Vector3 feet = new Vector3(transform.position.x, feetY, transform.position.z);
+        Collider[] nearby = Physics.OverlapSphere(
+            feet, 0.35f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
+
+        PlantableSquare closest = null;
+        float closestDistance = float.MaxValue;
+        foreach (Collider collider in nearby)
+        {
+            PlantableSquare square = collider.GetComponentInParent<PlantableSquare>();
+            if (square == null) continue;
+
+            Vector3 offset = square.transform.position - feet;
+            offset.y = 0f;
+            float distance = offset.sqrMagnitude;
+            if (distance < closestDistance)
+            {
+                closest = square;
+                closestDistance = distance;
+            }
+        }
+
+        if (closest != null) return closest;
+
+        // Fallback for uneven geometry: cast from above the whole character,
+        // never from inside the square trigger.
+        float castHeight = controller != null ? controller.height + 1f : 3f;
+        Vector3 rayOrigin = new Vector3(transform.position.x, feetY + castHeight, transform.position.z);
+        RaycastHit[] hits = Physics.RaycastAll(
+            rayOrigin, Vector3.down, castHeight + 2f, Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Collide);
+
+        foreach (RaycastHit hit in hits)
+        {
+            PlantableSquare square = hit.collider.GetComponentInParent<PlantableSquare>();
+            if (square != null && hit.distance < closestDistance)
+            {
+                closest = square;
+                closestDistance = hit.distance;
+            }
+        }
+        return closest;
     }
     
     void UpdateTargetedPlant(PlantBase newTarget)
@@ -493,7 +530,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (currentSquare.isOccupied) return;
                 
-                if (plants == null || plants.Length == 0) return;
+                if (plants == null || currentPlantIndex < 0 || currentPlantIndex >= plants.Length) return;
                 PlantData activePlant = plants[currentPlantIndex];
                 
                 if (activePlant.prefab == null) return;
@@ -519,6 +556,7 @@ public class PlayerController : MonoBehaviour
                 
                 isPlanting = true;
                 plantingTimer = plantingDuration;
+                plantingSquare = currentSquare;
                 
                 currentIndicator.SetActive(false); 
             }
@@ -531,30 +569,75 @@ public class PlayerController : MonoBehaviour
         
         if (plantingTimer <= 0f)
         {
-            if (currentSquare != null && plants != null && plants.Length > currentPlantIndex)
+            if (plantingSquare != null && !plantingSquare.isOccupied &&
+                plants != null && currentPlantIndex >= 0 && currentPlantIndex < plants.Length)
             {
                 GameObject prefab = plants[currentPlantIndex].prefab;
                 if (prefab != null)
                 {
-                    Quaternion finalRotation = currentSquare.transform.rotation * prefab.transform.rotation;
-                    GameObject planted = Instantiate(prefab, currentSquare.transform.position + Vector3.up * 0.05f, finalRotation);
+                    Quaternion finalRotation = plantingSquare.transform.rotation * prefab.transform.rotation;
+                    GameObject planted = Instantiate(prefab, plantingSquare.transform.position + Vector3.up * 0.05f, finalRotation);
+                    ScalePlantToPlayerHeight(planted);
                     
                     // Register plant with the square using PlantBase
                     PlantBase plantComponent = planted.GetComponent<PlantBase>();
                     if (plantComponent != null)
                     {
-                        currentSquare.PlantHere(plantComponent);
+                        plantingSquare.PlantHere(plantComponent);
+
+                        // Face outward along the cardinal lane, toward enemies
+                        // approaching from beyond the house's plant grid. The
+                        // combat component reads each model's SpawnPoint to
+                        // resolve its real muzzle direction.
+                        PeashooterCombat combat = planted.GetComponent<PeashooterCombat>();
+                        if (combat != null)
+                        {
+                            Vector3 squarePosition = plantingSquare.transform.position;
+                            Vector3 outwardLaneDirection = GetOutwardLaneDirection(squarePosition);
+                            combat.SetAimDirection(outwardLaneDirection);
+                        }
                     }
                     else
                     {
                         // Fallback for prefabs without PlantBase (shouldn't happen)
-                        currentSquare.SetOccupied(true);
+                        plantingSquare.SetOccupied(true);
                     }
                 }
             }
             
             isPlanting = false;
+            plantingSquare = null;
         }
+    }
+
+    /// <summary>Maps every cardinal planting zone to its enemy-entry direction.</summary>
+    private static Vector3 GetOutwardLaneDirection(Vector3 squarePosition)
+    {
+        // North: +Z, South: -Z, East: +X, West: -X.
+        // This is intentionally based on the zone axis, not the square's
+        // individual rotation, because square rotations are decorative.
+        if (Mathf.Abs(squarePosition.z) >= Mathf.Abs(squarePosition.x))
+            return squarePosition.z >= 0f ? Vector3.forward : Vector3.back;
+
+        return squarePosition.x >= 0f ? Vector3.right : Vector3.left;
+    }
+
+    private void ScalePlantToPlayerHeight(GameObject planted)
+    {
+        if (planted == null || controller == null) return;
+
+        Renderer[] renderers = planted.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return;
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+            bounds.Encapsulate(renderers[i].bounds);
+
+        if (bounds.size.y < 0.01f) return;
+
+        float targetHeight = controller.height * plantedHeightRelativeToPlayer;
+        float scaleFactor = Mathf.Clamp(targetHeight / bounds.size.y, 0.5f, 4f);
+        planted.transform.localScale *= scaleFactor;
     }
 
     void HandleAttackInput()

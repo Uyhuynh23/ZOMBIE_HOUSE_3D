@@ -9,8 +9,8 @@ public class PeashooterCombat : PlantBase
     public float projectileSpeed = 10f;
     public float aggroRadius = 5f;
     public float forwardConeThreshold = 0.3f; // dot product threshold (~72 degree cone)
-    [Tooltip("The imported peashooter faces local +X. Rotate the plant root to aim this axis down any map road.")]
-    public Vector3 localAimAxis = Vector3.right;
+    [Tooltip("Fallback muzzle axis when a SpawnPoint is unavailable. The imported peashooter models use local +Z.")]
+    public Vector3 localAimAxis = Vector3.forward;
 
     [Header("Body Collider Settings")]
     public float bodyHeight = 1.0f;
@@ -26,10 +26,41 @@ public class PeashooterCombat : PlantBase
     private float fireTimer = 0f;
     private Animator animator;
     private GameObject currentTarget;
+    private Vector3 lockedLaneDirection;
 
     protected override void Awake()
     {
         base.Awake();
+    }
+
+    /// <summary>Rotates the plant so its configured local firing axis faces a world-space lane direction.</summary>
+    public void SetAimDirection(Vector3 worldDirection)
+    {
+        worldDirection.y = 0f;
+        if (worldDirection.sqrMagnitude < 0.001f) return;
+
+        lockedLaneDirection = worldDirection.normalized;
+        ApplyLockedLaneRotation();
+    }
+
+    private void LateUpdate()
+    {
+        // Some imported animation clips can write to the root transform.
+        // Re-apply the lane direction after animation evaluation so plants stay
+        // pointed at the incoming-enemy side of their own lane.
+        if (lockedLaneDirection.sqrMagnitude > 0.001f)
+            ApplyLockedLaneRotation();
+    }
+
+    private void ApplyLockedLaneRotation()
+    {
+        if (lockedLaneDirection.sqrMagnitude < 0.001f) return;
+
+        Vector3 currentWorldAim = GetCurrentAimDirection();
+        if (currentWorldAim.sqrMagnitude < 0.001f) return;
+
+        transform.rotation = Quaternion.FromToRotation(currentWorldAim.normalized, lockedLaneDirection)
+                             * transform.rotation;
     }
 
     void Start()
@@ -76,7 +107,9 @@ public class PeashooterCombat : PlantBase
             if (z == null) continue;
             Vector3 toZombie = z.transform.position - transform.position;
             toZombie.y = 0f;
-            Vector3 worldAim = transform.TransformDirection(localAimAxis).normalized;
+            Vector3 worldAim = lockedLaneDirection.sqrMagnitude > 0.001f
+                ? lockedLaneDirection
+                : GetCurrentAimDirection();
             Vector3 worldSide = Vector3.Cross(Vector3.up, worldAim).normalized;
             float laneDistance = Mathf.Abs(Vector3.Dot(toZombie, worldSide));
             bool isAhead = toZombie.sqrMagnitude > 0.001f &&
@@ -116,7 +149,7 @@ public class PeashooterCombat : PlantBase
         {
             Vector3 direction = currentTarget != null
                 ? currentTarget.transform.position + Vector3.up * 0.9f - spawnPoint.position
-                : transform.TransformDirection(localAimAxis);
+                : GetCurrentAimDirection();
             direction.Normalize();
             rb.linearVelocity = direction * projectileSpeed;
         }
@@ -132,6 +165,20 @@ public class PeashooterCombat : PlantBase
         {
             animator.SetTrigger("Shoot");
         }
+    }
+
+    // SpawnPoint is the authoritative visual firing direction. It also works
+    // before Start caches the reference, when a just-planted prefab is first
+    // aligned to its lane by PlayerController.
+    private Vector3 GetCurrentAimDirection()
+    {
+        Transform point = spawnPoint != null ? spawnPoint : transform.Find("SpawnPoint");
+        Vector3 direction = point != null
+            ? point.position - transform.position
+            : transform.TransformDirection(localAimAxis);
+
+        direction.y = 0f;
+        return direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.forward;
     }
 
     void OnTriggerEnter(Collider other)

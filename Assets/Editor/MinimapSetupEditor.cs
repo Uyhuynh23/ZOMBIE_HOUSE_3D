@@ -28,8 +28,9 @@ public class MinimapSetupEditor : EditorWindow
                 // Remove collider
                 DestroyImmediate(indicator.GetComponent<Collider>());
                 
-                // Set Layer to 6 (LocationMarker)
-                indicator.layer = 6;
+                // Marker-only layer is rendered by the minimap camera and
+                // excluded from the gameplay camera.
+                indicator.layer = LayerMask.NameToLayer("LocationMarker");
                 
                 // Create a red material
                 string matPath = "Assets/Minimap/ZombieIndicatorMat.mat";

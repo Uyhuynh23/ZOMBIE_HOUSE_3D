@@ -22,15 +22,13 @@ public class PeaProjectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Zombie"))
+        // Imported enemies can expose a child collider whose tag is Untagged.
+        // Resolve health from the hierarchy so both Zombie and Spider take
+        // damage regardless of which collider the projectile reaches first.
+        ZombieHealth zh = other.GetComponentInParent<ZombieHealth>();
+        if (zh != null)
         {
-            // Deal damage to the zombie
-            ZombieHealth zh = other.GetComponentInParent<ZombieHealth>();
-            if (zh != null)
-            {
-                zh.TakeDamage(damage);
-            }
-
+            zh.TakeDamage(damage);
             ReturnToPool();
         }
     }
