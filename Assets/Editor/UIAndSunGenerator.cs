@@ -23,6 +23,24 @@ public class UIAndSunGenerator
         Debug.Log("[UIAndSunGenerator] UI and Sun updated!");
     }
 
+    [MenuItem("Tools/Save HUDPanel As Prefab")]
+    public static void SaveHUDPanelAsPrefab()
+    {
+        GameObject hudPanel = GameObject.Find("HUDPanel");
+        if (hudPanel == null)
+        {
+            Debug.LogError("[UIAndSunGenerator] No HUDPanel found in the current scene!");
+            return;
+        }
+
+        if (!System.IO.Directory.Exists("Assets/Prefabs"))
+            System.IO.Directory.CreateDirectory("Assets/Prefabs");
+
+        PrefabUtility.SaveAsPrefabAsset(hudPanel, "Assets/Prefabs/HUDPanel.prefab");
+        AssetDatabase.SaveAssets();
+        Debug.Log("[UIAndSunGenerator] HUDPanel saved to Assets/Prefabs/HUDPanel.prefab successfully!");
+    }
+
     // -----------------------------------------------------------------------------
     //  SUN PREFAB
     // -----------------------------------------------------------------------------
@@ -119,75 +137,31 @@ public class UIAndSunGenerator
 
         CreateBattleStatus(canvasObj, uiManager, uiFont);
 
-        // -- Bottom HUD Panel (dark wood-brown bar) --
+        // -- Left Sidebar HUD Panel (dark wood-brown bar) --
         GameObject hudPanel = new GameObject("HUDPanel");
         hudPanel.transform.SetParent(canvasObj.transform, false);
         Image hudBg = hudPanel.AddComponent<Image>();
         hudBg.color = new Color(0.27f, 0.15f, 0.05f, 0.92f); // dark wood brown
         RectTransform hudRt = hudPanel.GetComponent<RectTransform>();
         hudRt.anchorMin = new Vector2(0f, 0f);
-        hudRt.anchorMax = new Vector2(1f, 0f);
-        hudRt.pivot = new Vector2(0.5f, 0f);
+        hudRt.anchorMax = new Vector2(0f, 1f);
+        hudRt.pivot = new Vector2(0f, 0.5f);
         hudRt.anchoredPosition = Vector2.zero;
-        hudRt.sizeDelta = new Vector2(0f, 150f);
+        hudRt.sizeDelta = new Vector2(130f, 0f);
 
-        // -- Sun Counter (left side of HUD) --
-        GameObject sunDisplay = new GameObject("SunDisplay");
-        sunDisplay.transform.SetParent(hudPanel.transform, false);
-        RectTransform sdRt = sunDisplay.AddComponent<RectTransform>();
-        sdRt.anchorMin = new Vector2(0f, 0.5f);
-        sdRt.anchorMax = new Vector2(0f, 0.5f);
-        sdRt.pivot = new Vector2(0f, 0.5f);
-        sdRt.anchoredPosition = new Vector2(10f, 0f);
-        sdRt.sizeDelta = new Vector2(135f, 115f);
+        VerticalLayoutGroup vlg = hudPanel.AddComponent<VerticalLayoutGroup>();
+        vlg.padding = new RectOffset(15, 15, 15, 15);
+        vlg.spacing = 10f;
+        vlg.childAlignment = TextAnchor.MiddleCenter;
+        vlg.childControlWidth = false;
+        vlg.childControlHeight = false;
+        vlg.childForceExpandWidth = false;
+        vlg.childForceExpandHeight = false;
 
-        // Sun icon (circle)
-        GameObject sunCircle = new GameObject("SunCircle");
-        sunCircle.transform.SetParent(sunDisplay.transform, false);
-        Image sunCircleImg = sunCircle.AddComponent<Image>();
-        sunCircleImg.color = new Color(1f, 0.9f, 0f, 1f);
-        RectTransform scRt = sunCircle.GetComponent<RectTransform>();
-        scRt.anchorMin = new Vector2(0.5f, 0.55f);
-        scRt.anchorMax = new Vector2(0.5f, 0.55f);
-        scRt.pivot = new Vector2(0.5f, 0.5f);
-        scRt.anchoredPosition = Vector2.zero;
-        scRt.sizeDelta = new Vector2(70f, 70f);
+        // 1. Shovel Button (top item)
+        CreateShovelButton(hudPanel, uiManager, uiFont);
 
-        // Sun text
-        GameObject sunTextObj = new GameObject("SunText");
-        sunTextObj.transform.SetParent(sunDisplay.transform, false);
-        Text sunText = sunTextObj.AddComponent<Text>();
-        sunText.text = "50";
-        sunText.font = uiFont;
-        sunText.fontSize = 34;
-        sunText.fontStyle = FontStyle.Bold;
-        sunText.color = Color.white;
-        sunText.alignment = TextAnchor.MiddleCenter;
-        RectTransform stRt = sunText.GetComponent<RectTransform>();
-        stRt.anchorMin = new Vector2(0f, 0f);
-        stRt.anchorMax = new Vector2(1f, 0.45f);
-        stRt.sizeDelta = Vector2.zero;
-        stRt.anchoredPosition = Vector2.zero;
-
-        uiManager.sunText = sunText;
-
-        // -- Cards Container (centered in HUD) --
-        GameObject cardsContainer = new GameObject("CardsContainer");
-        cardsContainer.transform.SetParent(hudPanel.transform, false);
-        RectTransform ccRt = cardsContainer.AddComponent<RectTransform>();
-        ccRt.anchorMin = new Vector2(0.5f, 0.5f);
-        ccRt.anchorMax = new Vector2(0.5f, 0.5f);
-        ccRt.pivot = new Vector2(0.5f, 0.5f);
-        ccRt.anchoredPosition = new Vector2(0f, 0f);
-        ccRt.sizeDelta = new Vector2(450f, 140f);
-
-        HorizontalLayoutGroup hlg = cardsContainer.AddComponent<HorizontalLayoutGroup>();
-        hlg.childControlWidth = false;
-        hlg.childControlHeight = false;
-        hlg.childAlignment = TextAnchor.MiddleCenter;
-        hlg.spacing = 8f;
-
-        // Plant definitions: name, cost, PvZ-inspired background color
+        // 2. Plant Cards (middle items)
         string[] plantNames = { "Peashooter", "Snow Pea", "Sunflower" };
         Color[]  cardColors  = {
             new Color(0.4f, 0.8f, 0.35f, 1f),  // Peashooter — dark green
@@ -197,18 +171,16 @@ public class UIAndSunGenerator
         int[] costs = { 100, 175, 50 };
 
         PlantCardUI[] cards = new PlantCardUI[plantNames.Length];
-
         for (int i = 0; i < plantNames.Length; i++)
         {
-            cards[i] = CreatePlantCard(cardsContainer, i, plantNames[i], costs[i], cardColors[i], uiFont);
+            cards[i] = CreatePlantCard(hudPanel, i, plantNames[i], costs[i], cardColors[i], uiFont);
         }
-
         uiManager.plantCards = cards;
 
-        // -- Shovel Button (right side of HUD) --
-        CreateShovelButton(hudPanel, uiManager, uiFont);
+        // 3. Sun Counter (bottom item)
+        CreateSunDisplay(hudPanel, uiManager, uiFont);
 
-        // -- Controls hint (top-left, small) --
+        // -- Controls hint (bottom, next to sidebar) --
         GameObject hintObj = new GameObject("ControlsHint");
         hintObj.transform.SetParent(canvasObj.transform, false);
         Text hintText = hintObj.AddComponent<Text>();
@@ -222,8 +194,8 @@ public class UIAndSunGenerator
         hRt.anchorMin = new Vector2(0f, 0f);
         hRt.anchorMax = new Vector2(1f, 0f);
         hRt.pivot = new Vector2(0f, 0f);
-        hRt.anchoredPosition = new Vector2(12f, 155f);
-        hRt.sizeDelta = new Vector2(-24f, 28f);
+        hRt.anchoredPosition = new Vector2(145f, 12f);
+        hRt.sizeDelta = new Vector2(-160f, 28f);
 
         CreateEndGamePanels(canvasObj, uiManager, uiFont);
     }
@@ -332,7 +304,7 @@ public class UIAndSunGenerator
         GameObject cardObj = new GameObject("Card_" + plantName);
         cardObj.transform.SetParent(parent.transform, false);
         RectTransform cardRt = cardObj.AddComponent<RectTransform>();
-        cardRt.sizeDelta = new Vector2(100f, 130f);
+        cardRt.sizeDelta = new Vector2(100f, 120f);
 
         PlantCardUI cardUI = cardObj.AddComponent<PlantCardUI>();
         cardUI.plantIndex = index;
@@ -446,11 +418,11 @@ public class UIAndSunGenerator
         GameObject shovelObj = new GameObject("ShovelButton");
         shovelObj.transform.SetParent(hudPanel.transform, false);
         RectTransform sRt = shovelObj.AddComponent<RectTransform>();
-        sRt.anchorMin = new Vector2(1f, 0.5f);
-        sRt.anchorMax = new Vector2(1f, 0.5f);
-        sRt.pivot = new Vector2(1f, 0.5f);
-        sRt.anchoredPosition = new Vector2(-12f, 0f);
-        sRt.sizeDelta = new Vector2(90f, 110f);
+        sRt.anchorMin = new Vector2(0.5f, 0.5f);
+        sRt.anchorMax = new Vector2(0.5f, 0.5f);
+        sRt.pivot = new Vector2(0.5f, 0.5f);
+        sRt.anchoredPosition = Vector2.zero;
+        sRt.sizeDelta = new Vector2(100f, 75f);
 
         Image shovelBg = shovelObj.AddComponent<Image>();
         shovelBg.color = new Color(0.45f, 0.25f, 0.08f, 1f);
@@ -474,6 +446,51 @@ public class UIAndSunGenerator
         lRt.anchorMax = Vector2.one;
         lRt.sizeDelta = Vector2.zero;
         lRt.anchoredPosition = Vector2.zero;
+    }
+
+    // -----------------------------------------------------------------------------
+    //  SUN DISPLAY
+    // -----------------------------------------------------------------------------
+    static void CreateSunDisplay(GameObject hudPanel, GameUIManager uiManager, Font uiFont)
+    {
+        GameObject sunDisplay = new GameObject("SunDisplay");
+        sunDisplay.transform.SetParent(hudPanel.transform, false);
+        RectTransform sdRt = sunDisplay.AddComponent<RectTransform>();
+        sdRt.anchorMin = new Vector2(0.5f, 0.5f);
+        sdRt.anchorMax = new Vector2(0.5f, 0.5f);
+        sdRt.pivot = new Vector2(0.5f, 0.5f);
+        sdRt.anchoredPosition = Vector2.zero;
+        sdRt.sizeDelta = new Vector2(100f, 95f);
+
+        // Sun icon (circle)
+        GameObject sunCircle = new GameObject("SunCircle");
+        sunCircle.transform.SetParent(sunDisplay.transform, false);
+        Image sunCircleImg = sunCircle.AddComponent<Image>();
+        sunCircleImg.color = new Color(1f, 0.9f, 0f, 1f);
+        RectTransform scRt = sunCircle.GetComponent<RectTransform>();
+        scRt.anchorMin = new Vector2(0.5f, 0.60f);
+        scRt.anchorMax = new Vector2(0.5f, 0.60f);
+        scRt.pivot = new Vector2(0.5f, 0.5f);
+        scRt.anchoredPosition = Vector2.zero;
+        scRt.sizeDelta = new Vector2(55f, 55f);
+
+        // Sun text
+        GameObject sunTextObj = new GameObject("SunText");
+        sunTextObj.transform.SetParent(sunDisplay.transform, false);
+        Text sunText = sunTextObj.AddComponent<Text>();
+        sunText.text = "50";
+        sunText.font = uiFont;
+        sunText.fontSize = 28;
+        sunText.fontStyle = FontStyle.Bold;
+        sunText.color = Color.white;
+        sunText.alignment = TextAnchor.MiddleCenter;
+        RectTransform stRt = sunText.GetComponent<RectTransform>();
+        stRt.anchorMin = new Vector2(0f, 0f);
+        stRt.anchorMax = new Vector2(1f, 0.38f);
+        stRt.sizeDelta = Vector2.zero;
+        stRt.anchoredPosition = Vector2.zero;
+
+        uiManager.sunText = sunText;
     }
 
     private static Font LoadShlopFont()

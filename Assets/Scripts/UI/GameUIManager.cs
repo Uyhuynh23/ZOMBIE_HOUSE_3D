@@ -46,6 +46,24 @@ public class GameUIManager : MonoBehaviour
 
     void Start()
     {
+        // Auto-find HUD elements if not assigned (e.g. when HUDPanel prefab is instantiated)
+        if (sunText == null)
+        {
+            var stObj = GameObject.Find("SunText");
+            if (stObj != null) sunText = stObj.GetComponent<Text>();
+        }
+        if (plantCards == null || plantCards.Length == 0)
+        {
+            var allCards = Object.FindObjectsByType<PlantCardUI>(FindObjectsSortMode.None);
+            var cardList = new System.Collections.Generic.List<PlantCardUI>();
+            foreach (var card in allCards)
+            {
+                if (!card.isShovelCard) cardList.Add(card);
+            }
+            cardList.Sort((a, b) => a.plantIndex.CompareTo(b.plantIndex));
+            plantCards = cardList.ToArray();
+        }
+
         if (sunText != null)
         {
             originalSunTextColor = sunText.color;
