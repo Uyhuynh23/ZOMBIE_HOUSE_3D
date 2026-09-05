@@ -1,0 +1,510 @@
+% Section 6 only. Paste this file into main.tex or use:
+% \input{section6_genai.tex}
+%
+% Required packages in the main document:
+% \usepackage{booktabs,longtable,tabularx,listings}
+% Use XeLaTeX because the exact prompts contain Vietnamese Unicode text.
+%
+% The main document must also define:
+% \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+
+\section{GenAI Usage \& Code Refinement Log (Mandatory Appendix)}
+
+\newcommand{\sourceA}{\textbf{Source A: Antigravity history}}
+\newcommand{\sourceB}{\textbf{Source B: Codex development conversation}}
+
+\subsection{Purpose and Scope}
+
+This appendix consolidates the two AI-assisted development histories used by
+the group:
+
+\begin{enumerate}
+  \item \sourceA;
+  \item \sourceB, 
+\end{enumerate}
+
+The selected interactions are representative examples, not a replacement for
+the complete raw records. The group will submit
+the complete Antigravity and Codex conversations export as supplementary evidence. This
+prevents the selected excerpts from being interpreted outside their original
+context.
+
+AI assistance was substantial. It supported initial scaffolding, debugging,
+protocol refinement, test construction, explanation, and documentation. The
+evidence below focuses on how the group made choices, questioned results,
+requested corrections, compared the implementation with course theory, and
+required executable verification. The group does not claim that all code was
+written without AI; it claims ownership through review, testing,
+understanding, and responsibility for the final system.
+
+\subsection{Development Timeline Across Both Histories}
+
+\begin{longtable}{p{0.08\textwidth}p{0.18\textwidth}p{0.30\textwidth}p{0.34\textwidth}}
+\toprule
+Phase & Source & Main activity & Evidence of team decision or verification\\
+\midrule
+P01 & A & Requirements and architecture & Chose Python, TCP control/UDP data, and a staged SAW-to-GBN strategy\\
+P02 & A & Initial implementation & Required English comments/debug output and a structured project layout\\
+P03 & A & First E2E execution & Real STOR/RETR/HASH run exposed a TID mismatch\\
+P04 & A & Debugging and UX & Fixed TID agreement and client auto-connect after observed failures\\
+P05 & A & Broader acceptance tests & Requested binary, PORT, concurrency, and packet-loss validation\\
+P06 & A & Branch/test review & Compared branches, retained the stronger implementation, and corrected a sandbox test\\
+P07 & B & Requirement audit & Required manual review, grouped unit tests, and real E2E evidence\\
+P08 & B & Protocol upgrade & Required GBN, sliding window, Slow Start, AIMD, and adaptive RTO\\
+P09 & B & Conceptual review & Questioned session identity, authentication keys, ports, and statefulness\\
+P10 & B & Theory comparison & Identified that the controller differed from TCP Reno learned in class\\
+P11 & B & Demonstration evidence & Expanded real evidence from three panels to eight complete scenarios\\
+P12 & B & Documentation & Aligned the seven-section report with the final code and documented limitations\\
+\bottomrule
+\end{longtable}
+
+\subsection{Selected Interaction Records}
+
+\subsubsection{Interaction 1 -- Requirements, constraints, and staged strategy}
+
+\sourceA
+
+\textbf{Exact user input}
+
+\begin{lstlisting}
+Đọc yêu cầu đề bài cho rõ và hoàn thành toàn bộ yêu cầu giúp mình.
+Yêu cầu: Ngôn ngữ Python.
+Nếu trong bài có cần comment hay những dòng code print để debug thì đều
+phải sử dụng tiếng Anh, không dùng tiếng Việt nhé.
+
+Mình chưa hiểu về Project socket này, nên cũng chưa hiểu việc nên chạy/test
+lại project thế nào. Bạn hướng dẫn và hỗ trợ mình hết nhé.
+\end{lstlisting}
+
+\textbf{Later decision recorded by the user}
+
+\begin{lstlisting}
+Mình nghĩ nên chọn Go-Back-N (GBN). Chiến thuật an toàn: Hãy làm
+Stop-and-Wait trước để chắc chắn nắm trong tay số điểm của mục Reliable UDP.
+Khi mọi thứ đã chạy mượt, bạn hãy nâng cấp code lên GBN.
+
+Quản lý Users: Hardcode ở Giai đoạn 1, Đọc file ở Giai đoạn hoàn thiện.
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Project yêu cầu làm một Hybrid FTP với 2 kênh tách biệt:
+- Control Channel (TCP): truyền lệnh và mã phản hồi
+- Data Channel (UDP): truyền dữ liệu file, với reliability layer tự xây dựng
+
+Selective Repeat hay Go-Back-N cho UDP reliability?
+Users: hardcode admin/admin123 hay đọc từ file config?
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+We did not begin with an unspecified ``FTP application.'' We fixed the
+language, low-level socket constraint, English source-output convention,
+TCP/UDP channel separation, and target directory structure. We selected GBN
+as the eventual reliability algorithm but intentionally proposed a staged
+implementation so that basic reliability could be executed before adding
+window complexity. We also chose a simple credential source for the
+coursework scope. This interaction established explicit engineering choices
+that could later be checked against the final code.
+
+\textbf{Final artefacts:} \code{common/}, \code{server/}, \code{client/},
+\code{server_files/}, and \code{client_downloads/}.
+
+\subsubsection{Interaction 2 -- TID mismatch discovered by real execution}
+
+\sourceA
+
+\textbf{Executed validation requested in the conversation}
+
+\begin{lstlisting}
+Start a server in a background thread.
+Connect the real FTPClient.
+Login with admin/admin123.
+Upload with STOR.
+Download with RETR.
+Compare content byte-for-byte.
+Run HASH SHA-256.
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Root cause found: Server calls _next_tid() -> returns 1,
+client uses tid=0 -> TID mismatch -> receiver ignores all packets.
+Fix: both sides use tid=0 (safe because each transfer uses fresh sockets).
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+The first network test did not pass, which prevented an unsupported claim of
+completion. The packet trace showed that the sender and receiver filtered on
+different transfer IDs. The fix aligned both endpoints for the existing
+fresh-socket-per-transfer design, after which the same STOR/RETR/HASH test was
+rerun. The second run verified login, upload, download, byte equality,
+SHA-256, navigation, listing, NOOP, and QUIT. This record is important because
+the implementation was corrected from observed runtime evidence, not only
+from generated source.
+
+\textbf{Verification:} the rerun printed \code{ALL TESTS PASSED}; generated
+test files were then removed.
+
+\subsubsection{Interaction 3 -- Client usability failure and auto-connect}
+
+\sourceA
+
+\textbf{Exact user input}
+
+\begin{lstlisting}
+Vì sao mình vẫn không chạy được?
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Vấn đề rất rõ: server đang chạy tốt, nhưng client chưa connect --
+bạn cần gõ open trước khi login. Tuy nhiên, đây là UX không tốt.
+Tôi sẽ fix để client tự động connect khi khởi động.
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+The failure was reproduced at the CLI boundary rather than dismissed as user
+error. Inspection found that \code{main()} did not provide the default host,
+so the client started without a control connection. The startup path was
+changed to connect to \code{127.0.0.1:2121}. A follow-up validation simulated
+the exact startup flow. A separate ``address already in use'' result was also
+correctly distinguished from a client logic error because an existing server
+already occupied the port.
+
+\textbf{Final result:} users can start the client and proceed directly to
+login when the server is available.
+
+\subsubsection{Interaction 4 -- Broader test criteria requested by the user}
+
+\sourceA
+
+\textbf{Exact user input (abridged only for repeated spacing)}
+
+\begin{lstlisting}
+Test truyền File Nhị phân lớn...
+Test Chế độ Active Mode (PORT)...
+Test Đa luồng (Multi-client Concurrency)...
+Test Giả lập Mất gói / Timeout (Loss Recovery)...
+
+Những yêu cầu này thì của mình đã đạt chưa?
+Project đến đây là đã xong đủ các yêu cầu chưa?
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+This request expanded acceptance beyond a small text-file happy path. It
+required binary fragmentation/reassembly, the alternate PORT setup, several
+simultaneous clients, and deliberate UDP loss. These categories later became
+part of the permanent integration suite and demo evidence. The question
+``đã đạt chưa?'' also required evidence instead of a simple completion
+statement.
+
+\textbf{Final verification scope:} binary byte equality, PASV/PORT,
+concurrency, compression, ABOR, deterministic loss/retransmission, metadata,
+directory operations, and hash comparison.
+
+\subsubsection{Interaction 5 -- A failing sandbox test was investigated}
+
+\sourceA
+
+\textbf{Exact user input}
+
+\begin{lstlisting}
+Chỗ Test lõi hệ thống (Core tests): thì mình bị hiện là fail.
+Bạn xem thử xem.
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Lỗi nằm ở file test, chứ không phải lỗi hệ thống Server.
+File test cũ dùng một đường dẫn tuyệt đối. Cơ chế bảo mật mới tự động
+đưa đường dẫn tuyệt đối vào trong thư mục gốc.
+
+Thay vì dùng đường dẫn tuyệt đối, test dùng đường dẫn lùi
+../tên_thư_mục_bên_ngoài. Server phát hiện cố vượt khỏi sandbox
+và trả về None.
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+The test was not weakened merely to become green. The intended security
+property was clarified: the resolver must reject a path that escapes the
+server root. An absolute path was not a valid escape attempt under the
+application's virtual-path rules, so the test was replaced by a relative
+traversal case. The corrected test directly exercised the intended
+\code{commonpath} boundary and then passed.
+
+\textbf{Final artefact:} the path-sandbox regression test in
+\code{tests/test_core.py}.
+
+\subsubsection{Interaction 6 -- Upgrade from Stop-and-Wait to Go-Back-N}
+
+\sourceB
+
+\textbf{Exact user input}
+
+\begin{lstlisting}
+Go-Back-N
++ Sliding Window
++ Slow Start đơn giản
++ AIMD
+- Adaptive timeout
+cải tiến prject the hg này, sau khi cải tiếng xng, viết ại test và run test
+ần ựt the tiêu chí cũ, viết ại reprt
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Sender manages:
+base = oldest unacknowledged packet
+next_seq = next unsent packet
+
+ACK n means all packets from 0 through n were received.
+On timeout, Go-Back-N retransmits the outstanding flight:
+for seq in range(base, next_seq):
+    send_packet(packets[seq], retransmit=True)
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+We separated three ideas that are easily confused:
+
+\begin{itemize}
+  \item Go-Back-N provides reliability, ordering, cumulative ACK, and
+        retransmission;
+  \item \code{max_window=16} is a fixed protocol/sender ceiling; and
+  \item \code{cwnd} is a dynamic congestion-response variable.
+\end{itemize}
+
+The implementation introduced \code{base}/\code{next_seq}, cumulative ACK,
+receiver rejection of out-of-order packets, window retransmission,
+\code{cwnd}/\code{ssthresh}, simplified Slow Start and AIMD, SRTT/RTTVAR,
+bounded RTO, and Karn's rule. Observable histories were retained so unit tests
+could assert internal behaviour, not only final file equality.
+
+\textbf{Final artefacts:} \code{common/rdt.py},
+\code{common/protocol.py}, updated tests, and updated protocol documentation.
+
+\subsubsection{Interaction 7 -- Authentication and session identity}
+
+\sourceB
+
+\textbf{Exact prompts from the discussion}
+
+\begin{lstlisting}
+này cs hande việc giữ key để biết tài khản nàddg gin k
+
+nhưng the kiến thưcx tui hc thì để biết packet này đến từ acc nà thì phải
+dùng key đc tạ ử handshake mà
+
+ủa vậy àm s server biết à sessin nà
+
+ủa bthg cx z hả, 1 sessin chỉ đc nghe 1 scket?
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Authentication is stateful because it belongs to the TCP Session.
+Commands do not carry a login key; the accepted TCP socket identifies
+the control session.
+
+Each accepted TCP connection creates one independent Session object.
+The session retains authenticated user, CWD, TYPE, MODE, PASV/PORT,
+rename source, and cancellation state.
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+We compared the project's stateful FTP control connection with a previously
+learned stateless token/key model. Source review confirmed that each
+\code{accept()} creates \code{Session(conn, addr, sid)} and one thread. USER
+selects a candidate account; PASS changes authentication state; subsequent
+commands are associated through the same accepted TCP socket. We also
+documented the limitation: socket/session identity is not cryptographic
+identity, and the UDP transfer ID plus CRC is not an account-authentication
+HMAC.
+
+\textbf{Learning outcome:} we can distinguish stateful connection identity
+from stateless bearer-token authentication and from transport encryption.
+
+\subsubsection{Interaction 8 -- The group challenged the TCP comparison}
+
+\sourceB
+
+\textbf{Exact user input}
+
+\begin{lstlisting}
+cgestin này hình như hiw khác vs tui đc hc ử tcp, tại s ại àm khác
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Project chỉ mô phỏng các ý tưởng chính của TCP trên UDP,
+chứ không triển khai nguyên vẹn TCP Reno/Tahoe.
+
+TCP thường có Slow Start, Congestion Avoidance,
+Fast Retransmit và Fast Recovery.
+
+TCP:     effective_window = min(cwnd, rwnd)
+Project: effective_window = min(cwnd, max_window)
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+We noticed that the initial congestion-control description did not completely
+match TCP Reno taught in class. We therefore changed the report's claim to
+``simplified TCP-inspired application-layer congestion control.'' The project
+has no receiver-advertised \code{rwnd}, three-duplicate-ACK Fast Retransmit,
+Fast Recovery, SACK, or ECN. Timeout resets \code{cwnd} to one packet; NAK
+halves it. CRC corruption is conservatively treated as loss even though
+corruption does not necessarily imply router congestion.
+
+This is direct evidence of critical use: an apparent theoretical mismatch was
+questioned and the final claim was narrowed rather than exaggerated.
+
+\subsubsection{Interaction 9 -- Four-layer completion audit}
+
+\sourceB
+
+\textbf{Exact user input}
+
+\begin{lstlisting}
+hãy liệt kê các yêu cầu và kiểm tra xem có những yêu cầu nào đã được hoàn
+thiện, theo 4 yếu tố, check code manually, check unit test, phân nhóm check
+test, check test end to end
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+Main functionality is complete and all 17 tests pass.
+However, several details are only partial:
+- MODE B has no separate block framing.
+- HASH is available but not automatic after every transfer.
+- UDP has no session HMAC.
+- Authentication is plaintext and has no TLS.
+- There is no per-file write lock.
+- Congestion control is simpler than TCP.
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+We required four distinct evidence types: requirement matching, manual source
+review, grouped component tests, and real end-to-end execution. All 28
+approved command handlers were located. The test result was 16/16 core tests
+plus 1/1 comprehensive integration scenario. Negative findings were retained
+in the report so a passing suite would not be misrepresented as
+production-grade security or complete RFC behaviour.
+
+\subsubsection{Interaction 10 -- Real demo evidence, not hypothetical output}
+
+\sourceB
+
+\textbf{Exact user inputs}
+
+\begin{lstlisting}
+chạy ại dem và screen sht ch tui
+
+chạy hết ại các dem này và chụp màn hình
+
+k phải viết thành hứng dẫn mà à trình bày cách thực hiện dem và kết quả
+\end{lstlisting}
+
+\textbf{Selected raw AI output}
+
+\begin{lstlisting}
+DROP seq=0
+-> timeout at base=0
+-> retransmit outstanding flight
+-> upload PASS
+-> SHA-256 VERIFIED
+
+Client 0: PASS
+Client 1: PASS
+Client 2: PASS
+Concurrency: PASS
+\end{lstlisting}
+
+\textbf{Team review and refinement}
+
+The first evidence generator covered three categories. We requested all
+manual scenarios, so it was expanded to eight panels: control/authentication,
+directory management, PASV integrity, ASCII/compression, PORT, extended file
+operations, deterministic GBN loss recovery, and concurrency. Sequence zero
+is dropped once so every run contains an actual timeout and retransmission.
+Passwords are masked, the transcript is searched for \code{FAIL} and
+\code{MISMATCH}, and generated files are removed.
+
+\textbf{Final result:} eight inspected screenshots, no failure/mismatch line,
+and clean client/server data directories.
+
+\subsection{Combined Refinement and Debugging Register}
+
+\begin{longtable}{p{0.06\textwidth}p{0.23\textwidth}p{0.28\textwidth}p{0.31\textwidth}}
+\toprule
+ID & Initial issue & Team review/refinement & Verification\\
+\midrule
+R01 & Initial design scope unclear & Fixed TCP/UDP split, Python/native sockets, staged reliability plan & Architecture and import checks\\
+R02 & Server/client TID mismatch & Aligned TID for fresh per-transfer sockets & STOR/RETR/HASH rerun\\
+R03 & Client started disconnected & Added default auto-connect path & Startup/login reproduction\\
+R04 & Only small text happy path & Added binary, active, concurrent and loss scenarios & Integration tests\\
+R05 & Sandbox unit test asserted wrong path semantics & Replaced absolute path with real relative traversal & Core test passed\\
+R06 & Stop-and-Wait limited efficiency & Added cumulative-ACK GBN window & Window/retransmission tests\\
+R07 & Fixed timeout ignored RTT variation & Added SRTT, RTTVAR, bounded RTO and Karn's rule & Adaptive-RTO test\\
+R08 & Fixed window mislabeled as congestion control & Added loss-responsive cwnd/ssthresh, Slow Start and AIMD & cwnd-history tests\\
+R09 & Payload corruption & Added CRC-32 reject/NAK path & Corruption test\\
+R10 & Random loss evidence could be flaky & Deterministically dropped first DATA packet & Repeatable timeout/retransmission\\
+R11 & TCP receive assumed message boundaries & Added CRLF buffering and multiline response parsing & Command tests\\
+R12 & Active-mode method/field and reuse problems & Renamed field and recreated/reissued endpoint setup & Repeated PORT E2E\\
+R13 & Path traversal risk & Normalised paths and checked common root & Sandbox regression\\
+R14 & Initial explanation sounded like TCP Reno & Documented missing rwnd/Fast Recovery/SACK/ECN & Theory/source comparison\\
+R15 & Evidence covered only three areas & Expanded to eight real screenshots & No FAIL/MISMATCH\\
+R16 & Documentation described obsolete SAW state & Rebuilt diagrams and terminology for final GBN code & Manual report/source audit\\
+\bottomrule
+\end{longtable}
+
+
+\subsection{Known Limitations Retained After AI Review}
+
+\begin{itemize}
+  \item Credentials are basic in-memory/plaintext values; there is no TLS,
+        password hashing, role model, or expiring token.
+  \item UDP packets use CRC-32 for accidental corruption, not an HMAC for
+        authenticity.
+  \item The current transfer ID is not a cryptographic session key.
+  \item MODE B is accepted but has no separate RFC-style block-framing layer.
+  \item HASH verification is available but is not forced after every transfer.
+  \item Transfer payloads are assembled in memory instead of streamed.
+  \item There is no per-filename write lock for simultaneous writers.
+  \item The controller is simplified and is not TCP Reno/CUBIC.
+  \item There is no receiver-advertised window, Fast Retransmit, Fast
+        Recovery, SACK, or ECN.
+\end{itemize}
+
+Retaining these findings is part of the critical audit. A complete test pass
+proves the tested coursework behaviours, not production-grade security or
+all possible FTP/TCP semantics.
+
+
+
+\subsection{Final Provenance Statement}
+
+We declare that AI contributed substantially to the development process. We
+do not claim that the product was created without AI. We selected the final
+requirements, reported failures, challenged theoretical inconsistencies,
+requested and reviewed changes, executed the software, retained negative
+findings, and accept responsibility for the final submission.
+
+This appendix contains representative interactions from both histories. The
+complete unedited \code{AI.md} and Codex conversation export are submitted
+alongside it so that prompts and outputs can be verified in full context.

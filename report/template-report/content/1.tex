@@ -1,0 +1,108 @@
+\section{Application Scenario \& Protocol Interaction}
+\subsection{Application scenario}
+The application is a command-line Hybrid FTP system that separates the
+control and data planes. FTP commands, standard three-digit replies,
+authentication, and session state use a persistent TCP connection. File
+contents and directory listings use UDP with a custom application-layer
+Go-Back-N reliability protocol.
+
+The server listens at \code{127.0.0.1:2121}. Each accepted TCP connection
+creates one independent \code{Session} in one daemon thread. The session owns
+the authenticated user, working directory, transfer type, transfer mode,
+active/passive endpoint state, rename state, and cancellation event. Server
+files are confined to \code{server_files/}; client downloads are written to
+\code{client_downloads/}.
+
+\subsection{Architecture}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=8mm and 14mm,
+  box/.style={draw,rounded corners,align=center,minimum width=45mm,minimum height=9mm},
+  arrow/.style={-{Latex[length=2.5mm]},thick}
+]
+\node[box] (user) {User commands\\login, put, get, ls, verify};
+\node[box,below=of user] (cli) {\code{client/client.py}\\Interactive CLI};
+\node[box,below=of cli] (fc) {\code{client/ftp_client.py}\\Client protocol API};
+\node[box,right=45mm of fc] (server) {\code{server/server.py}\\TCP accept + thread/session};
+\node[box,below=of server] (session) {\code{server/session.py}\\Authentication and dispatch};
+\node[box,below=18mm of fc,xshift=30mm] (rdt) {\code{common/rdt.py}\\Go-Back-N reliable UDP};
+\draw[arrow] (user)--(cli);
+\draw[arrow] (cli)--(fc);
+\draw[arrow,<->] (fc)--node[above]{TCP commands/replies}(server);
+\draw[arrow] (server)--(session);
+\draw[arrow,<->] (fc)--node[left]{UDP data/ACK}(rdt);
+\draw[arrow,<->] (rdt)--(session);
+\end{tikzpicture}
+\caption{Project-wide control and data paths.}
+\end{figure}
+
+\subsection{Full TCP + UDP lifecycle}
+
+\begin{longtable}{p{0.07\textwidth}p{0.18\textwidth}p{0.18\textwidth}p{0.47\textwidth}}
+\toprule
+\# & Sender & Receiver & Interaction\\
+\midrule
+1 & Client & Server & TCP \code{connect()} to port 2121; server replies \code{220}.\\
+2 & Client & Server & \code{USER admin}; server replies \code{331}.\\
+3 & Client & Server & \code{PASS ********}; server verifies the selected user and replies \code{230}.\\
+4 & Client & Server & \code{PASV}; server binds UDP port 50000--51000 and replies \code{227}.\\
+5 & Client & Server & \code{STOR remote.bin} over TCP and an UDP \code{RDY} datagram to the PASV endpoint.\\
+6 & Server & Client & \code{150 Opening data connection}.\\
+7 & Client & Server & Window of UDP DATA packets containing sequence, length, flags, CRC-32 and payload.\\
+8 & Server & Client & Cumulative ACK for the highest contiguous sequence. Loss causes timeout/NAK and GBN retransmission.\\
+9 & Server & File system & Reassemble, validate representation, and write under \code{server_files/}.\\
+10 & Server & Client & \code{226 Transfer complete}.\\
+11 & Client & Server & \code{HASH SHA256 remote.bin}; server replies with \code{213} and digest.\\
+12 & Client & Client & Calculate local digest and compare end to end.\\
+13 & Client & Server & \code{QUIT}; server replies \code{221}, closes sockets, and deregisters the session.\\
+\bottomrule
+\end{longtable}
+
+\subsection{Passive and active modes}
+
+\textbf{PASV.} The server binds a random UDP socket, sends its endpoint in
+\code{227}, and learns the client's UDP endpoint from the client's RDY
+datagram. PASV is the default.
+
+\textbf{PORT.} The client binds a UDP socket and advertises it with
+\code{PORT h1,h2,h3,h4,p1,p2}. The server stores that endpoint and sends RDY
+from its per-transfer UDP socket. The client learns the server endpoint from
+that datagram.
+
+\subsection{Approved command coverage}
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.28\textwidth}X}
+\toprule
+Category & Commands\\
+\midrule
+Authentication/session & USER, PASS, QUIT, NOOP, HELP\\
+Navigation/directories & PWD, CWD, CDUP, MKD, RMD\\
+Listing/metadata & LIST, NLST, STAT, SIZE, MDTM\\
+Representation/data setup & TYPE, MODE, PORT, PASV\\
+File transfer & RETR, STOR, STOU, APPE, ABOR\\
+Management/integrity & DELE, RNFR, RNTO, HASH\\
+\bottomrule
+\end{tabularx}
+
+All 28 commands required by the specification have server dispatch handlers.
+
+\subsection{Evaluation-level mapping}
+
+\begin{longtable}{p{0.15\textwidth}p{0.32\textwidth}p{0.43\textwidth}}
+\toprule
+Level & Requirement & Implementation\\
+\midrule
+Basic & Authentication & Stateful USER/PASS on the TCP session\\
+Basic & ASCII and upload/download & TYPE A, STOR and RETR\\
+Basic & Fixed data mechanism & PASV default\\
+Advanced & Binary files & TYPE I, byte-preserving payload\\
+Advanced & Directory tree & Navigation, listing, create/remove, metadata\\
+Advanced & Active/passive & Runtime PORT/PASV switching\\
+Advanced & Concurrency & One thread and Session per TCP client\\
+Excellent & Reliable UDP & Sequence, ACK/NAK, CRC, timeout, retransmission\\
+Excellent & Flow/congestion control & GBN window, Slow Start, AIMD\\
+Excellent & End-to-end integrity & MD5/SHA-256 local/remote comparison\\
+\bottomrule
+\end{longtable}

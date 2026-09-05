@@ -1,0 +1,95 @@
+\section{Project-Wide Data Structures}
+\subsection{TCP control format}
+
+Client commands use \code{COMMAND [argument]\textbackslash r\textbackslash n};
+server responses use \code{ddd message\textbackslash r\textbackslash n}.
+TCP receive buffers extract complete CRLF-delimited records because TCP is a
+byte stream and does not preserve application message boundaries.
+
+\subsection{Custom UDP header}
+
+The binary format string is \code{!IIBBHIH}, network byte order, with an
+18-byte header.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{rllp{0.43\textwidth}}
+\toprule
+Offset & Field & Size & Meaning\\
+\midrule
+0 & Sequence number & 4 B & Zero-based DATA packet position\\
+4 & ACK number & 4 B & Highest contiguous sequence received\\
+8 & Flags & 1 B & SYN/FIN/ACK/NAK/DAT/RDY bitmask\\
+9 & Reserved & 1 B & Currently zero\\
+10 & Payload length & 2 B & Valid payload bytes, maximum 1452\\
+12 & CRC-32 & 4 B & Payload corruption check\\
+16 & Transfer ID & 2 B & Discriminator; current flow uses zero\\
+18 & Payload & 0--1452 B & File or listing content\\
+\bottomrule
+\end{tabular}
+\caption{Custom reliable UDP packet fields.}
+\end{table}
+
+\begin{lstlisting}
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++---------------------------------------------------------------+
+|                    Sequence Number (32)                       |
++---------------------------------------------------------------+
+|                  Acknowledgement Number (32)                  |
++---------------+---------------+-------------------------------+
+|   Flags (8)   | Reserved (8)  |      Payload Length (16)      |
++---------------------------------------------------------------+
+|                       CRC-32 (32)                             |
++-------------------------------+-------------------------------+
+|       Transfer ID (16)        | Payload (0-1452 bytes) ...    |
++-------------------------------+-------------------------------+
+\end{lstlisting}
+
+Flag values are SYN \(0x01\), FIN \(0x02\), ACK \(0x04\), NAK \(0x08\),
+DAT \(0x10\), and RDY \(0x20\). Maximum packet size is 1470 bytes.
+
+\subsection{Sender, receiver, and timeout state}
+
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+State & Initial value & Purpose\\
+\midrule
+\code{base} & 0 & Oldest unacknowledged sequence\\
+\code{next_seq} & 0 & Next unsent sequence\\
+\code{cwnd} & 1 packet & Congestion window\\
+\code{ssthresh} & window/2 & Slow Start threshold\\
+\code{max_window} & 16 & Protocol window ceiling\\
+\code{srtt}, \code{rttvar} & unset & Adaptive RTT estimators\\
+\code{rto} & 2.0 s & Retransmission timeout, bounded 0.05--10 s\\
+\code{expected_seq} & 0 & Receiver's next acceptable sequence\\
+\code{pieces} & empty & Ordered receiver fragments\\
+\bottomrule
+\end{tabularx}
+
+\[
+\mathrm{SRTT}\leftarrow(1-\tfrac18)\mathrm{SRTT}+\tfrac18R,
+\quad
+\mathrm{RTTVAR}\leftarrow(1-\tfrac14)\mathrm{RTTVAR}
+ +\tfrac14|\mathrm{SRTT}-R|
+\]
+\[
+\mathrm{RTO}=\operatorname{clamp}
+(\mathrm{SRTT}+\max(G,4\mathrm{RTTVAR}),0.05,10)
+\]
+
+Retransmitted packets do not contribute RTT samples (Karn's rule).
+
+\subsection{Session management}
+
+The server owns a locked dictionary mapping integer session IDs to
+\code{Session} objects. Each session owns its TCP socket, client address,
+authentication state, virtual CWD, TYPE, MODE, PASV/PORT state, data socket,
+rename source, transfer thread, cancellation event, and TCP receive buffer.
+
+\subsection{Representation and safety}
+
+\code{TYPE I} preserves bytes. \code{TYPE A} canonicalises network CRLF.
+\code{MODE C} applies zlib compression around reliable UDP. Paths are
+normalised and checked with \code{os.path.commonpath()} before file access.
+HASH supports MD5 and SHA-256.

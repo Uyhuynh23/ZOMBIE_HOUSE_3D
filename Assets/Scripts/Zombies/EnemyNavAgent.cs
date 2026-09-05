@@ -48,8 +48,6 @@ public class EnemyNavAgent : MonoBehaviour
     [SerializeField, Min(10f)]  private float angularSpeed = 480f;
     [Tooltip("NavMeshAgent stopping distance (outside fence only).")]
     [SerializeField, Min(0.1f)] private float navStoppingDistance = 1.2f;
-    [Tooltip("Flat distance from houseTarget to consider arrived (used in MovingInLane).")]
-    [SerializeField, Min(0.5f)] private float houseArrivalRadius = 4f;
     [Tooltip("Flat distance from LanePath.laneEntry to start the lane (EnteringLane → MovingInLane).")]
     [SerializeField, Min(0.1f)] private float laneEntryRadius = 0.6f;
 
@@ -315,16 +313,23 @@ public class EnemyNavAgent : MonoBehaviour
             return;
         }
 
-        // Arrival at house (physically touching the house collider)
+        // A lane end is only a direction marker.  The enemy may damage the
+        // house only after its forward sensor reaches the actual house collider.
+        // This guarantees that it traverses every plantable square in its lane.
         if (DetectHouseAhead(laneDir))
         {
-            IsAtHouse = true;
-            state     = AIState.AttackingHouse;
-            SetAnimSpeed(0f);
+            ArriveAtHouse();
             return;
         }
 
         MoveManually(laneDir);
+    }
+
+    private void ArriveAtHouse()
+    {
+        IsAtHouse = true;
+        state     = AIState.AttackingHouse;
+        SetAnimSpeed(0f);
     }
 
     // ──────────────────────────────────────────────────────────
@@ -408,7 +413,8 @@ public class EnemyNavAgent : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(sensorPos, plantDetectRadius); // Check all layers for the house
         foreach (var hit in hits)
         {
-            if (hit.CompareTag("HouseTarget") || hit.name == "Baker_house")
+            if (hit.CompareTag("HouseTarget") || hit.name == "Baker_house" ||
+                hit.GetComponentInParent<HouseHealth>() != null)
             {
                 return true;
             }

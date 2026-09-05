@@ -1,0 +1,91 @@
+\section{Functional Workflows (Flowcharts)}
+
+\subsection{Server dispatch}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=6mm,
+  every node/.style={font=\small},
+  proc/.style={draw,rounded corners,align=center,minimum width=47mm,minimum height=7mm},
+  decision/.style={draw,diamond,aspect=2,align=center},
+  arr/.style={-{Latex},thick}
+]
+\node[proc] (start) {Bind TCP socket and listen};
+\node[proc,below=of start] (accept) {accept client; allocate session ID};
+\node[proc,below=of accept] (thread) {Register Session; start daemon thread};
+\node[proc,below=of thread] (recv) {Send 220; receive buffered command};
+\node[decision,below=of recv] (auth) {Allowed in current\\authentication state?};
+\node[proc,below left=8mm and 12mm of auth] (deny) {Reply 530/503};
+\node[proc,below right=8mm and 12mm of auth] (dispatch) {Dispatch command handler};
+\node[decision,below=16mm of auth] (end) {QUIT, error,\\or disconnect?};
+\node[proc,below=of end] (clean) {Cancel transfer; close sockets; deregister};
+\draw[arr] (start)--(accept);
+\draw[arr] (accept)--(thread);
+\draw[arr] (thread)--(recv);
+\draw[arr] (recv)--(auth);
+\draw[arr] (auth)--node[above left]{no}(deny);
+\draw[arr] (auth)--node[above right]{yes}(dispatch);
+\draw[arr] (deny)--(end);
+\draw[arr] (dispatch)--(end);
+\draw[arr] (end.east) -- ++(12mm,0) |- node[pos=.25,right]{no} (recv.east);
+\draw[arr] (end)--node[right]{yes}(clean);
+\end{tikzpicture}
+\caption{TCP accept, authentication gate, and command dispatch.}
+\end{figure}
+
+\subsection{Go-Back-N sender}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+ node distance=6mm,
+ every node/.style={font=\small},
+ proc/.style={draw,rounded corners,align=center,minimum width=55mm,minimum height=7mm},
+ decision/.style={draw,diamond,aspect=2,align=center},
+ arr/.style={-{Latex},thick}
+]
+\node[proc] (prep) {Fragment payload; build DATA packets; FIN on last};
+\node[proc,below=of prep] (send) {Fill window: base to base + floor(cwnd)};
+\node[decision,below=of send] (event) {ACK, NAK, or RTO?};
+\node[proc,below left=9mm and 18mm of event] (ack) {ACK: advance base; update RTO if unambiguous};
+\node[proc,below right=9mm and 18mm of event] (loss) {Loss: halve threshold/window; timeout resets cwnd to 1};
+\node[proc,below=22mm of event] (update) {ACK: Slow Start or additive increase\\Loss: retransmit outstanding flight};
+\node[decision,below=of update] (done) {All packets ACKed?};
+\node[proc,below=of done] (ok) {Return success};
+\draw[arr] (prep)--(send);
+\draw[arr] (send)--(event);
+\draw[arr] (event)--node[above left]{ACK}(ack);
+\draw[arr] (event)--node[above right]{NAK/RTO}(loss);
+\draw[arr] (ack)--(update);
+\draw[arr] (loss)--(update);
+\draw[arr] (update)--(done);
+\draw[arr] (done.east)--++(13mm,0)|-node[pos=.2,right]{no}(send.east);
+\draw[arr] (done)--node[right]{yes}(ok);
+\end{tikzpicture}
+\caption{Cumulative-ACK Go-Back-N sender with congestion response.}
+\end{figure}
+
+\subsection{Go-Back-N receiver}
+
+The receiver validates header length and CRC, filters the transfer ID and DAT
+flag, accepts only \code{seq == expected_seq}, appends that payload, and
+returns a cumulative ACK. Corruption produces NAK. Duplicate/future packets
+are discarded and the highest contiguous ACK is repeated. FIN on an accepted
+packet terminates reassembly.
+
+\subsection{Data-mode toggle and transfer}
+
+PASV binds at the server and uses client-to-server RDY; PORT binds at the
+client and uses server-to-client RDY. Both converge on the same
+\code{RDTSender}/\code{RDTReceiver} workflow, then release the per-transfer
+UDP socket and return \code{226} or \code{426}.
+
+\subsection{Limitations}
+
+Authentication is basic and has no TLS/password hashing. CRC-32 detects
+accidental corruption but is not an HMAC. MODE B is accepted but does not
+introduce separate RFC block framing. Hash verification is available but not
+forced after every transfer. Payloads are assembled in memory. There is no
+per-filename write lock. The Slow Start/AIMD design is educational rather
+than a complete TCP congestion-control implementation.

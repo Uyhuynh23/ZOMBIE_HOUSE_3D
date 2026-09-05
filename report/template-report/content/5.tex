@@ -1,0 +1,63 @@
+\section{Self-Assessment \& Peer Evaluation}
+
+\subsection{Group assessment}
+
+The implementation reaches the Excellent-level functional targets: native
+socket operation, binary and ASCII transfers, directory management,
+active/passive switching, per-client threads, custom GBN, flow/congestion
+window response, and end-to-end MD5/SHA-256 verification. The report does not
+claim production security or complete TCP-equivalent congestion control.
+
+\subsection{Individual evaluations}
+
+\textbf{Member A --- Nguyen Hoang Gia Han, .}
+
+\textbf{Main responsibilities:} packet protocol, Go-Back-N sender/receiver,
+congestion control, authentication, server dispatcher, PASV/PORT, and
+multi-threaded session management.
+
+I was mainly responsible for the packet protocol, reliable UDP layer, and
+server-side session management. I helped choose an 18-byte UDP header with
+sequence number, ACK number, flags, payload length, CRC-32, and transfer ID.
+For reliable transfer, I implemented Go-Back-N with cumulative ACKs and a
+maximum sliding window of 16 packets. I also worked on the simplified Slow
+Start, AIMD, and adaptive timeout logic. During debugging, I used transfer
+logs to find packet-order, timeout, and data-channel problems. I checked that
+the receiver rejected corrupted or out-of-order packets and that the sender
+retransmitted the correct window. I also helped test authentication,
+PASV/PORT, and multiple client sessions. My strength was understanding the
+server and packet flow from the TCP command to the UDP transfer. In the
+future, I would improve the protocol by adding Fast Retransmit and a receiver
+advertised window.
+
+\textbf{Member B --- Nguyen Van Hoang Nhat, 23125043.}
+
+\textbf{Main responsibilities:} utilities, file and directory operations,
+client protocol API, interactive CLI, unit/integration testing, demo evidence,
+and technical documentation.
+
+I was mainly responsible for the client, file and directory commands, tests,
+demo evidence, and documentation. I connected the interactive commands to
+the FTP client functions and checked operations such as upload, download,
+list, rename, delete, append, and hash verification. I also worked on ASCII
+and binary transfer handling so that text newlines were converted correctly
+while binary files remained unchanged. During debugging, I tested both PASV
+and PORT modes and helped fix the active-mode socket setup between
+consecutive transfers. I wrote and ran unit tests and end-to-end tests,
+including packet loss, compressed transfer, ABOR, and three clients running
+at the same time. My strength was testing complete user workflows and finding
+problems that only appeared when the real server and client ran together. In
+the future, I would improve large-file transfers by streaming data instead
+of loading the complete file into memory.
+
+\subsection{Agreed contribution}
+
+\begin{tabularx}{\textwidth}{l l c X }
+\toprule
+Member & Student ID & Contribution & Justification\\
+\midrule
+Nguyen Hoang Gia Han & 23125055 & 50\% & Protocol/RDT, congestion control, server \\
+Nguyen Van Hoang Nhat & 23125043 & 50\% & Client, operations, tests, report \\
+\textbf{Total} & & \textbf{100\%} & Agreed by both members &\\
+\bottomrule
+\end{tabularx}

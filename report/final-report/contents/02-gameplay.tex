@@ -1,0 +1,30 @@
+\section{Gameplay and Player Experience}
+
+\subsection{Core loop}
+At the start of a round, the player enters a protected area containing planting lanes and a house objective. Sun is collected and spent to deploy plants on valid squares. Zombies enter through configured routes and move toward the house. Plants automatically engage targets in their lane while the player can move, attack, plant, and remove plants. The player adapts the defense until every wave is cleared or the base is destroyed.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=8mm and 10mm,
+  box/.style={draw,rounded corners,align=center,minimum width=31mm,minimum height=9mm,fill=blue!5},
+  arrow/.style={-{Latex[length=2.2mm]},thick}
+]
+\node[box] (prepare) {Collect sun\\and place plants};
+\node[box,right=of prepare] (defend) {Plants and player\\defend lanes};
+\node[box,right=of defend] (waves) {Zombie waves\\advance};
+\node[box,below=of defend,fill=green!8] (win) {All waves cleared\\Win};
+\node[box,below=of waves,fill=red!7] (lose) {House health is zero\\Lose};
+\draw[arrow] (prepare)--(defend);
+\draw[arrow] (defend)--(waves);
+\draw[arrow] (waves)--(win);
+\draw[arrow] (waves)--(lose);
+\end{tikzpicture}
+\caption{High-level gameplay loop.}
+\end{figure}
+
+\subsection{Controls and feedback}
+The player uses standard third-person movement and camera control. Contextual actions cover selecting a plant, placing it on a free planting square, removing a placed plant, and melee attacking nearby zombies. The UI presents the active round, resource state, base health, and win/lose outcome. Audio reinforces menu navigation, attacks, plant placement, projectile hits, zombie events, resource collection, and round results.
+
+\subsection{Tutorial map requirement}
+The next user-facing addition is a dedicated instruction map. It will teach movement, camera control, plant selection and placement, melee attacks, plant removal, resource collection, and the win/loss objective in a safe sequence before the player enters a full round.
