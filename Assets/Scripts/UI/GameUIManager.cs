@@ -32,6 +32,8 @@ public class GameUIManager : MonoBehaviour
     public GameObject winPanel;
     [Tooltip("Panel shown when zombies reach base. Leave null to skip.")]
     public GameObject losePanel;
+    [Tooltip("New styled Win/Lose panel (auto-found if null).")]
+    public WinLosePanelUI winLosePanelUI;
 
     [Header("Battle Status")]
     public Text roundText;
@@ -46,6 +48,10 @@ public class GameUIManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
+
+        // Auto-find WinLosePanelUI if not assigned
+        if (winLosePanelUI == null)
+            winLosePanelUI = Object.FindFirstObjectByType<WinLosePanelUI>(FindObjectsInactive.Include);
 
         if (winPanel != null) winPanel.SetActive(false);
         if (losePanel != null) losePanel.SetActive(false);
@@ -267,31 +273,42 @@ public class GameUIManager : MonoBehaviour
     /// <summary>Show victory overlay.</summary>
     public void ShowWinScreen(bool hasNextRound = false)
     {
+        // Prefer new styled panel
+        if (winLosePanelUI != null)
+        {
+            // Hide old panel if any
+            if (winPanel != null) winPanel.SetActive(false);
+            winLosePanelUI.ShowWin(hasNextRound);
+            return;
+        }
+
+        // Fallback to old panel
         if (winPanel != null)
         {
             winPanel.SetActive(true);
             Text titleText = winPanel.GetComponentInChildren<Text>();
             if (titleText != null)
-            {
-                if (hasNextRound)
-                {
-                    titleText.text = "Round Complete!\nNext round starting...";
-                }
-                else
-                {
-                    titleText.text = "Victory!\nAll rounds cleared!";
-                }
-            }
+                titleText.text = hasNextRound ? "Round Complete!\nNext round starting..." : "Victory!\nAll rounds cleared!";
         }
         else
         {
-            Debug.Log(hasNextRound ? "[UI] Round Complete!" : "[UI] YOU WIN! All rounds cleared!");
+            Debug.Log(hasNextRound ? "[UI] Round Complete!" : "[UI] YOU WIN!");
         }
     }
 
     /// <summary>Show game-over overlay.</summary>
     public void ShowLoseScreen()
     {
+        // Prefer new styled panel
+        if (winLosePanelUI != null)
+        {
+            // Hide old panel if any
+            if (losePanel != null) losePanel.SetActive(false);
+            winLosePanelUI.ShowLose();
+            return;
+        }
+
+        // Fallback to old panel
         if (losePanel != null) losePanel.SetActive(true);
         else Debug.Log("[UI] GAME OVER!");
     }
