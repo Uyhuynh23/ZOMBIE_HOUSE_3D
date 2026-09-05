@@ -1,9 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
 /// Drives the PvZ-style HUD each frame.
-/// Owns the PlantCardUI array and the sun display text.
+/// Owns the PlantCardUI array, shovel button, and the sun display text and icon.
 /// </summary>
 public class GameUIManager : MonoBehaviour
 {
@@ -11,14 +11,21 @@ public class GameUIManager : MonoBehaviour
 
     [Header("Sun Display")]
     public Text sunText;                // Top-left sun counter
+    public Image sunIcon;               // Sun icon image (SunCircle)
 
     [Header("Plant Cards")]
-    public PlantCardUI[] plantCards;    // One per plant (plus optionally shovel)
-    
+    public PlantCardUI[] plantCards;    // One per plant
+    public PlantCardUI shovelCard;      // Shovel card
+
     [Header("Sun Flash Settings")]
     public float flashFrequency = 5f;
     public Color flashColor = Color.red;
-    private Color originalSunTextColor = Color.white;
+    public Color normalSunTextColor = Color.white;
+    public Color normalSunIconColor = new Color(1f, 0.9f, 0f, 1f);
+    private float insufficientFlashTimer = 0f;
+    private bool colorsCaptured = false;
+    private int lastSelectedIndex = -1;
+    private bool lastShovelMode = false;
 
     [Header("End-Game Panels (optional)")]
     [Tooltip("Panel shown when player wins. Leave null to skip.")]
@@ -46,32 +53,96 @@ public class GameUIManager : MonoBehaviour
 
     void Start()
     {
-        // Auto-find HUD elements if not assigned (e.g. when HUDPanel prefab is instantiated)
+        EnsureUIReferences();
+
+        if (EconomyManager.Instance != null)
+        {
+            EconomyManager.Instance.OnSunChanged += UpdateSunText;
+            UpdateSunText(EconomyManager.Instance.currentSun);
+        }
+    }
+
+    public void TriggerInsufficientSunFlash(float duration = 1.0f)
+    {
+        insufficientFlashTimer = Mathf.Max(insufficientFlashTimer, duration);
+    }
+
+    private void EnsureUIReferences()
+    {
+        // Auto-find sunText if missing
         if (sunText == null)
         {
             var stObj = GameObject.Find("SunText");
             if (stObj != null) sunText = stObj.GetComponent<Text>();
         }
-        if (plantCards == null || plantCards.Length == 0)
+
+        // Auto-find sunIcon if missing
+        if (sunIcon == null)
+        {
+            var scObj = GameObject.Find("SunCircle");
+            if (scObj != null) sunIcon = scObj.GetComponent<Image>();
+        }
+
+        // Capture normal baseline colors once (protects against overwriting with flashing colors)
+        if (!colorsCaptured)
+        {
+            if (sunText != null && sunText.color != flashColor)
+            {
+                normalSunTextColor = sunText.color;
+            }
+            if (sunIcon != null && sunIcon.color != flashColor)
+            {
+                normalSunIconColor = sunIcon.color;
+            }
+            if (sunText != null && sunIcon != null)
+            {
+                colorsCaptured = true;
+            }
+        }
+
+        // Auto-find plantCards if missing or containing null elements
+        bool needsCards = (plantCards == null || plantCards.Length == 0);
+        if (!needsCards)
+        {
+            bool anyValid = false;
+            for (int i = 0; i < plantCards.Length; i++)
+            {
+                if (plantCards[i] != null) { anyValid = true; break; }
+            }
+            if (!anyValid) needsCards = true;
+        }
+
+        if (needsCards)
         {
             var allCards = Object.FindObjectsByType<PlantCardUI>(FindObjectsSortMode.None);
             var cardList = new System.Collections.Generic.List<PlantCardUI>();
             foreach (var card in allCards)
             {
-                if (!card.isShovelCard) cardList.Add(card);
+                if (card.isShovelCard)
+                {
+                    if (shovelCard == null) shovelCard = card;
+                }
+                else
+                {
+                    cardList.Add(card);
+                }
             }
             cardList.Sort((a, b) => a.plantIndex.CompareTo(b.plantIndex));
             plantCards = cardList.ToArray();
         }
 
-        if (sunText != null)
+        // Auto-find shovel card if missing
+        if (shovelCard == null)
         {
-            originalSunTextColor = sunText.color;
-        }
-        if (EconomyManager.Instance != null)
-        {
-            EconomyManager.Instance.OnSunChanged += UpdateSunText;
-            UpdateSunText(EconomyManager.Instance.currentSun);
+            var allCards = Object.FindObjectsByType<PlantCardUI>(FindObjectsSortMode.None);
+            foreach (var card in allCards)
+            {
+                if (card.isShovelCard)
+                {
+                    shovelCard = card;
+                    break;
+                }
+            }
         }
     }
 
@@ -82,54 +153,84 @@ public class GameUIManager : MonoBehaviour
 
     void Update()
     {
+        EnsureUIReferences();
         UpdateBattleStatus();
-        
+
+        if (insufficientFlashTimer > 0f)
+        {
+            insufficientFlashTimer -= Time.deltaTime;
+        }
+
         // Lazy lookup for player
         if (player == null)
         {
             player = Object.FindFirstObjectByType<PlayerController>();
         }
 
-        if (player == null || player.plants == null) return;
-        if (EconomyManager.Instance == null) return;
+        // Clear burst flash timer immediately when selection changes
+        if (player != null)
+        {
+            if (player.CurrentPlantIndex != lastSelectedIndex || player.IsShovelMode != lastShovelMode)
+            {
+                lastSelectedIndex = player.CurrentPlantIndex;
+                lastShovelMode = player.IsShovelMode;
+                insufficientFlashTimer = 0f;
+            }
+        }
 
-        int currentSun = EconomyManager.Instance.currentSun;
-        int selectedIndex = player.CurrentPlantIndex;
+        // Update shovel card selection state
+        if (shovelCard != null && player != null)
+        {
+            shovelCard.UpdateShovel(player.IsShovelMode);
+        }
+
         bool selectedIsUnaffordable = false;
 
-        for (int i = 0; i < plantCards.Length; i++)
+        if (player != null && player.plants != null && EconomyManager.Instance != null)
         {
-            PlantCardUI card = plantCards[i];
-            if (card == null || card.isShovelCard) continue;
+            int currentSun = EconomyManager.Instance.currentSun;
+            int selectedIndex = player.CurrentPlantIndex;
 
-            int idx = card.plantIndex;
-            if (idx < 0 || idx >= player.plants.Length) continue;
+            if (plantCards != null)
+            {
+                for (int i = 0; i < plantCards.Length; i++)
+                {
+                    PlantCardUI card = plantCards[i];
+                    if (card == null || card.isShovelCard) continue;
 
-            PlantData data = player.plants[idx];
-            bool isSelected = (!player.IsShovelMode) && (idx == selectedIndex);
-            
-            if (isSelected && currentSun < data.cost)
-            {
-                selectedIsUnaffordable = true;
-            }
-            
-            card.UpdateCard(data, isSelected, currentSun);
-        }
-        
-        // Flash sun text if selected plant is unaffordable
-        if (sunText != null)
-        {
-            if (selectedIsUnaffordable)
-            {
-                float t = Mathf.Sin(Time.time * flashFrequency) * 0.5f + 0.5f;
-                sunText.color = Color.Lerp(originalSunTextColor, flashColor, t);
-            }
-            else
-            {
-                sunText.color = originalSunTextColor;
+                    int idx = card.plantIndex;
+                    if (idx < 0 || idx >= player.plants.Length) continue;
+
+                    PlantData data = player.plants[idx];
+                    bool isSelected = (!player.IsShovelMode) && (idx == selectedIndex);
+
+                    if (isSelected && currentSun < data.cost)
+                    {
+                        selectedIsUnaffordable = true;
+                    }
+
+                    card.UpdateCard(data, isSelected, currentSun);
+                }
             }
         }
 
+        // Flash sun text and sun icon if selected plant is unaffordable or triggered
+        bool shouldFlash = selectedIsUnaffordable || insufficientFlashTimer > 0f;
+        if (shouldFlash)
+        {
+            float t = Mathf.Sin(Time.time * flashFrequency) * 0.5f + 0.5f;
+            if (sunText != null)
+                sunText.color = Color.Lerp(normalSunTextColor, flashColor, t);
+            if (sunIcon != null)
+                sunIcon.color = Color.Lerp(normalSunIconColor, flashColor, t);
+        }
+        else
+        {
+            if (sunText != null)
+                sunText.color = normalSunTextColor;
+            if (sunIcon != null)
+                sunIcon.color = normalSunIconColor;
+        }
     }
 
     private void UpdateBattleStatus()

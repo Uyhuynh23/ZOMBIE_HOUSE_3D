@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
@@ -254,6 +254,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             UpdateTargetedPlant(null);
+            UpdateIndicatorColor(Color.yellow);
         }
     }
 
@@ -486,6 +487,7 @@ public class PlayerController : MonoBehaviour
                 if (EconomyManager.Instance != null && EconomyManager.Instance.currentSun < activePlant.cost)
                 {
                     Debug.Log("Not enough sun for " + activePlant.name + "!");
+                    GameUIManager.Instance?.TriggerInsufficientSunFlash();
                     return;
                 }
 

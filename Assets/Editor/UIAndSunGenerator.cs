@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -198,6 +198,11 @@ public class UIAndSunGenerator
         hRt.sizeDelta = new Vector2(-160f, 28f);
 
         CreateEndGamePanels(canvasObj, uiManager, uiFont);
+
+        // Save HUDPanel as Prefab
+        if (!System.IO.Directory.Exists("Assets/Prefabs"))
+            System.IO.Directory.CreateDirectory("Assets/Prefabs");
+        PrefabUtility.SaveAsPrefabAsset(hudPanel, "Assets/Prefabs/HUDPanel.prefab");
     }
 
     private static void CreateBattleStatus(GameObject canvasObj, GameUIManager uiManager, Font uiFont)
