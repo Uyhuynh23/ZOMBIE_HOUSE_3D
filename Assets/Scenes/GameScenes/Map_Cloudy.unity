@@ -17931,14 +17931,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameUIManager
   sunText: {fileID: 0}
+  sunIcon: {fileID: 0}
   plantCards:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  shovelCard: {fileID: 0}
   flashFrequency: 5
   flashColor: {r: 1, g: 0, b: 0, a: 1}
-  winPanel: {fileID: 544291446}
-  losePanel: {fileID: 1483671255}
+  normalSunTextColor: {r: 1, g: 1, b: 1, a: 1}
+  normalSunIconColor: {r: 1, g: 0.9, b: 0, a: 1}
+  winPanel: {fileID: 1170504208}
+  losePanel: {fileID: 1170504207}
+  winLosePanelUI: {fileID: 1170504206}
   roundText: {fileID: 0}
   waveText: {fileID: 990044664}
   zombieText: {fileID: 968339903}
@@ -21351,6 +21356,124 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2146991846993930759, guid: 210f723a15858f54c94429e1ec0bb2e3, type: 3}
   m_PrefabInstance: {fileID: 1164275412}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1170504205
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7028260578962611571, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_Name
+      value: WinLosePanel
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+--- !u!114 &1170504206 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3727631597518706810, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+  m_PrefabInstance: {fileID: 1170504205}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 152a3a65fee754d24b38c65762ed2419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WinLosePanelUI
+--- !u!1 &1170504207 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 203212425173293201, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+  m_PrefabInstance: {fileID: 1170504205}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1170504208 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7749007072731476244, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+  m_PrefabInstance: {fileID: 1170504205}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1172646098
 PrefabInstance:
@@ -37513,3 +37636,4 @@ SceneRoots:
   - {fileID: 1271564788}
   - {fileID: 613823227}
   - {fileID: 980879380}
+  - {fileID: 1170504205}

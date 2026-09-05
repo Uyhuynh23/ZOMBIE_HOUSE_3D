@@ -1603,67 +1603,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 499492611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &95213089
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &100639147
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3867,67 +3806,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4661435515762813124, guid: e289bf5debb17f6459818c207d781953, type: 3}
   m_PrefabInstance: {fileID: 582398882}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &244826926
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1 &249126318
 GameObject:
   m_ObjectHideFlags: 0
@@ -4202,67 +4080,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
---- !u!1001 &260782833
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &263748964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4320,67 +4137,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a2d11066257665943b4f5d14d3afb84d, type: 3}
---- !u!1001 &271189859
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &274846882
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4906,67 +4662,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 499492611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &299710513
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &305149164
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6669,67 +6364,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
---- !u!1001 &373598975
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!4 &375903718 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
@@ -6921,67 +6555,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8783306491909106419, guid: f02116c209ecd9e488fc4d2cd8996133, type: 3}
   m_PrefabInstance: {fileID: 378794439}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &378897275
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &385230042
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7414,67 +6987,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1001 &412166870
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &413950571
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8500,19 +8012,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.7071068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -8528,12 +8040,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: isOccupied
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: currentPlant
       value: 
-      objectReference: {fileID: 1530325141}
+      objectReference: {fileID: 0}
     - target: {fileID: 4679787085228517956, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_Name
       value: Plantable North Road 15
@@ -8548,17 +8060,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 468742442}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &468742444 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
-  m_PrefabInstance: {fileID: 468742442}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff6a8f5d10e13747a2ca064785267c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantableSquare
 --- !u!1 &469983569
 GameObject:
   m_ObjectHideFlags: 0
@@ -8833,67 +8334,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7294992287088645823, guid: a2d11066257665943b4f5d14d3afb84d, type: 3}
   m_PrefabInstance: {fileID: 263748964}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &480123082
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!4 &484533260 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6348798071350301917, guid: 5b78483a17f1d9f49ac480bebcc8f57b, type: 3}
@@ -9352,67 +8792,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
   m_PrefabInstance: {fileID: 78983193}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &506807396
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &507225847
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10244,67 +9623,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8099097866964669313, guid: fea3efe59f8df0746bac291e857cb42d, type: 3}
   m_PrefabInstance: {fileID: 574863429}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &578798957
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!4 &579656029 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6242315999576643408, guid: b52bc897007c2764aa34136288b26f2c, type: 3}
@@ -10904,67 +10222,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e289bf5debb17f6459818c207d781953, type: 3}
---- !u!1001 &634890720
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &635391531
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11687,67 +10944,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac8efb728f1fb9b4092c4df591c827ca, type: 3}
---- !u!1001 &678525688
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &678925639
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12174,67 +11370,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
   m_PrefabInstance: {fileID: 151126722}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &703222981
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &703278676
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13925,67 +13060,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3356751432537613521, guid: ffbddc4ef9676cc419e81e06aaa836d8, type: 3}
   m_PrefabInstance: {fileID: 783680926}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &787047113
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1 &790191792
 GameObject:
   m_ObjectHideFlags: 0
@@ -16100,67 +15174,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
   m_PrefabInstance: {fileID: 1966963878}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &888735146
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &890744470
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16652,67 +15665,6 @@ Transform:
   - {fileID: 309948229}
   m_Father: {fileID: 538836204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &917623034
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &918920923
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16804,19 +15756,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.7071068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -17348,67 +16300,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9069115365609054727, guid: 60f79905accf3b24fa0114b941f1aac0, type: 3}
   m_PrefabInstance: {fileID: 945631103}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &947017743
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &949350184
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22082,7 +20973,7 @@ PrefabInstance:
     - target: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: currentPlant
       value: 
-      objectReference: {fileID: 1605515888}
+      objectReference: {fileID: 0}
     - target: {fileID: 4679787085228517956, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_Name
       value: Plantable East Road 15
@@ -22097,17 +20988,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1205037458}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1205037460 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
-  m_PrefabInstance: {fileID: 1205037458}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff6a8f5d10e13747a2ca064785267c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantableSquare
 --- !u!1001 &1210420384
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22414,67 +21294,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
---- !u!1001 &1233907429
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &1234939523
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22604,7 +21423,7 @@ PrefabInstance:
     - target: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: currentPlant
       value: 
-      objectReference: {fileID: 1569797052}
+      objectReference: {fileID: 0}
     - target: {fileID: 4679787085228517956, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_Name
       value: Plantable South Road 15
@@ -22614,17 +21433,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
---- !u!114 &1236727295 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
-  m_PrefabInstance: {fileID: 1236727294}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff6a8f5d10e13747a2ca064785267c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantableSquare
 --- !u!4 &1236727296 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
@@ -23528,67 +22336,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1738017220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1294837598
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &1296542209
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24301,67 +23048,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6481016334485925938, guid: 47088b806df548c438c483db406f9f2a, type: 3}
   m_PrefabInstance: {fileID: 1330872033}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1332175605
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &1334314756
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25551,14 +24237,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameUIManager
   sunText: {fileID: 0}
+  sunIcon: {fileID: 0}
   plantCards:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  shovelCard: {fileID: 0}
   flashFrequency: 5
   flashColor: {r: 1, g: 0, b: 0, a: 1}
-  winPanel: {fileID: 2144570484}
-  losePanel: {fileID: 1195150397}
+  normalSunTextColor: {r: 1, g: 1, b: 1, a: 1}
+  normalSunIconColor: {r: 1, g: 0.9, b: 0, a: 1}
+  winPanel: {fileID: 1869724420}
+  losePanel: {fileID: 1869724419}
+  winLosePanelUI: {fileID: 1869724418}
   roundText: {fileID: 0}
   waveText: {fileID: 1679532077}
   zombieText: {fileID: 1089774420}
@@ -26189,67 +24880,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
---- !u!1001 &1434539113
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!4 &1437934438 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4661435515762813124, guid: e289bf5debb17f6459818c207d781953, type: 3}
@@ -27939,67 +26569,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4661435515762813124, guid: e289bf5debb17f6459818c207d781953, type: 3}
   m_PrefabInstance: {fileID: 1520006185}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1521788574
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &1525545284
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28256,78 +26825,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8643406898246468476, guid: fce137871b378d142a8760622a68bf40, type: 3}
   m_PrefabInstance: {fileID: 1529348398}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1530325140
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 468742444}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
---- !u!114 &1530325141 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-  m_PrefabInstance: {fileID: 1530325140}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 790446314be8dde4cb6e1c79e96b6494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PeashooterCombat
 --- !u!1001 &1531818960
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29219,78 +27716,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
---- !u!1001 &1569797051
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 1236727295}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
---- !u!114 &1569797052 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-  m_PrefabInstance: {fileID: 1569797051}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 790446314be8dde4cb6e1c79e96b6494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PeashooterCombat
 --- !u!4 &1571307733 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
@@ -29735,78 +28160,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4661435515762813124, guid: e289bf5debb17f6459818c207d781953, type: 3}
   m_PrefabInstance: {fileID: 1597232218}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1605515887
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 1205037460}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
---- !u!114 &1605515888 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-  m_PrefabInstance: {fileID: 1605515887}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 790446314be8dde4cb6e1c79e96b6494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PeashooterCombat
 --- !u!1001 &1606609201
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32735,7 +31088,7 @@ PrefabInstance:
     - target: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: currentPlant
       value: 
-      objectReference: {fileID: 1784246833}
+      objectReference: {fileID: 0}
     - target: {fileID: 4679787085228517956, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_Name
       value: Plantable West Road 15
@@ -32750,17 +31103,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1738863692}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1738863694 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
-  m_PrefabInstance: {fileID: 1738863692}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff6a8f5d10e13747a2ca064785267c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantableSquare
 --- !u!1001 &1742392585
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33941,78 +32283,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 914948248}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1784246832
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 1738863694}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
---- !u!114 &1784246833 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-  m_PrefabInstance: {fileID: 1784246832}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 790446314be8dde4cb6e1c79e96b6494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PeashooterCombat
 --- !u!1001 &1784453483
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35055,67 +33325,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6242315999576643408, guid: b52bc897007c2764aa34136288b26f2c, type: 3}
   m_PrefabInstance: {fileID: 2022810318}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1848234408
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!4 &1850979217 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
@@ -35317,6 +33526,124 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
+--- !u!1001 &1869724417
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5458111766919196287, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7028260578962611571, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+      propertyPath: m_Name
+      value: WinLosePanel
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+--- !u!114 &1869724418 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3727631597518706810, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+  m_PrefabInstance: {fileID: 1869724417}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 152a3a65fee754d24b38c65762ed2419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WinLosePanelUI
+--- !u!1 &1869724419 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 203212425173293201, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+  m_PrefabInstance: {fileID: 1869724417}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1869724420 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7749007072731476244, guid: 883fba7fdc2d147b68517887935ba93f, type: 3}
+  m_PrefabInstance: {fileID: 1869724417}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1869984175
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35431,67 +33758,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
---- !u!1001 &1871510505
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &1873671308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35554,67 +33820,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2222111361405018444, guid: 88f2fd29f58b9734683512546acec310, type: 3}
   m_PrefabInstance: {fileID: 1873671308}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1877152043
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &1877523277
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36295,67 +34500,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dce278a18cc98aa41a4185c95e564f6f, type: 3}
---- !u!1001 &1920247803
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!1001 &1920253530
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36907,67 +35051,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5186735023777053022, guid: ac8efb728f1fb9b4092c4df591c827ca, type: 3}
   m_PrefabInstance: {fileID: 1952807907}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1954730945
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -1414969983806252636, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: mySquare
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.427531
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7413449749605851372, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8648567330590244738, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
-      propertyPath: m_Name
-      value: Map Showcase Peashooter
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 1107041fd4376cb42bdbf7bdba8d2e15, type: 3}
 --- !u!4 &1954831096 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7398591671180639709, guid: 1b095296d9d51a545b2b1bd11e624b4f, type: 3}
@@ -38458,19 +36541,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.7071068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -39892,38 +37975,7 @@ SceneRoots:
   - {fileID: 1630733262}
   - {fileID: 1650631537}
   - {fileID: 1222713671}
-  - {fileID: 1521788574}
-  - {fileID: 373598975}
-  - {fileID: 578798957}
-  - {fileID: 1233907429}
   - {fileID: 1606609201}
-  - {fileID: 678525688}
-  - {fileID: 1848234408}
-  - {fileID: 378897275}
-  - {fileID: 412166870}
-  - {fileID: 947017743}
-  - {fileID: 299710513}
-  - {fileID: 1871510505}
-  - {fileID: 1954730945}
-  - {fileID: 888735146}
-  - {fileID: 1877152043}
-  - {fileID: 480123082}
-  - {fileID: 703222981}
-  - {fileID: 1332175605}
-  - {fileID: 95213089}
-  - {fileID: 244826926}
-  - {fileID: 260782833}
-  - {fileID: 634890720}
-  - {fileID: 271189859}
-  - {fileID: 1920247803}
-  - {fileID: 917623034}
-  - {fileID: 506807396}
-  - {fileID: 1434539113}
-  - {fileID: 787047113}
-  - {fileID: 1294837598}
   - {fileID: 538836204}
-  - {fileID: 1605515887}
-  - {fileID: 1530325140}
-  - {fileID: 1784246832}
-  - {fileID: 1569797051}
   - {fileID: 1401874602}
+  - {fileID: 1869724417}
