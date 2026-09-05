@@ -204,7 +204,7 @@ public class TutorialManager : MonoBehaviour
         rt.pivot = new Vector2(0.5f, 1f);
         rt.anchoredPosition = new Vector2(0f, -16f);
         rt.localScale = new Vector3(1.58f, 1.58f, 1f);
-        rt.sizeDelta = new Vector2(680f, 68f);
+        rt.sizeDelta = new Vector2(590f, 68f);
 
         Image bg = bannerObj.AddComponent<Image>();
         bg.color = new Color(0.08f, 0.07f, 0.05f, 0.94f);
