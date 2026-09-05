@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class PlantableSquare : MonoBehaviour
 {
@@ -9,6 +9,7 @@ public class PlantableSquare : MonoBehaviour
     /// </summary>
     public PlantBase currentPlant;
 
+    public GameObject hoverGlow;
     private Renderer rend;
     private MaterialPropertyBlock propBlock;
     private Color originalColor;
@@ -16,6 +17,14 @@ public class PlantableSquare : MonoBehaviour
     void Start()
     {
         rend = GetComponent<Renderer>();
+        if (rend == null)
+        {
+            Transform dirt = transform.Find("DirtBed");
+            if (dirt != null) rend = dirt.GetComponent<Renderer>();
+            else rend = GetComponentInChildren<Renderer>();
+        }
+        Transform h = transform.Find("HoverGlow");
+        if (h != null) hoverGlow = h.gameObject;
         propBlock = new MaterialPropertyBlock();
         if (rend != null)
         {
@@ -51,7 +60,7 @@ public class PlantableSquare : MonoBehaviour
     }
 
     /// <summary>
-    /// Legacy method — prefer PlantHere/RemovePlant.
+    /// Legacy method ï¿½ prefer PlantHere/RemovePlant.
     /// </summary>
     public void SetOccupied(bool occupied)
     {
@@ -61,6 +70,11 @@ public class PlantableSquare : MonoBehaviour
             currentPlant = null;
         }
         UpdateVisual();
+    }
+
+    public void SetHover(bool hover)
+    {
+        if (hoverGlow != null) hoverGlow.SetActive(hover);
     }
 
     void UpdateVisual()

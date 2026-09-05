@@ -36,11 +36,11 @@ public class ZombieSpawner : MonoBehaviour
     [Tooltip("All enemy prefabs to pick from randomly (overrides zombiePrefab if filled).")]
     public GameObject[] enemyPrefabs;
 
-    [Header("Spawn Points (4 Directions)")]
-    [Tooltip("One Transform per entrance direction. Enemies NavMesh-path to Baker_house from here.")]
+    [Header("Spawn Points (Many Positions)")]
+    [Tooltip("Many spawn Transforms scattered around the map perimeter. Each enemy picks the nearest of 4 directions.")]
     public Transform[] spawnPoints;
-    [Tooltip("Random XZ radius offset at spawn so enemies do not stack on a single point.")]
-    [Min(0f)] public float spawnJitter = 1.5f;
+    [Tooltip("Small random offset within each lane so enemies don't stack exactly.")]
+    [Min(0f)] public float spawnJitter = 0.3f;
 
     [Header("House Target")]
     [Tooltip("Baker_house transform. Auto-found by tag 'HouseTarget' or name 'Baker_house' if null.")]
@@ -53,10 +53,10 @@ public class ZombieSpawner : MonoBehaviour
     [Header("Waves")]
     public WaveData[] waves = new WaveData[]
     {
-        new WaveData { zombieCount = 4,  spawnInterval = 2.0f, delayBeforeWave = 5f  },
-        new WaveData { zombieCount = 7,  spawnInterval = 1.4f, delayBeforeWave = 8f  },
-        new WaveData { zombieCount = 10, spawnInterval = 1.0f, delayBeforeWave = 8f  },
-        new WaveData { zombieCount = 14, spawnInterval = 0.7f, delayBeforeWave = 10f },
+        new WaveData { zombieCount = 8,  spawnInterval = 1.2f, delayBeforeWave = 5f  },
+        new WaveData { zombieCount = 12, spawnInterval = 0.9f, delayBeforeWave = 8f  },
+        new WaveData { zombieCount = 16, spawnInterval = 0.7f, delayBeforeWave = 8f  },
+        new WaveData { zombieCount = 20, spawnInterval = 0.5f, delayBeforeWave = 10f },
     };
 
     [Header("Movement Speed")]
@@ -89,6 +89,16 @@ public class ZombieSpawner : MonoBehaviour
     private List<GameObject> activeEnemies = new List<GameObject>();
     private bool allWavesComplete;
     private int spawnSequence;
+
+    // The 4 canonical gate positions (matched to LaneEntrance triggers)
+    private static readonly Vector3[] GatePositions = new Vector3[]
+    {
+        new Vector3(  0, 0,  35),  // North
+        new Vector3(  0, 0, -39),  // South
+        new Vector3( 35, 0,   0),  // East
+        new Vector3(-38, 0,   3),  // West
+    };
+
 
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
@@ -221,22 +231,49 @@ public class ZombieSpawner : MonoBehaviour
 
         if (spawnPoints != null && spawnPoints.Length > 0)
         {
-            Transform sp = spawnPoints[spawnSequence % spawnPoints.Length];
+            // Pick a random spawn point from the pool
+            Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
             spawnSequence++;
             if (sp != null)
             {
-                Vector2 jitter = Random.insideUnitCircle * spawnJitter;
-                candidate = sp.position + new Vector3(jitter.x, 0f, jitter.y);
+                // Find which of the 4 gates is nearest to this spawn point
+                int nearestGate = 0;
+                float nearestDist = float.MaxValue;
+                for (int g = 0; g < GatePositions.Length; g++)
+                {
+                    float d = Vector2.Distance(
+                        new Vector2(sp.position.x, sp.position.z),
+                        new Vector2(GatePositions[g].x, GatePositions[g].z));
+                    if (d < nearestDist) { nearestDist = d; nearestGate = g; }
+                }
+
+                // Determine lane alignment based on gate direction
+                // Gates: 0=North(N/S, vary X), 1=South(N/S, vary X), 2=East(E/W, vary Z), 3=West(E/W, vary Z)
+                bool approachOnZ = nearestGate <= 1; // North or South
+                float laneSpacing = 4f;
+                int laneIdx = Random.Range(0, 3);
+                float laneOffset = (laneIdx - 1) * laneSpacing; // -4, 0, or +4
+                float noise = Random.Range(-spawnJitter, spawnJitter);
+
+                Vector3 spawnPos = sp.position;
+                if (approachOnZ)
+                    spawnPos.x = laneOffset + noise;  // N/S: vary X to hit correct lane
+                else
+                    spawnPos.z = laneOffset + noise;  // E/W: vary Z to hit correct lane
+
+                candidate = spawnPos;
             }
         }
 
         // Sample nearest valid NavMesh position
         NavMeshHit hit;
-        if (NavMesh.SamplePosition(candidate, out hit, 6f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(candidate, out hit, 10f, NavMesh.AllAreas))
             return hit.position;
 
         return candidate;
     }
+
+
 
     // ──────────────────────────────────────────────────────────
     // Legacy route spawn (kept for test scenes with ZombieRoute)

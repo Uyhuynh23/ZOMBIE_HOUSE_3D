@@ -5,7 +5,10 @@ using UnityEngine.AI;
 /// <summary>
 /// NavMesh-based AI controller for all enemy types (Zombie, Spider).
 /// Replaces ZombiePrototypeMover in Map_Cloudy.
-/// States: Moving → AttackingPlant → AttackingHouse → Dead
+/// States: Moving -> AttackingPlant -> AttackingHouse -> Dead
+///
+/// Lane system: Once an enemy crosses a LaneEntrance trigger inside the fence,
+/// it is constrained to move along a narrow corridor toward the house.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyNavAgent : MonoBehaviour
@@ -19,13 +22,24 @@ public class EnemyNavAgent : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField, Min(0.1f)] public float moveSpeed = 1.5f;
-    [SerializeField, Min(10f)]  private float angularSpeed = 300f;
+    [SerializeField, Min(10f)]  private float angularSpeed = 360f;
     [Tooltip("Distance at which the agent stops walking (used as NavMeshAgent.stoppingDistance).")]
-    [SerializeField, Min(0.1f)] private float stoppingDistance = 1.5f;
-    [Tooltip("Max distance from house center to consider 'at the house'. Should match ~house half-width.")]
-    [SerializeField, Min(1f)]   private float houseArrivalRadius = 12f;
-    [Tooltip("Extra tolerance for PathPartial situations.")]
-    [SerializeField, Min(0f)]   private float pathPartialTolerance = 3f;
+    [SerializeField, Min(0.1f)] private float stoppingDistance = 1.2f;
+    [Tooltip("Max distance from house center to consider 'at the house'. House extents ~9.5m.")]
+    [SerializeField, Min(1f)]   private float houseArrivalRadius = 9f;
+
+    [Header("Lane Constraint")]
+    [Tooltip("How strongly the enemy is snapped to its lane. Higher = tighter constraint.")]
+    [SerializeField, Min(0f)] private float laneSnapStrength = 20f;
+    [Tooltip("How wide the lane corridor is (half-width). Enemy stays within this tolerance of its lane coord.")]
+    [SerializeField, Min(0.1f)] private float laneTolerance = 0.3f;
+
+
+    [Header("Stuck Recovery")]
+    [Tooltip("If the enemy hasn't moved more than this in stuckCheckInterval seconds, recalculate path.")]
+    [SerializeField, Min(0.1f)] private float stuckDistanceThreshold = 0.3f;
+    [Tooltip("How often (seconds) to check if the enemy is stuck.")]
+    [SerializeField, Min(1f)]   private float stuckCheckInterval = 2.5f;
 
     [Header("Plant Detection")]
     [Tooltip("Radius of sphere cast ahead of the enemy to detect plants.")]
@@ -48,11 +62,48 @@ public class EnemyNavAgent : MonoBehaviour
     [SerializeField] private string moveSpeedParam = "MoveSpeed";
 
     // ──────────────────────────────────────────────────────────
-    // Runtime state — public for ZombieAttack
+    // Runtime state — public for ZombieAttack / LaneEntrance
     // ──────────────────────────────────────────────────────────
-    public PlantBase BlockingPlant { get; private set; }
-    public bool IsAtHouse          { get; private set; }
-    public bool IsDead             { get; private set; }
+    public PlantBase BlockingPlant  { get; private set; }
+    public bool      IsAtHouse      { get; private set; }
+    public bool      IsDead         { get; private set; }
+    public bool      HasLaneAssigned { get; private set; }
+
+    // Lane data (set by LaneEntrance trigger)
+    private LaneEntrance.Direction laneDirection;
+    private int   assignedLaneIndex;
+    private float laneConstraintCoord;   // X for N/S lanes, Z for E/W lanes
+
+    // ──────────────────────────────────────────────────────────
+    // Private
+    // ──────────────────────────────────────────────────────────
+    private NavMeshAgent agent;
+    private int   moveSpeedHash;
+    private float baseSpeed;
+    private bool  isStaggered;
+
+    // Stuck detection
+    private Vector3 lastStuckCheckPos;
+    private float   stuckCheckTimer;
+
+    private enum AIState { Moving, AttackingPlant, AttackingHouse, Dead }
+    private AIState state = AIState.Moving;
+
+    // ──────────────────────────────────────────────────────────
+    // Public API
+    // ──────────────────────────────────────────────────────────
+    /// <summary>Called by LaneEntrance trigger when enemy crosses into defense zone.</summary>
+    public void AssignLane(LaneEntrance.Direction dir, int laneIdx, float worldCoord)
+    {
+        if (HasLaneAssigned) return;
+        laneDirection       = dir;
+        assignedLaneIndex   = laneIdx;
+        laneConstraintCoord = worldCoord;
+        HasLaneAssigned     = true;
+
+        // Recalculate destination with lane-constrained target
+        SetDestinationToHouse();
+    }
 
     public void ClearBlockingPlant()
     {
@@ -64,17 +115,6 @@ public class EnemyNavAgent : MonoBehaviour
             state = AIState.Moving;
         }
     }
-
-    // ──────────────────────────────────────────────────────────
-    // Private
-    // ──────────────────────────────────────────────────────────
-    private NavMeshAgent agent;
-    private int moveSpeedHash;
-    private float baseSpeed;
-    private bool isStaggered;
-
-    private enum AIState { Moving, AttackingPlant, AttackingHouse, Dead }
-    private AIState state = AIState.Moving;
 
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
@@ -102,6 +142,9 @@ public class EnemyNavAgent : MonoBehaviour
 
         ConfigureAgent();
         SetDestinationToHouse();
+
+        lastStuckCheckPos = transform.position;
+        stuckCheckTimer   = stuckCheckInterval;
     }
 
     private void Update()
@@ -119,7 +162,7 @@ public class EnemyNavAgent : MonoBehaviour
 
         switch (state)
         {
-            case AIState.Moving:         UpdateMoving();        break;
+            case AIState.Moving:         UpdateMoving();         break;
             case AIState.AttackingPlant: UpdateAttackingPlant(); break;
             case AIState.AttackingHouse: UpdateAttackingHouse(); break;
         }
@@ -135,6 +178,10 @@ public class EnemyNavAgent : MonoBehaviour
     private void UpdateMoving()
     {
         if (!AgentValid()) return;
+
+        // ── Lane constraint: snap perpendicular position to lane ──
+        if (HasLaneAssigned)
+            ApplyLaneConstraint();
 
         // ── Plant detection in forward arc ──
         Vector3 fwd = agent.velocity.sqrMagnitude > 0.01f
@@ -157,10 +204,7 @@ public class EnemyNavAgent : MonoBehaviour
         }
 
         // ── Arrival detection ──
-        // Use distance from house center rather than agent.remainingDistance,
-        // because PathPartial sets remainingDistance to the partial path length
-        bool arrivedAtHouse = CheckArrivedAtHouse();
-        if (arrivedAtHouse)
+        if (CheckArrivedAtHouse())
         {
             IsAtHouse = true;
             agent.isStopped = true;
@@ -172,10 +216,49 @@ public class EnemyNavAgent : MonoBehaviour
         IsAtHouse = false;
         agent.isStopped = false;
 
-        // Re-set destination periodically if path becomes invalid
+        // ── Path recovery ──
         if (!agent.pathPending && agent.path.status == NavMeshPathStatus.PathInvalid)
         {
             SetDestinationToHouse();
+        }
+
+        // ── Stuck detection ──
+        stuckCheckTimer -= Time.deltaTime;
+        if (stuckCheckTimer <= 0f)
+        {
+            stuckCheckTimer = stuckCheckInterval;
+            float moved = Vector3.Distance(transform.position, lastStuckCheckPos);
+            if (moved < stuckDistanceThreshold && state == AIState.Moving)
+            {
+                Debug.Log($"[EnemyNavAgent] {name} appears stuck. Recalculating path.");
+                SetDestinationToHouse();
+            }
+            lastStuckCheckPos = transform.position;
+        }
+    }
+
+    /// <summary>
+    /// Smoothly snaps the agent to its assigned lane coordinate on the
+    /// perpendicular axis (X for N/S, Z for E/W). Uses warp if deviation is large.
+    /// </summary>
+    private void ApplyLaneConstraint()
+    {
+        Vector3 pos = transform.position;
+        bool isNorthSouth = laneDirection == LaneEntrance.Direction.North ||
+                            laneDirection == LaneEntrance.Direction.South;
+
+        float currentCoord = isNorthSouth ? pos.x : pos.z;
+        float delta = laneConstraintCoord - currentCoord;
+
+        if (Mathf.Abs(delta) > laneTolerance)
+        {
+            float corrected = Mathf.MoveTowards(currentCoord, laneConstraintCoord, laneSnapStrength * Time.deltaTime);
+            Vector3 newPos = pos;
+            if (isNorthSouth) newPos.x = corrected;
+            else              newPos.z = corrected;
+
+            // Warp agent to corrected position (respects NavMesh)
+            agent.Warp(newPos);
         }
     }
 
@@ -187,17 +270,7 @@ public class EnemyNavAgent : MonoBehaviour
             new Vector3(transform.position.x, 0f, transform.position.z),
             new Vector3(houseTarget.position.x, 0f, houseTarget.position.z));
 
-        // Arrived if within the house arrival radius
-        if (distToHouseCenter <= houseArrivalRadius) return true;
-
-        // Also check NavMesh remaining distance for PathPartial cases
-        if (!agent.pathPending && agent.path.status == NavMeshPathStatus.PathPartial)
-        {
-            if (agent.remainingDistance <= stoppingDistance + pathPartialTolerance)
-                return true;
-        }
-
-        return false;
+        return distToHouseCenter <= houseArrivalRadius;
     }
 
     // ──────────────────────────────────────────────────────────
@@ -277,14 +350,29 @@ public class EnemyNavAgent : MonoBehaviour
         agent.updateRotation    = true;
         agent.updatePosition    = true;
         agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
-        agent.avoidancePriority = Random.Range(20, 80); // Randomize to spread out swarming
+        agent.avoidancePriority = Random.Range(20, 80);
         baseSpeed = moveSpeed;
     }
 
     private void SetDestinationToHouse()
     {
         if (houseTarget == null || !AgentValid()) return;
-        agent.SetDestination(houseTarget.position);
+
+        // If lane is assigned, aim at a point on the house perimeter along the lane axis
+        if (HasLaneAssigned)
+        {
+            Vector3 target = houseTarget.position;
+            bool isNS = laneDirection == LaneEntrance.Direction.North ||
+                        laneDirection == LaneEntrance.Direction.South;
+            // Keep the lane coordinate on the perpendicular axis so the path stays in-lane
+            if (isNS) target.x = laneConstraintCoord;
+            else      target.z = laneConstraintCoord;
+            agent.SetDestination(target);
+        }
+        else
+        {
+            agent.SetDestination(houseTarget.position);
+        }
     }
 
     private bool AgentValid() =>
@@ -307,6 +395,18 @@ public class EnemyNavAgent : MonoBehaviour
             Gizmos.DrawLine(transform.position, houseTarget.position);
             Gizmos.color = new Color(1f, 0f, 0f, 0.15f);
             Gizmos.DrawWireSphere(houseTarget.position, houseArrivalRadius);
+        }
+
+        // Lane constraint visualization
+        if (HasLaneAssigned)
+        {
+            Gizmos.color = Color.cyan;
+            bool isNS = laneDirection == LaneEntrance.Direction.North ||
+                        laneDirection == LaneEntrance.Direction.South;
+            Vector3 lanePos = transform.position;
+            if (isNS) lanePos.x = laneConstraintCoord;
+            else      lanePos.z = laneConstraintCoord;
+            Gizmos.DrawLine(transform.position, lanePos);
         }
 
         // Plant sensor

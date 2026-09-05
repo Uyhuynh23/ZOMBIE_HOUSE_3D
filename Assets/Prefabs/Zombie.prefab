@@ -336,7 +336,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2220333027162407996}
@@ -528,7 +528,10 @@ MonoBehaviour:
   angularSpeed: 300
   stoppingDistance: 1.5
   houseArrivalRadius: 12
-  pathPartialTolerance: 3
+  laneSnapStrength: 8
+  laneTolerance: 0.5
+  stuckDistanceThreshold: 0.3
+  stuckCheckInterval: 2.5
   plantDetectRadius: 0.65
   plantDetectOffset: 1
   plantLayerMask:
@@ -573,7 +576,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 42d3bd50fe2104e1aa5648d70d5a20a5, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.00000004371139
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 42d3bd50fe2104e1aa5648d70d5a20a5, type: 3}
       propertyPath: m_LocalRotation.x
@@ -581,7 +584,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 42d3bd50fe2104e1aa5648d70d5a20a5, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 42d3bd50fe2104e1aa5648d70d5a20a5, type: 3}
       propertyPath: m_LocalRotation.z
