@@ -34,6 +34,7 @@ public static class GameMapsIntegrationBuilder
     private const string ZombiePrefabPath = "Assets/Prefabs/Zombie.prefab";
     private const string SpiderPrefabPath = "Assets/Prefabs/Spider.prefab";
     private const string MinimapPrefabPath = "Assets/Prefabs/MinimapSystem.prefab";
+    private const string InstructionBoardPrefabPath = "Assets/Prefabs/InstructionBoard3D.prefab";
 
     private static readonly Vector3[] RouteDirections =
     {
@@ -139,6 +140,9 @@ public static class GameMapsIntegrationBuilder
         // 8. Minimap System
         EnsureMinimapSystem();
 
+        // 9. 3D In-Game Instruction Board
+        EnsureInstructionBoard(integrationRoot.transform, terrain, center);
+
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Debug.Log($"[GameMapsIntegrationBuilder] Scene integrated successfully: {scenePath}");
@@ -150,11 +154,15 @@ public static class GameMapsIntegrationBuilder
         if (oldRoot != null)
             Object.DestroyImmediate(oldRoot);
 
+        GameObject oldBoard = GameObject.Find("InstructionBoard3D");
+        if (oldBoard != null)
+            Object.DestroyImmediate(oldBoard);
+
         // Clean loose managers if any
         foreach (var obj in Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None))
         {
             if (obj == null) continue;
-            if (obj.name == "Map Game Managers" || obj.name == "House Target")
+            if (obj.name == "Map Game Managers" || obj.name == "House Target" || obj.name == "InstructionBoard3D")
                 Object.DestroyImmediate(obj);
         }
     }
@@ -471,6 +479,34 @@ public static class GameMapsIntegrationBuilder
         }
 
         AssetDatabase.SaveAssets();
+    }
+
+    private static void EnsureInstructionBoard(Transform parent, Terrain terrain, Vector3 center)
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(InstructionBoardPrefabPath);
+        if (prefab == null)
+        {
+            prefab = InstructionBoardBuilder.BuildPrefab();
+        }
+
+        Vector3 boardPos = center + new Vector3(-2.6f, 0f, -3.2f);
+        Vector3 groundPos = GroundPoint(terrain, boardPos, 0.02f);
+        Vector3 playerSpawn = center + new Vector3(-4.5f, 0f, -4.5f);
+
+        GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
+        instance.name = "InstructionBoard3D";
+        instance.transform.position = groundPos;
+
+        Vector3 lookDir = (playerSpawn - groundPos);
+        lookDir.y = 0f;
+        if (lookDir != Vector3.zero)
+        {
+            instance.transform.rotation = Quaternion.LookRotation(lookDir.normalized);
+        }
+        else
+        {
+            instance.transform.rotation = Quaternion.Euler(0f, 45f, 0f);
+        }
     }
 
     private static Vector3 GroundPoint(Terrain terrain, Vector3 position, float offset)

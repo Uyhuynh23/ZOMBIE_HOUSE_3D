@@ -78,6 +78,7 @@ public class PlayerController : MonoBehaviour
     public int CurrentPlantIndex => currentPlantIndex;
     public bool IsShovelMode => isShovelMode;
     public bool IsAttacking => isAttacking;
+    [HideInInspector] public bool isInputLocked = false;
 
     void Start()
     {
@@ -173,6 +174,13 @@ public class PlayerController : MonoBehaviour
         if (isPlanting)
         {
             HandlePlantingSequence();
+            return;
+        }
+
+        if (isInputLocked)
+        {
+            if (animator != null) animator.SetBool("IsMoving", false);
+            if (currentIndicator != null && currentIndicator.activeSelf) currentIndicator.SetActive(false);
             return;
         }
 

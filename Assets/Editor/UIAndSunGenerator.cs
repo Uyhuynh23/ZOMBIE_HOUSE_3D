@@ -8,7 +8,8 @@ using UnityEngine.UI;
 /// </summary>
 public class UIAndSunGenerator
 {
-    private const string RobotoBoldPath = "Assets/Fonts/Roboto/static/Roboto-Bold.ttf";
+    private const string RobotoBoldPath = "Assets/TextMesh Pro/Examples & Extras/Fonts/Roboto-Bold.ttf";
+    private const string ShlopFontPath = "Assets/Fonts/shlop/shlop rg.otf";
 
     // -----------------------------------------------------------------------------
     //  MAIN ENTRY: regenerate Sun prefab + PvZ HUD
@@ -211,7 +212,7 @@ public class UIAndSunGenerator
         GameObject hintObj = new GameObject("ControlsHint");
         hintObj.transform.SetParent(canvasObj.transform, false);
         Text hintText = hintObj.AddComponent<Text>();
-        hintText.text = "1/2/3 or Click: Select Plant | 4/R: Shovel | E: Plant/Remove";
+        hintText.text = "1/2/3: Select | E: Plant | 4/R: Shovel | LMB/Space: Attack | H: 3D Guide";
         hintText.font = uiFont;
         hintText.fontSize = 16;
         hintText.fontStyle = FontStyle.Bold;
@@ -240,7 +241,7 @@ public class UIAndSunGenerator
         panelRect.anchoredPosition = new Vector2(0f, -12f);
         panelRect.sizeDelta = new Vector2(620f, 76f);
 
-        uiManager.waveText = CreateText(panel, "WaveText", "WAVE 1/3", uiFont, 25,
+        uiManager.waveText = CreateText(panel, "WaveText", "WAVE 1/3", LoadShlopFont(), 28,
             new Vector2(0.02f, 0.48f), new Vector2(0.49f, 0.96f), TextAnchor.MiddleLeft);
         uiManager.zombieText = CreateText(panel, "ZombieText", "ZOMBIES  0 active", uiFont, 18,
             new Vector2(0.02f, 0.04f), new Vector2(0.49f, 0.48f), TextAnchor.MiddleLeft);
@@ -295,7 +296,7 @@ public class UIAndSunGenerator
         rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.sizeDelta = new Vector2(540f, 190f);
 
-        CreateText(panel, "Title", title, uiFont, 44,
+        CreateText(panel, "Title", title, LoadShlopFont(), 44,
             new Vector2(0.04f, 0.48f), new Vector2(0.96f, 0.92f), TextAnchor.MiddleCenter);
         CreateText(panel, "Subtitle", subtitle, uiFont, 23,
             new Vector2(0.04f, 0.12f), new Vector2(0.96f, 0.48f), TextAnchor.MiddleCenter);
@@ -475,11 +476,20 @@ public class UIAndSunGenerator
         lRt.anchoredPosition = Vector2.zero;
     }
 
+    private static Font LoadShlopFont()
+    {
+        Font font = AssetDatabase.LoadAssetAtPath<Font>(ShlopFontPath);
+        if (font == null) font = LoadUIFont();
+        return font;
+    }
+
     private static Font LoadUIFont()
     {
         Font font = AssetDatabase.LoadAssetAtPath<Font>(RobotoBoldPath);
         if (font == null)
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (font == null)
+            font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         return font;
     }
 

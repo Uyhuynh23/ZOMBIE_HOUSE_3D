@@ -108,6 +108,17 @@ public class MainMenuManager : MonoBehaviour
 
     // ── Back button (wired at runtime in ShowCharacterSetting) ────────────────
 
+    public void StartTutorial()
+    {
+        if (GameDataCarrier.Instance != null && !GameDataCarrier.Instance.HasSelection)
+        {
+            if (availableCharacters != null && availableCharacters.Length > 0)
+                GameDataCarrier.Instance.SelectCharacter(availableCharacters[0]);
+        }
+        Debug.Log("[MainMenuManager] Loading Tutorial Scene: Map_Tutorial");
+        SceneManager.LoadScene("Map_Tutorial");
+    }
+
     private void OnBackClicked()
     {
         ShowMainMenu();

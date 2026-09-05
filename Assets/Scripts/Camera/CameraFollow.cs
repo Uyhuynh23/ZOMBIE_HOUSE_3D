@@ -48,8 +48,40 @@ public class CameraFollow : MonoBehaviour
         }
     }
 
+    [Header("Override View")]
+    [SerializeField] private bool isOverridden = false;
+    private Transform overrideTransform;
+    private float overrideSpeed = 8f;
+
+    public bool IsOverridden => isOverridden;
+
+    public void SetOverrideView(Transform viewTransform, float speed = 8f)
+    {
+        isOverridden = true;
+        overrideTransform = viewTransform;
+        overrideSpeed = speed;
+    }
+
+    public void ClearOverrideView()
+    {
+        isOverridden = false;
+        overrideTransform = null;
+        if (target != null)
+        {
+            yaw = transform.eulerAngles.y;
+            pitch = initialPitch;
+        }
+    }
+
     void LateUpdate()
     {
+        if (isOverridden && overrideTransform != null)
+        {
+            transform.position = Vector3.Lerp(transform.position, overrideTransform.position, overrideSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, overrideTransform.rotation, overrideSpeed * Time.deltaTime);
+            return;
+        }
+
         if (target == null) return;
 
         // Unlock cursor if Escape is pressed (for debugging/editor)
