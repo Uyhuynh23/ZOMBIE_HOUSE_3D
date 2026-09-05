@@ -6,15 +6,16 @@ using UnityEngine.AI;
 /// <summary>
 /// Spawns waves of enemies that navigate to Baker_house via NavMesh.
 /// Supports 4 directional spawn zones (East/North/West/South).
-/// Does NOT depend on GridManager or ZombieRoute waypoints.
-/// Legacy lane/route mode kept for backward compatibility with test scenes.
+///
+/// Lane assignment is handled exclusively by LaneEntrance triggers in the scene.
+/// This spawner only picks a random spawn point and instantiates the prefab.
 /// </summary>
 public class ZombieSpawner : MonoBehaviour
 {
     public static ZombieSpawner Instance { get; private set; }
 
     // ──────────────────────────────────────────────────────────
-    // Wave Definition (kept public for MapWaveConfig compatibility)
+    // Wave Definition
     // ──────────────────────────────────────────────────────────
     [System.Serializable]
     public struct WaveData
@@ -36,11 +37,11 @@ public class ZombieSpawner : MonoBehaviour
     [Tooltip("All enemy prefabs to pick from randomly (overrides zombiePrefab if filled).")]
     public GameObject[] enemyPrefabs;
 
-    [Header("Spawn Points (Many Positions)")]
-    [Tooltip("Many spawn Transforms scattered around the map perimeter. Each enemy picks the nearest of 4 directions.")]
+    [Header("Spawn Points")]
+    [Tooltip("Spawn Transforms scattered around the map perimeter.")]
     public Transform[] spawnPoints;
-    [Tooltip("Small random offset within each lane so enemies don't stack exactly.")]
-    [Min(0f)] public float spawnJitter = 0.3f;
+    [Tooltip("Small XZ random offset at spawn so enemies don't stack exactly.")]
+    [Min(0f)] public float spawnJitter = 0.5f;
 
     [Header("House Target")]
     [Tooltip("Baker_house transform. Auto-found by tag 'HouseTarget' or name 'Baker_house' if null.")]
@@ -53,23 +54,20 @@ public class ZombieSpawner : MonoBehaviour
     [Header("Waves")]
     public WaveData[] waves = new WaveData[]
     {
-        new WaveData { zombieCount = 8,  spawnInterval = 1.2f, delayBeforeWave = 5f  },
-        new WaveData { zombieCount = 12, spawnInterval = 0.9f, delayBeforeWave = 8f  },
-        new WaveData { zombieCount = 16, spawnInterval = 0.7f, delayBeforeWave = 8f  },
-        new WaveData { zombieCount = 20, spawnInterval = 0.5f, delayBeforeWave = 10f },
+        new WaveData { zombieCount = 15, spawnInterval = 1.0f, delayBeforeWave = 5f  },
+        new WaveData { zombieCount = 25, spawnInterval = 0.8f, delayBeforeWave = 8f  },
+        new WaveData { zombieCount = 35, spawnInterval = 0.6f, delayBeforeWave = 8f  },
+        new WaveData { zombieCount = 50, spawnInterval = 0.4f, delayBeforeWave = 10f },
     };
 
     [Header("Movement Speed")]
-    [Tooltip("Base enemy movement speed.")]
     [Min(0.1f)] public float baseEnemySpeed = 1.4f;
-    [Tooltip("Speed increase per successive wave.")]
     [Min(0f)]   public float speedIncreasePerWave = 0.15f;
 
     // ──────────────────────────────────────────────────────────
-    // Inspector — Legacy Route Mode (for test scenes, kept for compat)
+    // Inspector — Legacy Route Mode (test scenes only)
     // ──────────────────────────────────────────────────────────
     [Header("Legacy Route Mode (Test Scenes Only)")]
-    [Tooltip("Assign ZombieRoute assets here to re-enable waypoint mode in test scenes.")]
     public ZombieRoute[] routes;
     [Min(0.1f)] public float routeMoveSpeed = 2.5f;
     [Min(0f)]   public float routeSpawnJitter = 0.35f;
@@ -88,17 +86,7 @@ public class ZombieSpawner : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private List<GameObject> activeEnemies = new List<GameObject>();
     private bool allWavesComplete;
-    private int spawnSequence;
-
-    // The 4 canonical gate positions (matched to LaneEntrance triggers)
-    private static readonly Vector3[] GatePositions = new Vector3[]
-    {
-        new Vector3(  0, 0,  35),  // North
-        new Vector3(  0, 0, -39),  // South
-        new Vector3( 35, 0,   0),  // East
-        new Vector3(-38, 0,   3),  // West
-    };
-
+    private int  spawnSequence;
 
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
@@ -130,21 +118,19 @@ public class ZombieSpawner : MonoBehaviour
             return;
         }
 
-        // Resolve house target
         if (houseTarget == null)
         {
             GameObject h = GameObject.FindWithTag("HouseTarget");
             if (h == null) h = GameObject.Find("Baker_house");
             if (h != null) houseTarget = h.transform;
-            else Debug.LogWarning("[ZombieSpawner] Baker_house not found! Enemies will not know their destination.");
+            else Debug.LogWarning("[ZombieSpawner] Baker_house not found!");
         }
 
-        // NavMesh sanity check
         if (!HasLegacyRoutes())
         {
             var tri = NavMesh.CalculateTriangulation();
             if (tri.indices.Length == 0)
-                Debug.LogWarning("[ZombieSpawner] NavMesh not baked! Run Tools → Zombie House → Bake NavMesh from the Unity menu.");
+                Debug.LogWarning("[ZombieSpawner] NavMesh not baked!");
         }
 
         StartCoroutine(RunWaves());
@@ -187,13 +173,12 @@ public class ZombieSpawner : MonoBehaviour
                 yield return new WaitForSeconds(wave.spawnInterval);
             }
 
-            // Wait for all enemies to be cleared before next wave
             yield return new WaitUntil(() => activeEnemyCount <= 0);
         }
 
-        allWavesComplete = true;
+        allWavesComplete  = true;
         nextWaveCountdown = 0f;
-        remainingToSpawn = 0;
+        remainingToSpawn  = 0;
         Debug.Log("[ZombieSpawner] All waves complete!");
         GameManager.Instance?.OnAllWavesComplete();
     }
@@ -203,21 +188,22 @@ public class ZombieSpawner : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private void SpawnNavMeshEnemy(int waveIndex)
     {
-        Vector3 spawnPos = GetNavMeshSpawnPosition();
+        Vector3 spawnPos = GetRandomNavMeshSpawnPosition();
 
         GameObject prefab = GetRandomEnemyPrefab();
         if (prefab == null) return;
 
         GameObject enemy = Instantiate(prefab, spawnPos, Quaternion.identity);
-        enemy.name = $"{prefab.name}_W{waveIndex + 1}";
+        enemy.name  = $"{prefab.name}_W{waveIndex + 1}";
         enemy.layer = LayerMask.NameToLayer("Enemy");
 
-        // Configure NavMesh agent
         EnemyNavAgent navAgent = enemy.GetComponent<EnemyNavAgent>();
         if (navAgent != null)
         {
-            navAgent.moveSpeed  = WaveSpeed(waveIndex);
+            navAgent.moveSpeed   = WaveSpeed(waveIndex);
             navAgent.houseTarget = houseTarget;
+            // Lane assignment happens later via LaneEntrance trigger in the scene.
+            // Do NOT call any lane assignment here.
         }
 
         activeEnemies.Add(enemy);
@@ -225,47 +211,29 @@ public class ZombieSpawner : MonoBehaviour
         Debug.Log($"[ZombieSpawner] Spawned {prefab.name} at {spawnPos}");
     }
 
-    private Vector3 GetNavMeshSpawnPosition()
+    /// <summary>
+    /// Picks a random spawn point (with small XZ jitter) and snaps it to the NavMesh.
+    /// No lane logic here — zombies move freely until they cross a LaneEntrance trigger.
+    /// </summary>
+    private Vector3 GetRandomNavMeshSpawnPosition()
     {
         Vector3 candidate = transform.position;
 
         if (spawnPoints != null && spawnPoints.Length > 0)
         {
-            // Pick a random spawn point from the pool
-            Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
+            Transform sp = spawnPoints[spawnSequence % spawnPoints.Length];
             spawnSequence++;
+
             if (sp != null)
             {
-                // Find which of the 4 gates is nearest to this spawn point
-                int nearestGate = 0;
-                float nearestDist = float.MaxValue;
-                for (int g = 0; g < GatePositions.Length; g++)
-                {
-                    float d = Vector2.Distance(
-                        new Vector2(sp.position.x, sp.position.z),
-                        new Vector2(GatePositions[g].x, GatePositions[g].z));
-                    if (d < nearestDist) { nearestDist = d; nearestGate = g; }
-                }
-
-                // Determine lane alignment based on gate direction
-                // Gates: 0=North(N/S, vary X), 1=South(N/S, vary X), 2=East(E/W, vary Z), 3=West(E/W, vary Z)
-                bool approachOnZ = nearestGate <= 1; // North or South
-                float laneSpacing = 4f;
-                int laneIdx = Random.Range(0, 3);
-                float laneOffset = (laneIdx - 1) * laneSpacing; // -4, 0, or +4
-                float noise = Random.Range(-spawnJitter, spawnJitter);
-
-                Vector3 spawnPos = sp.position;
-                if (approachOnZ)
-                    spawnPos.x = laneOffset + noise;  // N/S: vary X to hit correct lane
-                else
-                    spawnPos.z = laneOffset + noise;  // E/W: vary Z to hit correct lane
-
-                candidate = spawnPos;
+                candidate = sp.position;
+                // Small XZ jitter so zombies don't stack on the same point
+                candidate.x += Random.Range(-spawnJitter, spawnJitter);
+                candidate.z += Random.Range(-spawnJitter, spawnJitter);
             }
         }
 
-        // Sample nearest valid NavMesh position
+        // Snap to nearest NavMesh surface
         NavMeshHit hit;
         if (NavMesh.SamplePosition(candidate, out hit, 10f, NavMesh.AllAreas))
             return hit.position;
@@ -273,10 +241,8 @@ public class ZombieSpawner : MonoBehaviour
         return candidate;
     }
 
-
-
     // ──────────────────────────────────────────────────────────
-    // Legacy route spawn (kept for test scenes with ZombieRoute)
+    // Legacy route spawn (test scenes)
     // ──────────────────────────────────────────────────────────
     private void SpawnOnLegacyRoute()
     {
@@ -293,7 +259,7 @@ public class ZombieSpawner : MonoBehaviour
         if (prefab == null) return;
 
         GameObject enemy = Instantiate(prefab, pos, Quaternion.identity);
-        enemy.name = $"{prefab.name}_W{currentWaveIndex + 1}_{route.name}";
+        enemy.name  = $"{prefab.name}_W{currentWaveIndex + 1}_{route.name}";
         enemy.layer = LayerMask.NameToLayer("Enemy");
 
         ZombiePrototypeMover legacyMover = enemy.GetComponent<ZombiePrototypeMover>();

@@ -526,10 +526,9 @@ MonoBehaviour:
   houseTarget: {fileID: 0}
   moveSpeed: 1.5
   angularSpeed: 300
-  stoppingDistance: 1.5
+  navStoppingDistance: 1.2
   houseArrivalRadius: 12
-  laneSnapStrength: 8
-  laneTolerance: 0.5
+  laneEntryRadius: 0.6
   stuckDistanceThreshold: 0.3
   stuckCheckInterval: 2.5
   plantDetectRadius: 0.65
@@ -542,6 +541,8 @@ MonoBehaviour:
   animator: {fileID: 0}
   animDampTime: 0.1
   moveSpeedParam: MoveSpeed
+  visualRoot: {fileID: 0}
+  visualYawOffset: 180
 --- !u!1001 &1826926954233209815
 PrefabInstance:
   m_ObjectHideFlags: 0

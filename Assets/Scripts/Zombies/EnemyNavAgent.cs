@@ -3,12 +3,34 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// NavMesh-based AI controller for all enemy types (Zombie, Spider).
-/// Replaces ZombiePrototypeMover in Map_Cloudy.
-/// States: Moving -> AttackingPlant -> AttackingHouse -> Dead
+/// Hybrid AI controller — Plants vs. Zombies style.
 ///
-/// Lane system: Once an enemy crosses a LaneEntrance trigger inside the fence,
-/// it is constrained to move along a narrow corridor toward the house.
+/// STATE MACHINE
+/// ─────────────────────────────────────────────────────────────
+///  OutsideFence  : NavMesh moves freely toward the house/fence.
+///                  Agent is active. Rotation uses desiredVelocity.
+///
+///  EnteringLane  : NavMesh disabled. Zombie walks manually to LanePath.laneEntry.
+///                  Rotation faces manual movement direction.
+///
+///  MovingInLane  : Manual straight-line walk along the lane column.
+///                  Direction = (laneEnd - laneEntry).normalized — locked forever.
+///                  Plant detection active.
+///
+///  AttackingPlant: Stopped, ZombieAttack deals damage.
+///                  On plant death → resume MovingInLane toward the SAME laneEnd.
+///
+///  AttackingHouse: Arrived at laneEnd (near house). ZombieAttack attacks house.
+///
+///  Dead          : Everything stopped.
+///
+/// ROTATION
+/// ─────────────────────────────────────────────────────────────
+///  Root (this.transform): always faces movement direction (smooth RotateTowards).
+///  Visual child         : visualYawOffset applied ONCE in Awake, never touched again.
+///                         Default 0° = model art already faces +Z.
+///                         Use 180° for models whose art faces -Z.
+///                         Use 90 / -90 for models whose art faces ±X.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyNavAgent : MonoBehaviour
@@ -17,103 +39,123 @@ public class EnemyNavAgent : MonoBehaviour
     // Inspector
     // ──────────────────────────────────────────────────────────
     [Header("Target")]
-    [Tooltip("The house GameObject that enemies march toward. Auto-found by tag 'HouseTarget' if null.")]
+    [Tooltip("Baker_house transform. Auto-found by tag 'HouseTarget' or name 'Baker_house'.")]
     public Transform houseTarget;
 
     [Header("Movement")]
     [SerializeField, Min(0.1f)] public float moveSpeed = 1.5f;
-    [SerializeField, Min(10f)]  private float angularSpeed = 360f;
-    [Tooltip("Distance at which the agent stops walking (used as NavMeshAgent.stoppingDistance).")]
-    [SerializeField, Min(0.1f)] private float stoppingDistance = 1.2f;
-    [Tooltip("Max distance from house center to consider 'at the house'. House extents ~9.5m.")]
-    [SerializeField, Min(1f)]   private float houseArrivalRadius = 9f;
+    [Tooltip("Root rotation speed (degrees/s). Applied in all states.")]
+    [SerializeField, Min(10f)]  private float angularSpeed = 480f;
+    [Tooltip("NavMeshAgent stopping distance (outside fence only).")]
+    [SerializeField, Min(0.1f)] private float navStoppingDistance = 1.2f;
+    [Tooltip("Flat distance from houseTarget to consider arrived (used in MovingInLane).")]
+    [SerializeField, Min(0.5f)] private float houseArrivalRadius = 4f;
+    [Tooltip("Flat distance from LanePath.laneEntry to start the lane (EnteringLane → MovingInLane).")]
+    [SerializeField, Min(0.1f)] private float laneEntryRadius = 0.6f;
 
-    [Header("Lane Constraint")]
-    [Tooltip("How strongly the enemy is snapped to its lane. Higher = tighter constraint.")]
-    [SerializeField, Min(0f)] private float laneSnapStrength = 20f;
-    [Tooltip("How wide the lane corridor is (half-width). Enemy stays within this tolerance of its lane coord.")]
-    [SerializeField, Min(0.1f)] private float laneTolerance = 0.3f;
-
-
-    [Header("Stuck Recovery")]
-    [Tooltip("If the enemy hasn't moved more than this in stuckCheckInterval seconds, recalculate path.")]
+    [Header("Stuck Recovery (OutsideFence only)")]
     [SerializeField, Min(0.1f)] private float stuckDistanceThreshold = 0.3f;
-    [Tooltip("How often (seconds) to check if the enemy is stuck.")]
     [SerializeField, Min(1f)]   private float stuckCheckInterval = 2.5f;
 
     [Header("Plant Detection")]
-    [Tooltip("Radius of sphere cast ahead of the enemy to detect plants.")]
     [SerializeField, Min(0.1f)] private float plantDetectRadius = 0.8f;
-    [Tooltip("Distance ahead of the agent to probe for plants.")]
     [SerializeField, Min(0f)]   private float plantDetectOffset = 1.1f;
-    [Tooltip("Layer mask for plant detection. Leave as 'Everything' if plants have no specific layer.")]
     [SerializeField]            private LayerMask plantLayerMask = ~0;
 
     [Header("Hit Stagger")]
-    [Tooltip("Speed multiplier when hit. 0 = full stop.")]
     [SerializeField, Range(0f, 1f)] private float hitSpeedMultiplier = 0.15f;
-    [Tooltip("Duration of the hit stagger in seconds.")]
     [SerializeField, Min(0f)]       private float hitStaggerDuration = 0.4f;
 
     [Header("Animation")]
     [SerializeField] private Animator animator;
     [SerializeField, Min(0.01f)] private float animDampTime = 0.1f;
-    [Tooltip("Animator float parameter name for the walk cycle.")]
     [SerializeField] private string moveSpeedParam = "MoveSpeed";
 
-    // ──────────────────────────────────────────────────────────
-    // Runtime state — public for ZombieAttack / LaneEntrance
-    // ──────────────────────────────────────────────────────────
-    public PlantBase BlockingPlant  { get; private set; }
-    public bool      IsAtHouse      { get; private set; }
-    public bool      IsDead         { get; private set; }
-    public bool      HasLaneAssigned { get; private set; }
+    [Header("Visual Rotation")]
+    [Tooltip("Child Transform that holds the 3-D mesh/animator. Auto-found if null.\n" +
+             "Its localRotation is ONLY set once in Awake (visualYawOffset), never touched again at runtime.")]
+    [SerializeField] private Transform visualRoot;
+    [Tooltip("Y-axis rotation baked onto the visual child to correct model import orientation.\n" +
+             "  0°  = model art faces +Z  (default, try this first)\n" +
+             "180°  = model art faces -Z\n" +
+             " 90°  = model art faces -X\n" +
+             "-90°  = model art faces +X")]
+    [SerializeField] private float visualYawOffset = 0f;
 
-    // Lane data (set by LaneEntrance trigger)
-    private LaneEntrance.Direction laneDirection;
-    private int   assignedLaneIndex;
-    private float laneConstraintCoord;   // X for N/S lanes, Z for E/W lanes
+    // ──────────────────────────────────────────────────────────
+    // Public state — read by ZombieAttack, LaneEntrance
+    // ──────────────────────────────────────────────────────────
+    public PlantBase BlockingPlant   { get; private set; }
+    public bool      IsAtHouse       { get; private set; }
+    public bool      IsDead          { get; private set; }
+    public bool      HasLaneAssigned { get; private set; }
 
     // ──────────────────────────────────────────────────────────
     // Private
     // ──────────────────────────────────────────────────────────
+    private enum AIState
+    {
+        OutsideFence,    // NavMesh free movement
+        EnteringLane,    // Manual walk to laneEntry point
+        MovingInLane,    // Manual straight walk laneEntry→laneEnd
+        AttackingPlant,
+        AttackingHouse,
+        Dead
+    }
+    private AIState state = AIState.OutsideFence;
+
+    // Lane
+    private LanePath  assignedLane;
+    private Vector3   laneDir;           // normalised direction laneEntry→laneEnd, locked at assignment
+    private Vector3   manualMoveDir;     // current manual movement direction (for rotation)
+
+    // Components
     private NavMeshAgent agent;
     private int   moveSpeedHash;
     private float baseSpeed;
     private bool  isStaggered;
 
-    // Stuck detection
+    // Stuck detection (OutsideFence)
     private Vector3 lastStuckCheckPos;
     private float   stuckCheckTimer;
 
-    private enum AIState { Moving, AttackingPlant, AttackingHouse, Dead }
-    private AIState state = AIState.Moving;
-
     // ──────────────────────────────────────────────────────────
-    // Public API
+    // Public API — called by LaneEntrance trigger
     // ──────────────────────────────────────────────────────────
-    /// <summary>Called by LaneEntrance trigger when enemy crosses into defense zone.</summary>
-    public void AssignLane(LaneEntrance.Direction dir, int laneIdx, float worldCoord)
+    /// <summary>
+    /// Called by LaneEntrance the moment a zombie crosses into the fence.
+    /// Disables NavMesh and begins manual lane movement.
+    /// </summary>
+    public void AssignLane(LanePath lane)
     {
-        if (HasLaneAssigned) return;
-        laneDirection       = dir;
-        assignedLaneIndex   = laneIdx;
-        laneConstraintCoord = worldCoord;
-        HasLaneAssigned     = true;
+        if (HasLaneAssigned || lane == null || !lane.IsValid) return;
 
-        // Recalculate destination with lane-constrained target
-        SetDestinationToHouse();
+        assignedLane    = lane;
+        HasLaneAssigned = true;
+
+        // Lock lane direction now — never recalculated
+        Vector3 delta = lane.laneEnd.position - lane.laneEntry.position;
+        delta.y = 0f;
+        laneDir = delta.normalized;
+
+        // Stop and disable NavMeshAgent — inside fence is scripted movement only
+        if (agent != null && agent.isActiveAndEnabled)
+        {
+            if (agent.isOnNavMesh) agent.isStopped = true;
+            agent.enabled = false;
+        }
+
+        state = AIState.EnteringLane;
+        Debug.Log($"[EnemyNavAgent] {name}: assigned lane '{lane.name}', entering lane.");
     }
 
+    /// <summary>Called by ZombieAttack (via ClearBlockingPlant) when attacking plant dies.</summary>
     public void ClearBlockingPlant()
     {
         BlockingPlant = null;
-        if (!IsDead && AgentValid())
-        {
-            agent.isStopped = false;
-            SetDestinationToHouse();
-            state = AIState.Moving;
-        }
+        // Resume movement along the same lane — never call NavMesh again
+        if (!IsDead && state == AIState.AttackingPlant)
+            state = AIState.MovingInLane;
     }
 
     // ──────────────────────────────────────────────────────────
@@ -125,13 +167,35 @@ public class EnemyNavAgent : MonoBehaviour
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
 
+        // Disable conflicting legacy mover
+        var legacyMover = GetComponent<ZombiePrototypeMover>();
+        if (legacyMover != null) legacyMover.enabled = false;
+
+        // Find visual child (owns the mesh)
+        if (visualRoot == null)
+        {
+            Transform found = transform.Find("Zombie Visual");
+            if (found == null)
+            {
+                foreach (Transform child in transform)
+                {
+                    if (child.GetComponent<RectTransform>() == null &&
+                        child.GetComponent<Canvas>()        == null)
+                    { found = child; break; }
+                }
+            }
+            visualRoot = found;
+        }
+
+        // The visualYawOffset is now applied dynamically in RotateRoot()
+        // instead of touching visualRoot.localRotation, because Animator overwrites it.
+
         moveSpeedHash = Animator.StringToHash(moveSpeedParam);
-        baseSpeed = moveSpeed;
+        baseSpeed     = moveSpeed;
     }
 
     private void Start()
     {
-        // Auto-find house
         if (houseTarget == null)
         {
             GameObject h = GameObject.FindWithTag("HouseTarget");
@@ -141,7 +205,10 @@ public class EnemyNavAgent : MonoBehaviour
         }
 
         ConfigureAgent();
-        SetDestinationToHouse();
+
+        // Start walking toward the fence / house
+        if (AgentValid())
+            agent.SetDestination(houseTarget != null ? houseTarget.position : transform.position);
 
         lastStuckCheckPos = transform.position;
         stuckCheckTimer   = stuckCheckInterval;
@@ -151,9 +218,9 @@ public class EnemyNavAgent : MonoBehaviour
     {
         if (IsDead) return;
 
-        // Pause during non-play game states
-        if (GameManager.Instance != null &&
-            GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        bool paused = GameManager.Instance != null &&
+                      GameManager.Instance.CurrentState != GameManager.GameState.Playing;
+        if (paused)
         {
             if (AgentValid()) agent.isStopped = true;
             SetAnimSpeed(0f);
@@ -162,115 +229,102 @@ public class EnemyNavAgent : MonoBehaviour
 
         switch (state)
         {
-            case AIState.Moving:         UpdateMoving();         break;
+            case AIState.OutsideFence:   UpdateOutsideFence();   break;
+            case AIState.EnteringLane:   UpdateEnteringLane();   break;
+            case AIState.MovingInLane:   UpdateMovingInLane();   break;
             case AIState.AttackingPlant: UpdateAttackingPlant(); break;
             case AIState.AttackingHouse: UpdateAttackingHouse(); break;
         }
-
-        // Sync animation to actual NavMesh velocity
-        float vel = AgentValid() ? agent.velocity.magnitude : 0f;
-        SetAnimSpeed(vel / Mathf.Max(0.01f, baseSpeed));
     }
 
     // ──────────────────────────────────────────────────────────
-    // State: Moving
+    // State: OutsideFence  (NavMesh free)
     // ──────────────────────────────────────────────────────────
-    private void UpdateMoving()
+    private void UpdateOutsideFence()
     {
         if (!AgentValid()) return;
 
-        // ── Lane constraint: snap perpendicular position to lane ──
-        if (HasLaneAssigned)
-            ApplyLaneConstraint();
-
-        // ── Plant detection in forward arc ──
-        Vector3 fwd = agent.velocity.sqrMagnitude > 0.01f
-            ? agent.velocity.normalized
-            : transform.forward;
-
-        Vector3 sensorPos = transform.position + Vector3.up * 0.8f + fwd * plantDetectOffset;
-        Collider[] hits = Physics.OverlapSphere(sensorPos, plantDetectRadius, plantLayerMask);
-        foreach (var hit in hits)
-        {
-            if (hit.isTrigger) continue;
-            PlantBase plant = hit.GetComponentInParent<PlantBase>();
-            if (plant != null && plant.currentHealth > 0)
-            {
-                BlockingPlant = plant;
-                agent.isStopped = true;
-                state = AIState.AttackingPlant;
-                return;
-            }
-        }
-
-        // ── Arrival detection ──
-        if (CheckArrivedAtHouse())
-        {
-            IsAtHouse = true;
-            agent.isStopped = true;
-            state = AIState.AttackingHouse;
-            return;
-        }
-
-        // Keep moving
-        IsAtHouse = false;
         agent.isStopped = false;
 
-        // ── Path recovery ──
-        if (!agent.pathPending && agent.path.status == NavMeshPathStatus.PathInvalid)
-        {
-            SetDestinationToHouse();
-        }
+        // Rotate root using NavMesh desired velocity
+        Vector3 desired = agent.desiredVelocity;
+        desired.y = 0f;
+        if (desired.sqrMagnitude < 0.01f) { desired = agent.velocity; desired.y = 0f; }
+        RotateRoot(desired.normalized);
 
-        // ── Stuck detection ──
+        // Sync anim
+        SetAnimSpeed(agent.velocity.magnitude / Mathf.Max(0.01f, baseSpeed));
+
+        // Stuck detection
         stuckCheckTimer -= Time.deltaTime;
         if (stuckCheckTimer <= 0f)
         {
             stuckCheckTimer = stuckCheckInterval;
-            float moved = Vector3.Distance(transform.position, lastStuckCheckPos);
-            if (moved < stuckDistanceThreshold && state == AIState.Moving)
+            if (Vector3.Distance(transform.position, lastStuckCheckPos) < stuckDistanceThreshold)
             {
-                Debug.Log($"[EnemyNavAgent] {name} appears stuck. Recalculating path.");
-                SetDestinationToHouse();
+                if (houseTarget != null) agent.SetDestination(houseTarget.position);
             }
             lastStuckCheckPos = transform.position;
         }
+
+        // Path recovery
+        if (!agent.pathPending && agent.path.status == NavMeshPathStatus.PathInvalid)
+            if (houseTarget != null) agent.SetDestination(houseTarget.position);
     }
 
-    /// <summary>
-    /// Smoothly snaps the agent to its assigned lane coordinate on the
-    /// perpendicular axis (X for N/S, Z for E/W). Uses warp if deviation is large.
-    /// </summary>
-    private void ApplyLaneConstraint()
+    // ──────────────────────────────────────────────────────────
+    // State: EnteringLane  (walk manually to laneEntry point)
+    // ──────────────────────────────────────────────────────────
+    private void UpdateEnteringLane()
     {
-        Vector3 pos = transform.position;
-        bool isNorthSouth = laneDirection == LaneEntrance.Direction.North ||
-                            laneDirection == LaneEntrance.Direction.South;
+        Vector3 target = assignedLane.laneEntry.position;
+        target.y = transform.position.y;
 
-        float currentCoord = isNorthSouth ? pos.x : pos.z;
-        float delta = laneConstraintCoord - currentCoord;
+        Vector3 toTarget = target - transform.position;
+        toTarget.y = 0f;
 
-        if (Mathf.Abs(delta) > laneTolerance)
+        if (toTarget.magnitude <= laneEntryRadius)
         {
-            float corrected = Mathf.MoveTowards(currentCoord, laneConstraintCoord, laneSnapStrength * Time.deltaTime);
-            Vector3 newPos = pos;
-            if (isNorthSouth) newPos.x = corrected;
-            else              newPos.z = corrected;
+            // Snap exactly onto entry X/Z, keep Y
+            Vector3 snapped = transform.position;
+            snapped.x = assignedLane.laneEntry.position.x;
+            snapped.z = assignedLane.laneEntry.position.z;
+            transform.position = snapped;
 
-            // Warp agent to corrected position (respects NavMesh)
-            agent.Warp(newPos);
+            manualMoveDir = laneDir;
+            state = AIState.MovingInLane;
+            return;
         }
+
+        manualMoveDir = toTarget.normalized;
+        MoveManually(manualMoveDir);
     }
 
-    private bool CheckArrivedAtHouse()
+    // ──────────────────────────────────────────────────────────
+    // State: MovingInLane  (straight scripted walk)
+    // ──────────────────────────────────────────────────────────
+    private void UpdateMovingInLane()
     {
-        if (houseTarget == null) return false;
+        manualMoveDir = laneDir;
 
-        float distToHouseCenter = Vector3.Distance(
-            new Vector3(transform.position.x, 0f, transform.position.z),
-            new Vector3(houseTarget.position.x, 0f, houseTarget.position.z));
+        // Plant detection ahead along lane direction
+        if (DetectPlantAhead(laneDir))
+        {
+            state = AIState.AttackingPlant;
+            SetAnimSpeed(0f);
+            return;
+        }
 
-        return distToHouseCenter <= houseArrivalRadius;
+        // Arrival at house (physically touching the house collider)
+        if (DetectHouseAhead(laneDir))
+        {
+            IsAtHouse = true;
+            state     = AIState.AttackingHouse;
+            SetAnimSpeed(0f);
+            return;
+        }
+
+        MoveManually(laneDir);
     }
 
     // ──────────────────────────────────────────────────────────
@@ -278,19 +332,14 @@ public class EnemyNavAgent : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private void UpdateAttackingPlant()
     {
-        // Check if plant is gone
-        if (BlockingPlant == null ||
-            !BlockingPlant.gameObject.activeInHierarchy ||
-            BlockingPlant.currentHealth <= 0)
+        // ZombieAttack calls ClearBlockingPlant() → state becomes MovingInLane
+        // We just keep still and face the plant
+        if (BlockingPlant != null)
         {
-            BlockingPlant = null;
-            IsAtHouse = false;
-            if (AgentValid()) { agent.isStopped = false; SetDestinationToHouse(); }
-            state = AIState.Moving;
-            return;
+            Vector3 toPlant = BlockingPlant.transform.position - transform.position;
+            toPlant.y = 0f;
+            RotateRoot(toPlant.normalized);
         }
-
-        if (AgentValid()) agent.isStopped = true;
         SetAnimSpeed(0f);
     }
 
@@ -300,12 +349,75 @@ public class EnemyNavAgent : MonoBehaviour
     private void UpdateAttackingHouse()
     {
         IsAtHouse = true;
-        if (AgentValid()) agent.isStopped = true;
         SetAnimSpeed(0f);
     }
 
     // ──────────────────────────────────────────────────────────
-    // Hit stagger
+    // Manual movement helpers
+    // ──────────────────────────────────────────────────────────
+    private void MoveManually(Vector3 dir)
+    {
+        if (dir.sqrMagnitude < 0.001f) return;
+        dir.y = 0f;
+        dir.Normalize();
+
+        float speed = isStaggered ? baseSpeed * hitSpeedMultiplier : baseSpeed;
+        transform.position += dir * speed * Time.deltaTime;
+
+        RotateRoot(dir);
+        SetAnimSpeed(speed / Mathf.Max(0.01f, baseSpeed));
+    }
+
+    private void RotateRoot(Vector3 dir)
+    {
+        if (dir.sqrMagnitude < 0.001f) return;
+        Quaternion lookRot = Quaternion.LookRotation(dir, Vector3.up);
+        // Apply visualYawOffset to the root's target rotation.
+        // This makes the root face differently, allowing the backwards-facing visual child 
+        // to face the movement direction, without touching localRotation (which Animator overrides).
+        Quaternion target = lookRot * Quaternion.Euler(0f, visualYawOffset, 0f);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, target, angularSpeed * Time.deltaTime);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Plant detection
+    // ──────────────────────────────────────────────────────────
+    private bool DetectPlantAhead(Vector3 dir)
+    {
+        Vector3 sensorPos = transform.position + Vector3.up * 0.8f + dir * plantDetectOffset;
+        Collider[] hits = Physics.OverlapSphere(sensorPos, plantDetectRadius, plantLayerMask);
+        foreach (var hit in hits)
+        {
+            if (hit.isTrigger) continue;
+            PlantBase plant = hit.GetComponentInParent<PlantBase>();
+            if (plant != null && plant.currentHealth > 0)
+            {
+                BlockingPlant = plant;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Arrival check (House collision)
+    // ──────────────────────────────────────────────────────────
+    private bool DetectHouseAhead(Vector3 dir)
+    {
+        Vector3 sensorPos = transform.position + Vector3.up * 0.8f + dir * plantDetectOffset;
+        Collider[] hits = Physics.OverlapSphere(sensorPos, plantDetectRadius); // Check all layers for the house
+        foreach (var hit in hits)
+        {
+            if (hit.CompareTag("HouseTarget") || hit.name == "Baker_house")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Hit stagger (works in any state)
     // ──────────────────────────────────────────────────────────
     public void TriggerHitStagger()
     {
@@ -345,34 +457,13 @@ public class EnemyNavAgent : MonoBehaviour
         agent.speed             = moveSpeed;
         agent.angularSpeed      = angularSpeed;
         agent.acceleration      = 8f;
-        agent.stoppingDistance  = stoppingDistance;
+        agent.stoppingDistance  = navStoppingDistance;
         agent.autoBraking       = false;
-        agent.updateRotation    = true;
+        agent.updateRotation    = false;   // root rotated manually in all states
         agent.updatePosition    = true;
         agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
         agent.avoidancePriority = Random.Range(20, 80);
         baseSpeed = moveSpeed;
-    }
-
-    private void SetDestinationToHouse()
-    {
-        if (houseTarget == null || !AgentValid()) return;
-
-        // If lane is assigned, aim at a point on the house perimeter along the lane axis
-        if (HasLaneAssigned)
-        {
-            Vector3 target = houseTarget.position;
-            bool isNS = laneDirection == LaneEntrance.Direction.North ||
-                        laneDirection == LaneEntrance.Direction.South;
-            // Keep the lane coordinate on the perpendicular axis so the path stays in-lane
-            if (isNS) target.x = laneConstraintCoord;
-            else      target.z = laneConstraintCoord;
-            agent.SetDestination(target);
-        }
-        else
-        {
-            agent.SetDestination(houseTarget.position);
-        }
     }
 
     private bool AgentValid() =>
@@ -385,7 +476,7 @@ public class EnemyNavAgent : MonoBehaviour
     }
 
     // ──────────────────────────────────────────────────────────
-    // Scene Gizmos
+    // Gizmos
     // ──────────────────────────────────────────────────────────
     private void OnDrawGizmosSelected()
     {
@@ -393,30 +484,17 @@ public class EnemyNavAgent : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Gizmos.DrawLine(transform.position, houseTarget.position);
-            Gizmos.color = new Color(1f, 0f, 0f, 0.15f);
-            Gizmos.DrawWireSphere(houseTarget.position, houseArrivalRadius);
         }
-
-        // Lane constraint visualization
-        if (HasLaneAssigned)
+        if (assignedLane != null && assignedLane.IsValid)
         {
             Gizmos.color = Color.cyan;
-            bool isNS = laneDirection == LaneEntrance.Direction.North ||
-                        laneDirection == LaneEntrance.Direction.South;
-            Vector3 lanePos = transform.position;
-            if (isNS) lanePos.x = laneConstraintCoord;
-            else      lanePos.z = laneConstraintCoord;
-            Gizmos.DrawLine(transform.position, lanePos);
+            Gizmos.DrawLine(transform.position, assignedLane.laneEntry.position);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(assignedLane.laneEntry.position, assignedLane.laneEnd.position);
         }
-
         // Plant sensor
-        Vector3 fwd = transform.forward;
-        if (Application.isPlaying && agent != null && agent.velocity.sqrMagnitude > 0.01f)
-            fwd = agent.velocity.normalized;
-
+        Vector3 fwd = HasLaneAssigned ? laneDir : transform.forward;
         Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f);
-        Gizmos.DrawWireSphere(
-            transform.position + Vector3.up * 0.8f + fwd * plantDetectOffset,
-            plantDetectRadius);
+        Gizmos.DrawWireSphere(transform.position + Vector3.up * 0.8f + fwd * plantDetectOffset, plantDetectRadius);
     }
 }
