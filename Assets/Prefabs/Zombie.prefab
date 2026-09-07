@@ -373,6 +373,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieHealthBar
   worldOffset: {x: 0, y: 2.3, z: 0}
+  worldSpaceScale: 0.012
 --- !u!114 &5444601305971858964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -421,6 +422,7 @@ MonoBehaviour:
   damagePerAttack: 10
   attackInterval: 1.2
   attackRange: 1
+  plantContactRadius: 0.9
   animator: {fileID: 1379519200775583497}
 --- !u!136 &8148853893030828572
 CapsuleCollider:
@@ -442,9 +444,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.48
-  m_Height: 2.1
+  m_Height: 2.0019925
   m_Direction: 1
-  m_Center: {x: 0, y: 1.05, z: 0}
+  m_Center: {x: 0, y: 1.0990038, z: 0}
 --- !u!54 &1960793609882910763
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -527,7 +529,6 @@ MonoBehaviour:
   moveSpeed: 1.5
   angularSpeed: 300
   navStoppingDistance: 1.2
-  houseArrivalRadius: 12
   laneEntryRadius: 0.6
   stuckDistanceThreshold: 0.3
   stuckCheckInterval: 2.5
