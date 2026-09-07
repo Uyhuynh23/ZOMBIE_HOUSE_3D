@@ -25,6 +25,8 @@ public abstract class PlantBase : MonoBehaviour
         // requiring each plant prefab to carry another serialized component.
         if (GetComponent<PlantHealthBar>() == null)
             gameObject.AddComponent<PlantHealthBar>();
+        if (GetComponent<PlantDamageVisual>() == null)
+            gameObject.AddComponent<PlantDamageVisual>();
     }
 
     /// <summary>

@@ -6,6 +6,10 @@ public sealed class ZombieHealthBar : MonoBehaviour
 {
     [SerializeField] private Vector3 worldOffset = new Vector3(0f, 2.3f, 0f);
     [SerializeField, Min(0.001f)] private float worldSpaceScale = 0.012f;
+    [Header("Optional Custom Art")]
+    [SerializeField] private Sprite backgroundSprite;
+    [SerializeField] private Sprite fillSprite;
+    [SerializeField] private Sprite iconSprite;
     private ZombieHealth health;
     private RectTransform fill;
     private Image fillImage;
@@ -54,6 +58,7 @@ public sealed class ZombieHealthBar : MonoBehaviour
             canvasTransform = existingBar;
             fill = existingFill;
             fillImage = existingFill.GetComponent<Image>();
+            ApplySprites(existingBar);
             ConfigureCanvas(existingBar.GetComponent<Canvas>());
             SetBarTransform();
             return;
@@ -72,12 +77,16 @@ public sealed class ZombieHealthBar : MonoBehaviour
         GameObject background = new GameObject("Background");
         background.transform.SetParent(canvasObject.transform, false);
         Image backgroundImage = background.AddComponent<Image>();
+        backgroundImage.sprite = backgroundSprite;
+        backgroundImage.type = backgroundSprite != null ? Image.Type.Sliced : Image.Type.Simple;
         backgroundImage.color = new Color(0.12f, 0.03f, 0.03f, 0.95f);
         Stretch(backgroundImage.rectTransform);
 
         GameObject fillObject = new GameObject("Fill");
         fillObject.transform.SetParent(background.transform, false);
         Image newFillImage = fillObject.AddComponent<Image>();
+        newFillImage.sprite = fillSprite;
+        newFillImage.type = Image.Type.Simple;
         this.fillImage = newFillImage;
         this.fillImage.color = new Color(0.25f, 0.95f, 0.22f, 1f);
         fill = this.fillImage.rectTransform;
@@ -86,6 +95,19 @@ public sealed class ZombieHealthBar : MonoBehaviour
         fill.pivot = new Vector2(0f, 0.5f);
         fill.offsetMin = new Vector2(2f, 2f);
         fill.offsetMax = new Vector2(-2f, -2f);
+
+        if (iconSprite != null)
+        {
+            GameObject icon = new GameObject("Icon");
+            icon.transform.SetParent(canvasObject.transform, false);
+            Image iconImage = icon.AddComponent<Image>();
+            iconImage.sprite = iconSprite;
+            iconImage.preserveAspect = true;
+            iconImage.rectTransform.anchorMin = new Vector2(0f, 0.5f);
+            iconImage.rectTransform.anchorMax = new Vector2(0f, 0.5f);
+            iconImage.rectTransform.sizeDelta = new Vector2(18f, 18f);
+            iconImage.rectTransform.anchoredPosition = new Vector2(-10f, 0f);
+        }
     }
 
     private void ConfigureCanvas(Canvas canvas)
@@ -94,6 +116,18 @@ public sealed class ZombieHealthBar : MonoBehaviour
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.overrideSorting = true;
         canvas.sortingOrder = 20;
+    }
+
+    private void ApplySprites(Transform existingBar)
+    {
+        Image background = existingBar.Find("Background")?.GetComponent<Image>();
+        if (background != null && backgroundSprite != null)
+        {
+            background.sprite = backgroundSprite;
+            background.type = Image.Type.Sliced;
+        }
+        if (fillImage != null && fillSprite != null)
+            fillImage.sprite = fillSprite;
     }
 
     private void SetBarTransform()

@@ -21,6 +21,9 @@ public class ZombieAttack : MonoBehaviour
 
     [Header("Animation")]
     [SerializeField] private Animator animator;
+    [SerializeField] private Transform visualRoot;
+    [SerializeField] private string attackStateName = "Attack";
+    [SerializeField, Min(0.05f)] private float fallbackBiteDuration = 0.28f;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
 
     // ──────────────────────────────────────────────────────────
@@ -31,6 +34,7 @@ public class ZombieAttack : MonoBehaviour
 
     private PlantBase currentTarget;
     private float attackTimer;
+    private Coroutine fallbackBite;
 
     private void Awake()
     {
@@ -39,6 +43,8 @@ public class ZombieAttack : MonoBehaviour
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
+        if (visualRoot == null && animator != null)
+            visualRoot = animator.transform;
     }
 
     private void Update()
@@ -180,7 +186,11 @@ public class ZombieAttack : MonoBehaviour
 
     private void TriggerAttackAnimation()
     {
-        if (animator == null || animator.runtimeAnimatorController == null) return;
+        if (animator == null || animator.runtimeAnimatorController == null)
+        {
+            StartFallbackBite();
+            return;
+        }
 
         foreach (AnimatorControllerParameter p in animator.parameters)
         {
@@ -190,6 +200,43 @@ public class ZombieAttack : MonoBehaviour
                 break;
             }
         }
+
+        if (!HasAttackTrigger() && !animator.HasState(0, Animator.StringToHash(attackStateName)))
+            StartFallbackBite();
+        else if (!HasAttackTrigger())
+            animator.CrossFadeInFixedTime(attackStateName, 0.05f);
+    }
+
+    private bool HasAttackTrigger()
+    {
+        if (animator == null) return false;
+        foreach (AnimatorControllerParameter p in animator.parameters)
+            if (p.nameHash == AttackHash && p.type == AnimatorControllerParameterType.Trigger) return true;
+        return false;
+    }
+
+    private void StartFallbackBite()
+    {
+        if (visualRoot == null || fallbackBite != null) return;
+        fallbackBite = StartCoroutine(FallbackBiteRoutine());
+    }
+
+    private System.Collections.IEnumerator FallbackBiteRoutine()
+    {
+        Quaternion baseRotation = visualRoot.localRotation;
+        Vector3 basePosition = visualRoot.localPosition;
+        float elapsed = 0f;
+        while (elapsed < fallbackBiteDuration)
+        {
+            elapsed += Time.deltaTime;
+            float bite = Mathf.Sin(Mathf.Clamp01(elapsed / fallbackBiteDuration) * Mathf.PI);
+            visualRoot.localRotation = baseRotation * Quaternion.Euler(-12f * bite, 0f, 0f);
+            visualRoot.localPosition = basePosition + Vector3.back * (0.08f * bite);
+            yield return null;
+        }
+        visualRoot.localRotation = baseRotation;
+        visualRoot.localPosition = basePosition;
+        fallbackBite = null;
     }
 
     private void OnDrawGizmosSelected()

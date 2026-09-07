@@ -109,6 +109,7 @@ public class EnemyNavAgent : MonoBehaviour
 
     // Components
     private NavMeshAgent agent;
+    private ZombieAttack attack;
     private int   moveSpeedHash;
     private float baseSpeed;
     private bool  isStaggered;
@@ -177,6 +178,7 @@ public class EnemyNavAgent : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        attack = GetComponent<ZombieAttack>();
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
 
@@ -412,8 +414,18 @@ public class EnemyNavAgent : MonoBehaviour
             PlantBase plant = hit.GetComponentInParent<PlantBase>();
             if (plant != null && plant.currentHealth > 0)
             {
-            BlockOnPlant(plant);
-            return true;
+                // The overlap sphere is intentionally an early-warning sensor,
+                // but the enemy must keep walking until it is genuinely within
+                // its melee range. Previously the sensor stopped enemies around
+                // two metres away, then ZombieAttack rejected the same target,
+                // creating a stop/clear loop with no damage or health bar.
+                Vector3 toPlant = plant.transform.position - transform.position;
+                toPlant.y = 0f;
+                float meleeRange = attack != null ? attack.attackRange : 1f;
+                if (toPlant.magnitude > meleeRange) continue;
+
+                BlockOnPlant(plant);
+                return true;
             }
         }
         return false;
