@@ -21,6 +21,14 @@ public class PlayerController : MonoBehaviour
     private float turnSmoothVelocity;
     private float velocityY = 0f;
 
+    [Header("Fall Recovery")]
+    [Tooltip("Returns the player to their last grounded position instead of allowing an endless fall.")]
+    public bool recoverFromFalls = true;
+    [Tooltip("How far below the lowest known ground the player may fall before being recovered.")]
+    [Min(1f)] public float fallRecoveryDistance = 10f;
+    private Vector3 lastSafeGroundPosition;
+    private bool hasSafeGroundPosition;
+
     [Header("Map Boundaries")]
     public bool useBounds = false;
     public float minX = -100f;
@@ -31,7 +39,7 @@ public class PlayerController : MonoBehaviour
     [Header("Planting System")]
     public PlantData[] plants;
     [Tooltip("New plants are resized to this fraction of the player's CharacterController height.")]
-    [Min(0.1f)] public float plantedHeightRelativeToPlayer = 1.25f;
+    [Min(0.1f)] public float plantedHeightRelativeToPlayer = 2.0f;
     private int currentPlantIndex = 0;
     
     [Header("References")]
@@ -96,6 +104,8 @@ public class PlayerController : MonoBehaviour
 
         // Snap to terrain on spawn so the character doesn't float
         SnapToGround();
+        lastSafeGroundPosition = transform.position;
+        hasSafeGroundPosition = true;
     }
 
     /// <summary>Teleport the character down onto the terrain/collider beneath it at spawn.</summary>
@@ -226,6 +236,36 @@ public class PlayerController : MonoBehaviour
         }
 
         ApplyBoundaries();
+        HandleFallRecovery();
+    }
+
+    /// <summary>
+    /// Remembers stable ground and recovers the character if it ever gets below
+    /// the map. This protects against terrain edges and transient collider gaps.
+    /// </summary>
+    void HandleFallRecovery()
+    {
+        if (!recoverFromFalls || controller == null) return;
+
+        if (controller.isGrounded)
+        {
+            lastSafeGroundPosition = transform.position;
+            hasSafeGroundPosition = true;
+            return;
+        }
+
+        float lowestGroundY = hasSafeGroundPosition ? lastSafeGroundPosition.y : transform.position.y;
+        Terrain terrain = Terrain.activeTerrain;
+        if (terrain != null)
+            lowestGroundY = Mathf.Min(lowestGroundY, terrain.transform.position.y);
+
+        if (!hasSafeGroundPosition || transform.position.y >= lowestGroundY - fallRecoveryDistance)
+            return;
+
+        controller.enabled = false;
+        transform.position = lastSafeGroundPosition + Vector3.up * 0.1f;
+        controller.enabled = true;
+        velocityY = -4f;
     }
 
     void ApplyBoundaries()
