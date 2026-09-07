@@ -16,6 +16,9 @@ public class ZombieAttack : MonoBehaviour
     [Tooltip("Max distance to keep attacking a plant")]
     public float attackRange = 1.8f;
 
+    [Tooltip("Close-range fallback used when a manual-moving enemy reaches a plant collider.")]
+    [SerializeField, Min(0.1f)] private float plantContactRadius = 0.9f;
+
     [Header("Animation")]
     [SerializeField] private Animator animator;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
@@ -54,6 +57,19 @@ public class ZombieAttack : MonoBehaviour
                        : false;
 
         currentTarget = blockingPlant;
+
+        // EnemyNavAgent normally detects the plant ahead of its lane. This
+        // fallback also catches real collider contact, preventing kinematic
+        // manual movement from passing through a plant on either enemy prefab.
+        if (currentTarget == null)
+        {
+            PlantBase contactedPlant = FindPlantAtContact();
+            if (contactedPlant != null)
+            {
+                currentTarget = contactedPlant;
+                SetBlockingPlant(contactedPlant);
+            }
+        }
 
         if (currentTarget == null)
         {
@@ -110,6 +126,56 @@ public class ZombieAttack : MonoBehaviour
     {
         if (navAgent != null)    navAgent.ClearBlockingPlant();
         if (legacyMover != null) legacyMover.ClearBlockingPlant();
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        TryBlockOnPlant(collision.collider);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        TryBlockOnPlant(collision.collider);
+    }
+
+    private void TryBlockOnPlant(Collider collider)
+    {
+        PlantBase plant = collider != null ? collider.GetComponentInParent<PlantBase>() : null;
+        if (plant != null && plant.currentHealth > 0)
+            SetBlockingPlant(plant);
+    }
+
+    private PlantBase FindPlantAtContact()
+    {
+        Vector3 center = transform.position + Vector3.up * 0.5f;
+        Collider[] hits = Physics.OverlapSphere(
+            center, plantContactRadius, Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Ignore);
+
+        PlantBase closest = null;
+        float closestDistance = float.MaxValue;
+        foreach (Collider hit in hits)
+        {
+            PlantBase plant = hit.GetComponentInParent<PlantBase>();
+            if (plant == null || plant.currentHealth <= 0) continue;
+
+            float distance = (hit.ClosestPoint(center) - center).sqrMagnitude;
+            if (distance < closestDistance)
+            {
+                closest = plant;
+                closestDistance = distance;
+            }
+        }
+        return closest;
+    }
+
+    private void SetBlockingPlant(PlantBase plant)
+    {
+        if (plant == null || plant.currentHealth <= 0) return;
+
+        currentTarget = plant;
+        if (navAgent != null) navAgent.BlockOnPlant(plant);
+        else if (legacyMover != null) legacyMover.BlockOnPlant(plant);
     }
 
     private void TriggerAttackAnimation()

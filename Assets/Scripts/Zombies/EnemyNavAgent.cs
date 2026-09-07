@@ -156,6 +156,21 @@ public class EnemyNavAgent : MonoBehaviour
             state = AIState.MovingInLane;
     }
 
+    /// <summary>
+    /// Stops this enemy at a plant reached by physical contact or the close
+    /// range fallback in ZombieAttack. The lane is preserved for resuming once
+    /// the plant has been destroyed.
+    /// </summary>
+    public void BlockOnPlant(PlantBase plant)
+    {
+        if (plant == null || plant.currentHealth <= 0 || IsDead) return;
+
+        BlockingPlant = plant;
+        if (AgentValid()) agent.isStopped = true;
+        state = AIState.AttackingPlant;
+        SetAnimSpeed(0f);
+    }
+
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
     // ──────────────────────────────────────────────────────────
@@ -397,8 +412,8 @@ public class EnemyNavAgent : MonoBehaviour
             PlantBase plant = hit.GetComponentInParent<PlantBase>();
             if (plant != null && plant.currentHealth > 0)
             {
-                BlockingPlant = plant;
-                return true;
+            BlockOnPlant(plant);
+            return true;
             }
         }
         return false;

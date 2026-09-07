@@ -8,6 +8,7 @@ public sealed class ZombieHealthBar : MonoBehaviour
     [SerializeField, Min(0.001f)] private float worldSpaceScale = 0.012f;
     private ZombieHealth health;
     private RectTransform fill;
+    private Image fillImage;
     private Transform canvasTransform;
 
     private void Awake()
@@ -52,6 +53,7 @@ public sealed class ZombieHealthBar : MonoBehaviour
         {
             canvasTransform = existingBar;
             fill = existingFill;
+            fillImage = existingFill.GetComponent<Image>();
             ConfigureCanvas(existingBar.GetComponent<Canvas>());
             SetBarTransform();
             return;
@@ -75,9 +77,10 @@ public sealed class ZombieHealthBar : MonoBehaviour
 
         GameObject fillObject = new GameObject("Fill");
         fillObject.transform.SetParent(background.transform, false);
-        Image fillImage = fillObject.AddComponent<Image>();
-        fillImage.color = new Color(0.25f, 0.95f, 0.22f, 1f);
-        fill = fillImage.rectTransform;
+        Image newFillImage = fillObject.AddComponent<Image>();
+        this.fillImage = newFillImage;
+        this.fillImage.color = new Color(0.25f, 0.95f, 0.22f, 1f);
+        fill = this.fillImage.rectTransform;
         fill.anchorMin = Vector2.zero;
         fill.anchorMax = Vector2.one;
         fill.pivot = new Vector2(0f, 0.5f);
@@ -106,7 +109,22 @@ public sealed class ZombieHealthBar : MonoBehaviour
     {
         if (fill == null) return;
         float ratio = maximum <= 0 ? 0f : Mathf.Clamp01((float)current / maximum);
-        fill.anchorMax = new Vector2(ratio, 1f);
+
+        // Scale the visible green rectangle from its left pivot. This works
+        // with the existing prefab UI even when a source image has no sprite
+        // and therefore cannot use Image.FillAmount reliably.
+        fill.anchorMin = Vector2.zero;
+        fill.anchorMax = Vector2.one;
+        fill.pivot = new Vector2(0f, 0.5f);
+        fill.offsetMin = new Vector2(2f, 2f);
+        fill.offsetMax = new Vector2(-2f, -2f);
+        fill.localScale = new Vector3(ratio, 1f, 1f);
+
+        if (fillImage == null) fillImage = fill.GetComponent<Image>();
+        if (fillImage != null)
+        {
+            fillImage.type = Image.Type.Simple;
+        }
     }
 
     private static void Stretch(RectTransform rect)

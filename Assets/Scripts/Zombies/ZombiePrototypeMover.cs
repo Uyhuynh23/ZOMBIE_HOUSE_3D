@@ -72,6 +72,14 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         blockingPlant = null;
     }
 
+    /// <summary>Used by ZombieAttack when physical contact reaches a plant.</summary>
+    public void BlockOnPlant(PlantBase plant)
+    {
+        if (plant == null || plant.currentHealth <= 0) return;
+        blockingPlant = plant;
+        StopMovement();
+    }
+
     // ──────────────────────────────────────────────────────────
     // Public API (used by scene builders / spawner)
     // ──────────────────────────────────────────────────────────

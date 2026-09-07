@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -9,6 +10,7 @@ public abstract class PlantBase : MonoBehaviour
     [Header("Plant Base Settings")]
     public int maxHealth = 100;
     public int currentHealth;
+    public event Action<int, int> HealthChanged;
 
     /// <summary>
     /// The square this plant is planted on. Set by PlayerController after instantiation.
@@ -18,6 +20,11 @@ public abstract class PlantBase : MonoBehaviour
     protected virtual void Awake()
     {
         currentHealth = maxHealth;
+
+        // Every plant receives the same on-demand world health bar without
+        // requiring each plant prefab to carry another serialized component.
+        if (GetComponent<PlantHealthBar>() == null)
+            gameObject.AddComponent<PlantHealthBar>();
     }
 
     /// <summary>
@@ -25,7 +32,10 @@ public abstract class PlantBase : MonoBehaviour
     /// </summary>
     public virtual void TakeDamage(int amount)
     {
-        currentHealth -= amount;
+        if (amount <= 0 || currentHealth <= 0) return;
+
+        currentHealth = Mathf.Max(0, currentHealth - amount);
+        HealthChanged?.Invoke(currentHealth, maxHealth);
         if (currentHealth <= 0)
         {
             Die();
