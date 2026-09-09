@@ -300,12 +300,6 @@ public class EnemyNavAgent : MonoBehaviour
 
         if (toTarget.magnitude <= laneEntryRadius)
         {
-            // Snap exactly onto entry X/Z, keep Y
-            Vector3 snapped = transform.position;
-            snapped.x = assignedLane.laneEntry.position.x;
-            snapped.z = assignedLane.laneEntry.position.z;
-            transform.position = snapped;
-
             manualMoveDir = laneDir;
             state = AIState.MovingInLane;
             return;
@@ -337,6 +331,26 @@ public class EnemyNavAgent : MonoBehaviour
         {
             ArriveAtHouse();
             return;
+        }
+
+        // Constrain perpendicular axis smoothly every frame so the zombie walks
+        // into the exact lane column without teleporting, and stays locked on it.
+        if (assignedLane != null && assignedLane.laneEntry != null)
+        {
+            Vector3 pos = transform.position;
+            float currentSpeed = isStaggered ? baseSpeed * hitSpeedMultiplier : baseSpeed;
+            float lateralStep = currentSpeed * Time.deltaTime;
+
+            if (Mathf.Abs(laneDir.z) > 0.5f) // North-South lane: smoothly lock X
+            {
+                pos.x = Mathf.MoveTowards(pos.x, assignedLane.laneEntry.position.x, lateralStep);
+            }
+            else // East-West lane: smoothly lock Z
+            {
+                pos.z = Mathf.MoveTowards(pos.z, assignedLane.laneEntry.position.z, lateralStep);
+            }
+
+            transform.position = pos;
         }
 
         MoveManually(laneDir);
