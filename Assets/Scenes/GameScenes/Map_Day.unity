@@ -118,7 +118,7 @@ NavMeshSettings:
     preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: 07037daa6eb32164db2b18439121478b, type: 2}
 --- !u!4 &1289120 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
@@ -1004,9 +1004,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 135500832}
   - {fileID: 1205037459}
   - {fileID: 858527447}
+  - {fileID: 135500832}
   m_Father: {fileID: 538836204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &54939608 stripped
@@ -2105,7 +2105,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &135500832 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 135500831}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &136563968 stripped
@@ -6173,7 +6173,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &368415020 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 368415019}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &370275403
@@ -7820,9 +7820,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 368415020}
-  - {fileID: 1236727296}
+  - {fileID: 1236727295}
   - {fileID: 1532668270}
+  - {fileID: 368415020}
   m_Father: {fileID: 538836204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &462444640
@@ -8057,7 +8057,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &468742443 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 468742442}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &469983569
@@ -14572,7 +14572,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &858527447 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 858527446}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &863057966
@@ -15793,7 +15793,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &924783118 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 924783117}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &926548352 stripped
@@ -17481,9 +17481,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2053098782}
   - {fileID: 924783118}
   - {fileID: 468742443}
-  - {fileID: 2053098782}
   m_Father: {fileID: 538836204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1002299646
@@ -20908,7 +20908,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &1205037459 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1205037458}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1210420384
@@ -21063,6 +21063,9 @@ MonoBehaviour:
     currentCooldown: 0
     portrait: {fileID: 21300000, guid: cf1ed4901c30cdf4ab3996399aa5780e, type: 3}
   cameraFollow: {fileID: 330585548}
+  playerMarkerSprite: {fileID: 0}
+  playerMarkerColor: {r: 0.25, g: 0.9, b: 1, a: 1}
+  playerMarkerScale: 2.2
 --- !u!114 &1222713670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21356,9 +21359,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
---- !u!4 &1236727296 stripped
+--- !u!4 &1236727295 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1236727294}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1243244526 stripped
@@ -21801,7 +21804,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &1272767467 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1272767466}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1275852911
@@ -26795,7 +26798,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &1532668270 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1532668269}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1533995348 stripped
@@ -30784,7 +30787,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &1738863693 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1738863692}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1742392585
@@ -30858,7 +30861,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &1742392586 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1742392585}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1743805923 stripped
@@ -32441,18 +32444,9 @@ MonoBehaviour:
   zombiePrefab: {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
   enemyPrefabs:
   - {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
-  routes:
-  - {fileID: 499492610}
-  - {fileID: 1738017219}
-  - {fileID: 914948247}
-  - {fileID: 773593655}
-  routeMoveSpeed: 2.35
-  routeSpawnJitter: 0.25
-  spawnX: 8
-  spawnY: 0
-  laneApproachJitter: 0.9
-  laneEntryX: 6.2
-  houseAttackX: -4.75
+  spawnPoints: []
+  spawnJitter: 0.5
+  houseTarget: {fileID: 0}
   waveConfig: {fileID: 11400000, guid: e3ee77c15b661b449ae43c7f7fbe34e3, type: 2}
   waves:
   - zombieCount: 4
@@ -32464,8 +32458,17 @@ MonoBehaviour:
   - zombieCount: 12
     spawnInterval: 1
     delayBeforeWave: 7
+  baseEnemySpeed: 1.4
+  speedIncreasePerWave: 0.15
+  routes:
+  - {fileID: 499492610}
+  - {fileID: 1738017219}
+  - {fileID: 914948247}
+  - {fileID: 773593655}
+  routeMoveSpeed: 2.35
+  routeSpawnJitter: 0.25
   currentWaveIndex: 0
-  activeZombieCount: 0
+  activeEnemyCount: 0
   nextWaveCountdown: 0
   remainingToSpawn: 0
 --- !u!114 &1813148921
@@ -32494,8 +32497,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55dd96f64a5e24be9b3513632497967d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  rows: 4
-  columns: 3
+  lanesPerZone: 3
+  rowsPerZone: 5
+  innerBoundary: 8
 --- !u!114 &1813148923
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36262,7 +36266,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
 --- !u!4 &2053098782 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 2053098781}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2053227082
