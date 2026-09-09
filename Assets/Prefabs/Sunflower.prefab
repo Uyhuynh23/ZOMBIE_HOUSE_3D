@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8341058833871516485}
@@ -152,7 +152,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10.59754, y: 1.74, z: 0.25728}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8341058833871516485}
@@ -170,8 +170,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1470d95feb8645348b08af3e740b760f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SunflowerLogic
+  maxHealth: 100
+  currentHealth: 0
+  mySquare: {fileID: 0}
   sunPrefab: {fileID: 2222790445701324439, guid: 71c02fcdde724de4098978b7c4bc5ff2, type: 3}
   productionInterval: 2
+  bodyHeight: 1
+  bodyRadius: 0.5
+  bodyCenter: {x: 0, y: 0.4, z: 0}
 --- !u!95 &-6114928414343886980
 Animator:
   serializedVersion: 7

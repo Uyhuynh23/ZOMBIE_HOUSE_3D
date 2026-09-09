@@ -1,10 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// Handles zombie melee attack against plants.
-/// Attach to the zombie root. Works alongside ZombiePrototypeMover.
+/// Handles zombie melee attack against plants and the player's house.
+/// Works with both EnemyNavAgent (NavMesh mode) and ZombiePrototypeMover (legacy mode).
 /// </summary>
-[RequireComponent(typeof(ZombiePrototypeMover))]
 public class ZombieAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
@@ -15,34 +14,73 @@ public class ZombieAttack : MonoBehaviour
     public float attackInterval = 1.2f;
 
     [Tooltip("Max distance to keep attacking a plant")]
-    public float attackRange = 1.0f;
+    public float attackRange = 1.8f;
+
+    [Tooltip("Close-range fallback used when a manual-moving enemy reaches a plant collider.")]
+    [SerializeField, Min(0.1f)] private float plantContactRadius = 0.9f;
 
     [Header("Animation")]
     [SerializeField] private Animator animator;
+    [SerializeField] private Transform visualRoot;
+    [SerializeField] private string attackStateName = "Attack";
+    [SerializeField, Min(0.05f)] private float fallbackBiteDuration = 0.28f;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
 
+    // ──────────────────────────────────────────────────────────
+    // References — supports both AI modes
+    // ──────────────────────────────────────────────────────────
+    private EnemyNavAgent navAgent;           // NavMesh mode
+    private ZombiePrototypeMover legacyMover; // Legacy mode
+
     private PlantBase currentTarget;
-    private float attackTimer = 0f;
-    private ZombiePrototypeMover mover;
+    private float attackTimer;
+    private Coroutine fallbackBite;
 
     private void Awake()
     {
-        mover = GetComponent<ZombiePrototypeMover>();
+        navAgent    = GetComponent<EnemyNavAgent>();
+        legacyMover = GetComponent<ZombiePrototypeMover>();
+
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
+        if (visualRoot == null && animator != null)
+            visualRoot = animator.transform;
     }
 
     private void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        if (GameManager.Instance != null &&
+            GameManager.Instance.CurrentState != GameManager.GameState.Playing)
             return;
 
-        // Ask the mover what plant it is blocked by.
-        currentTarget = mover.BlockingPlant;
+        // Pull state from whichever AI is active
+        PlantBase blockingPlant = navAgent != null  ? navAgent.BlockingPlant
+                                : legacyMover != null ? legacyMover.BlockingPlant
+                                : null;
+
+        bool isAtHouse = navAgent != null      ? navAgent.IsAtHouse
+                       : legacyMover != null   ? legacyMover.IsAtHouse
+                       : false;
+
+        currentTarget = blockingPlant;
+
+        // EnemyNavAgent normally detects the plant ahead of its lane. This
+        // fallback also catches real collider contact, preventing kinematic
+        // manual movement from passing through a plant on either enemy prefab.
+        if (currentTarget == null)
+        {
+            PlantBase contactedPlant = FindPlantAtContact();
+            if (contactedPlant != null)
+            {
+                currentTarget = contactedPlant;
+                SetBlockingPlant(contactedPlant);
+            }
+        }
 
         if (currentTarget == null)
         {
-            if (mover.IsAtHouse && HouseHealth.Instance != null)
+            // Attack house if at destination
+            if (isAtHouse && HouseHealth.Instance != null)
             {
                 attackTimer -= Time.deltaTime;
                 if (attackTimer <= 0f)
@@ -60,12 +98,12 @@ public class ZombieAttack : MonoBehaviour
             return;
         }
 
-        // Check still in range (plant might have been removed)
+        // Check still in range (plant might have been destroyed)
         float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
         if (dist > attackRange + 0.5f)
         {
             currentTarget = null;
-            mover.ClearBlockingPlant();
+            ClearBlockingPlant();
             return;
         }
 
@@ -83,25 +121,124 @@ public class ZombieAttack : MonoBehaviour
 
         currentTarget.TakeDamage(damagePerAttack);
         AudioManager.PlaySfx(AudioCue.ZombieAttack);
-
         TriggerAttackAnimation();
 
-        Debug.Log($"[ZombieAttack] {gameObject.name} hit {currentTarget.gameObject.name} for {damagePerAttack} dmg");
+        if (currentTarget.currentHealth <= 0)
+        {
+            currentTarget = null;
+            ClearBlockingPlant();
+        }
+    }
+
+    private void ClearBlockingPlant()
+    {
+        if (navAgent != null)    navAgent.ClearBlockingPlant();
+        if (legacyMover != null) legacyMover.ClearBlockingPlant();
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        TryBlockOnPlant(collision.collider);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        TryBlockOnPlant(collision.collider);
+    }
+
+    private void TryBlockOnPlant(Collider collider)
+    {
+        PlantBase plant = collider != null ? collider.GetComponentInParent<PlantBase>() : null;
+        if (plant != null && plant.currentHealth > 0)
+            SetBlockingPlant(plant);
+    }
+
+    private PlantBase FindPlantAtContact()
+    {
+        Vector3 center = transform.position + Vector3.up * 0.5f;
+        Collider[] hits = Physics.OverlapSphere(
+            center, plantContactRadius, Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Ignore);
+
+        PlantBase closest = null;
+        float closestDistance = float.MaxValue;
+        foreach (Collider hit in hits)
+        {
+            PlantBase plant = hit.GetComponentInParent<PlantBase>();
+            if (plant == null || plant.currentHealth <= 0) continue;
+
+            float distance = (hit.ClosestPoint(center) - center).sqrMagnitude;
+            if (distance < closestDistance)
+            {
+                closest = plant;
+                closestDistance = distance;
+            }
+        }
+        return closest;
+    }
+
+    private void SetBlockingPlant(PlantBase plant)
+    {
+        if (plant == null || plant.currentHealth <= 0) return;
+
+        currentTarget = plant;
+        if (navAgent != null) navAgent.BlockOnPlant(plant);
+        else if (legacyMover != null) legacyMover.BlockOnPlant(plant);
     }
 
     private void TriggerAttackAnimation()
     {
-        if (animator != null && animator.runtimeAnimatorController != null)
+        if (animator == null || animator.runtimeAnimatorController == null)
         {
-            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            StartFallbackBite();
+            return;
+        }
+
+        foreach (AnimatorControllerParameter p in animator.parameters)
+        {
+            if (p.nameHash == AttackHash && p.type == AnimatorControllerParameterType.Trigger)
             {
-                if (parameter.nameHash == AttackHash && parameter.type == AnimatorControllerParameterType.Trigger)
-                {
-                    animator.SetTrigger(AttackHash);
-                    break;
-                }
+                animator.SetTrigger(AttackHash);
+                break;
             }
         }
+
+        if (!HasAttackTrigger() && !animator.HasState(0, Animator.StringToHash(attackStateName)))
+            StartFallbackBite();
+        else if (!HasAttackTrigger())
+            animator.CrossFadeInFixedTime(attackStateName, 0.05f);
+    }
+
+    private bool HasAttackTrigger()
+    {
+        if (animator == null) return false;
+        foreach (AnimatorControllerParameter p in animator.parameters)
+            if (p.nameHash == AttackHash && p.type == AnimatorControllerParameterType.Trigger) return true;
+        return false;
+    }
+
+    private void StartFallbackBite()
+    {
+        if (visualRoot == null || fallbackBite != null) return;
+        fallbackBite = StartCoroutine(FallbackBiteRoutine());
+    }
+
+    private System.Collections.IEnumerator FallbackBiteRoutine()
+    {
+        Quaternion baseRotation = visualRoot.localRotation;
+        Vector3 basePosition = visualRoot.localPosition;
+        float elapsed = 0f;
+        while (elapsed < fallbackBiteDuration)
+        {
+            elapsed += Time.deltaTime;
+            float bite = Mathf.Sin(Mathf.Clamp01(elapsed / fallbackBiteDuration) * Mathf.PI);
+            visualRoot.localRotation = baseRotation * Quaternion.Euler(-12f * bite, 0f, 0f);
+            visualRoot.localPosition = basePosition + Vector3.back * (0.08f * bite);
+            yield return null;
+        }
+        visualRoot.localRotation = baseRotation;
+        visualRoot.localPosition = basePosition;
+        fallbackBite = null;
     }
 
     private void OnDrawGizmosSelected()

@@ -9,8 +9,8 @@ public class PeashooterCombat : PlantBase
     public float projectileSpeed = 10f;
     public float aggroRadius = 5f;
     public float forwardConeThreshold = 0.3f; // dot product threshold (~72 degree cone)
-    [Tooltip("The imported peashooter faces local +X. Rotate the plant root to aim this axis down any map road.")]
-    public Vector3 localAimAxis = Vector3.right;
+    [Tooltip("Fallback muzzle axis when a SpawnPoint is unavailable. The imported peashooter models use local +Z.")]
+    public Vector3 localAimAxis = Vector3.forward;
 
     [Header("Body Collider Settings")]
     public float bodyHeight = 1.0f;
@@ -26,10 +26,41 @@ public class PeashooterCombat : PlantBase
     private float fireTimer = 0f;
     private Animator animator;
     private GameObject currentTarget;
+    private Vector3 lockedLaneDirection;
 
     protected override void Awake()
     {
         base.Awake();
+    }
+
+    /// <summary>Rotates the plant so its configured local firing axis faces a world-space lane direction.</summary>
+    public void SetAimDirection(Vector3 worldDirection)
+    {
+        worldDirection.y = 0f;
+        if (worldDirection.sqrMagnitude < 0.001f) return;
+
+        lockedLaneDirection = worldDirection.normalized;
+        ApplyLockedLaneRotation();
+    }
+
+    private void LateUpdate()
+    {
+        // Some imported animation clips can write to the root transform.
+        // Re-apply the lane direction after animation evaluation so plants stay
+        // pointed at the incoming-enemy side of their own lane.
+        if (lockedLaneDirection.sqrMagnitude > 0.001f)
+            ApplyLockedLaneRotation();
+    }
+
+    private void ApplyLockedLaneRotation()
+    {
+        if (lockedLaneDirection.sqrMagnitude < 0.001f) return;
+
+        Vector3 currentWorldAim = GetCurrentAimDirection();
+        if (currentWorldAim.sqrMagnitude < 0.001f) return;
+
+        transform.rotation = Quaternion.FromToRotation(currentWorldAim.normalized, lockedLaneDirection)
+                             * transform.rotation;
     }
 
     void Start()
@@ -48,6 +79,11 @@ public class PeashooterCombat : PlantBase
         bodyCollider.radius = bodyRadius;
         bodyCollider.center = bodyCenter;
         bodyCollider.direction = 1; // Y-axis (upright)
+        // The Peashooter prefab keeps this collider disabled in the asset so
+        // it can be configured at runtime. Enemy plant detection intentionally
+        // ignores triggers, so leaving it disabled makes enemies walk through
+        // Peashooters without ever acquiring a target.
+        bodyCollider.enabled = true;
 
         if (spawnPoint == null)
         {
@@ -65,10 +101,19 @@ public class PeashooterCombat : PlantBase
 
     void Update()
     {
-        // Clean up destroyed zombies
-        zombiesInRange.RemoveWhere(z => z == null || !z.activeInHierarchy);
+        // Clean up destroyed/dead enemies. Taking damage does not disable this
+        // combat component, so a living plant keeps firing while being eaten.
+        zombiesInRange.RemoveWhere(z =>
+        {
+            if (z == null || !z.activeInHierarchy) return true;
+            ZombieHealth health = z.GetComponent<ZombieHealth>();
+            return health == null || health.currentHealth <= 0;
+        });
 
-        // Check if any zombie is in the forward cone
+        // Select the closest valid enemy anywhere inside the aggro trigger.
+        // Projectiles already aim at the selected target, so restricting the
+        // target to a narrow lane made plants stop shooting when enemies were
+        // pushed or navigated slightly sideways.
         currentTarget = null;
         float closestDistance = float.MaxValue;
         foreach (var z in zombiesInRange)
@@ -76,12 +121,7 @@ public class PeashooterCombat : PlantBase
             if (z == null) continue;
             Vector3 toZombie = z.transform.position - transform.position;
             toZombie.y = 0f;
-            Vector3 worldAim = transform.TransformDirection(localAimAxis).normalized;
-            Vector3 worldSide = Vector3.Cross(Vector3.up, worldAim).normalized;
-            float laneDistance = Mathf.Abs(Vector3.Dot(toZombie, worldSide));
-            bool isAhead = toZombie.sqrMagnitude > 0.001f &&
-                           Vector3.Dot(toZombie.normalized, worldAim) > forwardConeThreshold;
-            if (isAhead && laneDistance <= 0.85f && toZombie.sqrMagnitude < closestDistance)
+            if (toZombie.sqrMagnitude < closestDistance)
             {
                 closestDistance = toZombie.sqrMagnitude;
                 currentTarget = z;
@@ -116,7 +156,7 @@ public class PeashooterCombat : PlantBase
         {
             Vector3 direction = currentTarget != null
                 ? currentTarget.transform.position + Vector3.up * 0.9f - spawnPoint.position
-                : transform.TransformDirection(localAimAxis);
+                : GetCurrentAimDirection();
             direction.Normalize();
             rb.linearVelocity = direction * projectileSpeed;
         }
@@ -126,7 +166,7 @@ public class PeashooterCombat : PlantBase
         {
             pp = pea.AddComponent<PeaProjectile>();
         }
-        pp.Initialize();
+        pp.Initialize(gameObject);
 
         AudioManager.PlaySfx(AudioCue.PeashooterShot);
 
@@ -136,20 +176,34 @@ public class PeashooterCombat : PlantBase
         }
     }
 
+    // SpawnPoint is the authoritative visual firing direction. It also works
+    // before Start caches the reference, when a just-planted prefab is first
+    // aligned to its lane by PlayerController.
+    private Vector3 GetCurrentAimDirection()
+    {
+        Transform point = spawnPoint != null ? spawnPoint : transform.Find("SpawnPoint");
+        Vector3 direction = point != null
+            ? point.position - transform.position
+            : transform.TransformDirection(localAimAxis);
+
+        direction.y = 0f;
+        return direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector3.forward;
+    }
+
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Zombie"))
+        ZombieHealth health = other != null ? other.GetComponentInParent<ZombieHealth>() : null;
+        if (health != null && health.currentHealth > 0)
         {
-            // Always use root to avoid multi-collider duplication
-            zombiesInRange.Add(other.transform.root.gameObject);
+            // Use the health owner rather than collider tags. Imported enemies
+            // may expose untagged child colliders (notably Spider variants).
+            zombiesInRange.Add(health.gameObject);
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Zombie"))
-        {
-            zombiesInRange.Remove(other.transform.root.gameObject);
-        }
+        ZombieHealth health = other != null ? other.GetComponentInParent<ZombieHealth>() : null;
+        if (health != null) zombiesInRange.Remove(health.gameObject);
     }
 }

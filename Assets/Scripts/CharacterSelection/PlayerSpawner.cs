@@ -19,6 +19,12 @@ public class PlayerSpawner : MonoBehaviour
     [Header("Camera")]
     public CameraFollow cameraFollow;
 
+    [Header("Minimap")]
+    [Tooltip("The LocationMarker sprite used by the Knight setup in Kha_Minimap.")]
+    public Sprite playerMarkerSprite;
+    public Color playerMarkerColor = new Color(0.25f, 0.9f, 1f, 1f);
+    [Min(0.1f)] public float playerMarkerScale = 2.2f;
+
     private GameObject spawnedPlayer;
 
     void Start()
@@ -94,7 +100,67 @@ public class PlayerSpawner : MonoBehaviour
             }
         }
 
+        SetupMinimapForPlayer();
+
         Debug.Log($"[PlayerSpawner] Spawned {characterToSpawn.characterName} at {spawnPos}");
+    }
+
+    /// <summary>
+    /// The player is created at runtime, so a scene reference cannot point to
+    /// it beforehand.  Bind every minimap rig after spawning and add the same
+    /// marker convention used by the Knight in Kha_Minimap.
+    /// </summary>
+    private void SetupMinimapForPlayer()
+    {
+        int markerLayer = LayerMask.NameToLayer("LocationMarker");
+        if (markerLayer < 0)
+        {
+            Debug.LogWarning("[PlayerSpawner] The LocationMarker layer is missing; minimap marker was not created.");
+            return;
+        }
+
+        MinimapFollow minimapFollow = Object.FindFirstObjectByType<MinimapFollow>();
+        if (minimapFollow != null)
+        {
+            minimapFollow.target = spawnedPlayer.transform;
+
+            Camera minimapCamera = minimapFollow.GetComponent<Camera>();
+            if (minimapCamera != null)
+                minimapCamera.cullingMask |= 1 << markerLayer;
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerSpawner] No MinimapFollow rig was found in this scene.");
+        }
+
+        // LocationMarker content must exist only in the RenderTexture camera,
+        // never as floating UI in the gameplay camera.
+        Camera gameplayCamera = cameraFollow != null ? cameraFollow.GetComponent<Camera>() : Camera.main;
+        if (gameplayCamera != null)
+            gameplayCamera.cullingMask &= ~(1 << markerLayer);
+
+        Transform existingMarker = spawnedPlayer.transform.Find("PlayerMinimapMarker");
+        if (existingMarker != null) return;
+
+        GameObject marker = new GameObject("PlayerMinimapMarker");
+        marker.layer = markerLayer;
+        marker.tag = "LocationMarker";
+        marker.transform.SetParent(spawnedPlayer.transform, false);
+        marker.transform.localPosition = new Vector3(0f, 0.12f, 0f);
+        marker.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+        marker.transform.localScale = Vector3.one * playerMarkerScale;
+
+        // Match the Knight marker in Kha_Minimap: the marker stays north-up
+        // instead of inheriting the player's turning animation.
+        LockRotation rotationLock = marker.AddComponent<LockRotation>();
+        rotationLock.fixedEulerAngles = new Vector3(90f, 0f, 0f);
+
+        SpriteRenderer renderer = marker.AddComponent<SpriteRenderer>();
+        renderer.sprite = playerMarkerSprite != null
+            ? playerMarkerSprite
+            : Sprite.Create(Texture2D.whiteTexture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f));
+        renderer.color = playerMarkerColor;
+        renderer.sortingOrder = 100;
     }
 
     /// <summary>

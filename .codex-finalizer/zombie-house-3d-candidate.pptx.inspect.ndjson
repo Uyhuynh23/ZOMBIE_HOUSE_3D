@@ -1,0 +1,106 @@
+{"kind":"deck","id":"pr/kqxx1n","name":"Deck"}
+{"kind":"layout","layoutId":"54fdc9e4-5a17-4427-bc5e-21cede2dd407","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"1c318b7b-d363-42ad-8e7c-416890cad995","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/esmhf5","slide":1,"title":"ZOMBIE HOUSE 3D","textShapes":4}
+{"kind":"shape","id":"sh/943u5oji","slide":1,"bbox":[0,0,1280,720]}
+{"kind":"textbox","id":"sh/83utcjix","slide":1,"text":"ZOMBIE HOUSE 3D","textPreview":"ZOMBIE HOUSE 3D","textChars":15,"textLines":1,"bbox":[78,118,720,74]}
+{"kind":"textbox","id":"sh/v65c7y18","slide":1,"text":"A third-person 3D defense game","textPreview":"A third-person 3D defense game","textChars":30,"textLines":1,"bbox":[82,206,610,42]}
+{"kind":"shape","id":"sh/a5cbet03","slide":1,"bbox":[72,278,1140,5]}
+{"kind":"textbox","id":"sh/x8nu98je","slide":1,"text":"CS427 - 3D Visualization and Game Development\nUniversity of Science, VNUHCM","textPreview":"CS427 - 3D Visualization and Game Development | University of Science, VNUHCM","textChars":75,"textLines":2,"bbox":[82,312,650,80]}
+{"kind":"textbox","id":"sh/w7etg3it","slide":1,"text":"Huynh Tran Uy  |  Tran My An  |  Nguyen Hoang Gia Han  |  Pham Bao Kha","textPreview":"Huynh Tran Uy  |  Tran My An  |  Nguyen Hoang Gia Han  |  Pham Bao Kha","textChars":70,"textLines":1,"bbox":[82,613,1000,30]}
+{"kind":"image","id":"im/va5k76xc","slide":1,"name":"","alt":"Zombie House 3D main menu artwork","bbox":[0,0,1280,720]}
+{"kind":"notes","id":"nt/esmhf5","slide":1,"text":"Source: project asset Assets/Textures/MainMenuBG.jpg. Introduce the team and the central premise: defend the house against zombie waves."}
+{"kind":"slide","id":"sl/9i7z7o","slide":2,"title":"Game Concept","textShapes":6}
+{"kind":"textbox","id":"sh/pof6143m","slide":2,"text":"Game Concept","textPreview":"Game Concept","textChars":12,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/21o7qpkb","slide":2,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/nmxozulg","slide":2,"text":"CS427  |  Zombie House 3D  |  2","textPreview":"CS427  |  Zombie House 3D  |  2","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/0zmpozm5","slide":2,"text":"Protect the house while zombie waves advance.","textPreview":"Protect the house while zombie waves advance.","textChars":45,"textLines":1,"bbox":[74,155,500,80]}
+{"kind":"textbox","id":"sh/10v6xk3q","slide":2,"text":"• Move through a low-poly 3D map and fight nearby enemies.\n\n• Spend sun resources to place plant defenders.\n\n• Clear every wave before the house health reaches zero.","textPreview":"• Move through a low-poly 3D map and fight nearby enemies. |  | • Spend sun resources to place plant defenders. |  | • Clear every wave b...","textChars":165,"textLines":5,"bbox":[76,275,470,260]}
+{"kind":"textbox","id":"sh/ex47mp4z","slide":2,"text":"GAMEPLAY SCREENSHOT\n\nInsert a wide capture showing the player, house, and an active lane.","textPreview":"GAMEPLAY SCREENSHOT |  | Insert a wide capture showing the player, house, and an active lane.","textChars":89,"textLines":3,"bbox":[625,160,540,360]}
+{"kind":"textbox","id":"sh/fydovulk","slide":2,"text":"Suggested capture: MapDay after the player spawns near the defended house.","textPreview":"Suggested capture: MapDay after the player spawns near the defended house.","textChars":74,"textLines":1,"bbox":[625,545,525,46]}
+{"kind":"image","id":"im/10by9cvq","slide":2,"name":"","geometry":"roundRect","alt":"Project character portrait","bbox":[432,544,96,96]}
+{"kind":"notes","id":"nt/9i7z7o","slide":2,"text":"Explain the round objective. Screenshot placeholder: capture the active MapDay scene with player, house, and enemies in view. Character portrait source: project asset Assets/Data/Characters/Portraits/Barbarian_Portrait.png."}
+{"kind":"slide","id":"sl/h9l01x","slide":3,"title":"Core Gameplay Loop","textShapes":17}
+{"kind":"textbox","id":"sh/4z658fmh","slide":3,"text":"Core Gameplay Loop","textPreview":"Core Gameplay Loop","textChars":18,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/3yx4za5c","slide":3,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/2xon654r","slide":3,"text":"CS427  |  Zombie House 3D  |  3","textPreview":"CS427  |  Zombie House 3D  |  3","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/dozm5kne","slide":3,"text":"A round repeats one clear decision cycle.","textPreview":"A round repeats one clear decision cycle.","textChars":41,"textLines":1,"bbox":[74,150,850,45]}
+{"kind":"shape","id":"sh/cnq5cfmt","slide":3,"bbox":[84,260,64,64]}
+{"kind":"textbox","id":"sh/r2h43a58","slide":3,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[84,271,64,38]}
+{"kind":"textbox","id":"sh/q18na54n","slide":3,"text":"Collect sun","textPreview":"Collect sun","textChars":11,"textLines":1,"bbox":[74,347,188,40]}
+{"kind":"textbox","id":"sh/tsvmtgnu","slide":3,"text":"Fund the defense","textPreview":"Fund the defense","textChars":16,"textLines":1,"bbox":[74,394,188,40]}
+{"kind":"shape","id":"sh/srml0vmp","slide":3,"bbox":[269,278,58,28]}
+{"kind":"shape","id":"sh/ylw7qp8r","slide":3,"bbox":[370,260,64,64]}
+{"kind":"textbox","id":"sh/jm5ojupc","slide":3,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[370,271,64,38]}
+{"kind":"textbox","id":"sh/knepszqx","slide":3,"text":"Place plants","textPreview":"Place plants","textChars":12,"textLines":1,"bbox":[360,347,188,40]}
+{"kind":"textbox","id":"sh/lon6l47i","slide":3,"text":"Cover key lanes","textPreview":"Cover key lanes","textChars":15,"textLines":1,"bbox":[360,394,188,40]}
+{"kind":"shape","id":"sh/6pg7u983","slide":3,"bbox":[555,278,58,28]}
+{"kind":"shape","id":"sh/7aponep8","slide":3,"bbox":[656,260,64,64]}
+{"kind":"textbox","id":"sh/8bypwjqt","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[656,271,64,38]}
+{"kind":"textbox","id":"sh/tc76p47e","slide":3,"text":"Fight zombies","textPreview":"Fight zombies","textChars":13,"textLines":1,"bbox":[646,347,188,40]}
+{"kind":"textbox","id":"sh/udg7y98z","slide":3,"text":"Support the defenses","textPreview":"Support the defenses","textChars":20,"textLines":1,"bbox":[646,394,188,40]}
+{"kind":"shape","id":"sh/feporepk","slide":3,"bbox":[841,278,58,28]}
+{"kind":"shape","id":"sh/ri9ofe5s","slide":3,"bbox":[942,260,64,64]}
+{"kind":"textbox","id":"sh/qh0n6t47","slide":3,"text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[942,271,64,38]}
+{"kind":"textbox","id":"sh/dkr6honi","slide":3,"text":"Protect the house","textPreview":"Protect the house","textChars":17,"textLines":1,"bbox":[932,347,188,40]}
+{"kind":"textbox","id":"sh/cji58jmx","slide":3,"text":"Win after all waves","textPreview":"Win after all waves","textChars":19,"textLines":1,"bbox":[932,394,188,40]}
+{"kind":"textbox","id":"sh/3ep4be5g","slide":3,"text":"Loss condition: house health reaches zero.","textPreview":"Loss condition: house health reaches zero.","textChars":42,"textLines":1,"bbox":[75,532,500,34]}
+{"kind":"textbox","id":"sh/2dgn294v","slide":3,"text":"Win condition: every configured zombie wave is cleared.","textPreview":"Win condition: every configured zombie wave is cleared.","textChars":55,"textLines":1,"bbox":[75,582,580,34]}
+{"kind":"notes","id":"nt/h9l01x","slide":3,"text":"Describe the core loop from resource collection through plant placement and combat. The final slide distinguishes the two round outcomes."}
+{"kind":"slide","id":"sl/9suqc2","slide":4,"title":"Player Interaction","textShapes":6}
+{"kind":"textbox","id":"sh/nq1432h8","slide":4,"text":"Player Interaction","textPreview":"Player Interaction","textChars":18,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/ora5w7it","slide":4,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/psj65cze","slide":4,"text":"CS427  |  Zombie House 3D  |  4","textPreview":"CS427  |  Zombie House 3D  |  4","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/e18nqd0r","slide":4,"text":"GAMEPLAY SCREENSHOT\n\nInsert a third-person capture showing movement, camera angle, and melee range.","textPreview":"GAMEPLAY SCREENSHOT |  | Insert a third-person capture showing movement, camera angle, and melee range.","textChars":99,"textLines":3,"bbox":[72,155,660,430]}
+{"kind":"textbox","id":"sh/f214zihc","slide":4,"text":"Direct player control","textPreview":"Direct player control","textChars":21,"textLines":1,"bbox":[795,173,360,46]}
+{"kind":"textbox","id":"sh/g3a5snih","slide":4,"text":"• Third-person movement and camera control.\n\n• Melee attacks for nearby zombie threats.\n\n• Plant selection, placement, and removal.","textPreview":"• Third-person movement and camera control. |  | • Melee attacks for nearby zombie threats. |  | • Plant selection, placement, and removal.","textChars":131,"textLines":5,"bbox":[796,250,360,250]}
+{"kind":"textbox","id":"sh/1ojm1sz2","slide":4,"text":"Suggested capture: player attacking beside a plantable square.","textPreview":"Suggested capture: player attacking beside a plantable square.","textChars":62,"textLines":1,"bbox":[796,538,350,46]}
+{"kind":"notes","id":"nt/9suqc2","slide":4,"text":"Show that the player actively participates rather than watching an automated defense. Screenshot placeholder: capture movement or a melee attack near a plantable square."}
+{"kind":"slide","id":"sl/6fpn1n","slide":5,"title":"Plants and Sun Economy","textShapes":5}
+{"kind":"textbox","id":"sh/9kvalovi","slide":5,"text":"Plants and Sun Economy","textPreview":"Plants and Sun Economy","textChars":22,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/mh4ratwr","slide":5,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/nidsjydc","slide":5,"text":"CS427  |  Zombie House 3D  |  5","textPreview":"CS427  |  Zombie House 3D  |  5","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/0f298je1","slide":5,"text":"Plants provide the strategic defense layer.","textPreview":"Plants provide the strategic defense layer.","textChars":43,"textLines":1,"bbox":[74,150,600,46]}
+{"kind":"textbox","id":"sh/1gvahov6","slide":5,"text":"• Collect sun as the resource for planting.\n\n• Place defenders on valid plantable squares.\n\n• Use Peashooter projectile attacks to pressure zombies.","textPreview":"• Collect sun as the resource for planting. |  | • Place defenders on valid plantable squares. |  | • Use Peashooter projectile attacks t...","textChars":148,"textLines":5,"bbox":[76,232,520,250]}
+{"kind":"textbox","id":"sh/sr294zep","slide":5,"text":"GAMEPLAY SCREENSHOT\n\nInsert a capture of a planted Peashooter firing at approaching zombies.","textPreview":"GAMEPLAY SCREENSHOT |  | Insert a capture of a planted Peashooter firing at approaching zombies.","textChars":92,"textLines":3,"bbox":[666,155,500,420]}
+{"kind":"image","id":"im/v2do76do","slide":5,"name":"","geometry":"roundRect","alt":"Sunflower plant portrait","bbox":[92,526,96,96]}
+{"kind":"image","id":"im/a147ylc3","slide":5,"name":"","geometry":"roundRect","alt":"Peashooter plant portrait","bbox":[210,526,96,96]}
+{"kind":"notes","id":"nt/6fpn1n","slide":5,"text":"Talk through the resource decision: sun enables placement, and plant positions determine lane coverage. Project asset portraits shown at lower left. Screenshot placeholder: show a Peashooter attacking zombies."}
+{"kind":"slide","id":"sl/2plgx8","slide":6,"title":"Zombie Waves and Base Defense","textShapes":5}
+{"kind":"textbox","id":"sh/rqxsru9c","slide":6,"text":"Zombie Waves and Base Defense","textPreview":"Zombie Waves and Base Defense","textChars":29,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/cr690zax","slide":6,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/dsfat4ri","slide":6,"text":"CS427  |  Zombie House 3D  |  6","textPreview":"CS427  |  Zombie House 3D  |  6","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/etor29s3","slide":6,"text":"GAMEPLAY SCREENSHOT\n\nInsert a capture with a zombie wave following a route toward the house.","textPreview":"GAMEPLAY SCREENSHOT |  | Insert a capture with a zombie wave following a route toward the house.","textChars":92,"textLines":3,"bbox":[72,155,650,425]}
+{"kind":"textbox","id":"sh/zuxsvu9o","slide":6,"text":"Enemy pressure","textPreview":"Enemy pressure","textChars":14,"textLines":1,"bbox":[790,166,350,48]}
+{"kind":"textbox","id":"sh/0f694za9","slide":6,"text":"• Zombies follow routes toward the house.\n\n• Health and melee attacks define each encounter.\n\n• Spider and zombie variants extend the enemy set.\n\n• Waves end when all spawned enemies are cleared.","textPreview":"• Zombies follow routes toward the house. |  | • Health and melee attacks define each encounter. |  | • Spider and zombie variants extend...","textChars":195,"textLines":7,"bbox":[790,242,355,280]}
+{"kind":"image","id":"im/gny1k3it","slide":6,"name":"","geometry":"roundRect","alt":"Cartoon Zombie project texture","bbox":[984,535,120,80]}
+{"kind":"notes","id":"nt/2plgx8","slide":6,"text":"Focus on the defensive tension: enemies approach the house, while the player and plants must remove them before base health reaches zero. Screenshot placeholder: a wave and the house on the same frame. Project zombie texture appears as a supporting asset."}
+{"kind":"slide","id":"sl/k7luwg","slide":7,"title":"Feedback: UI, Minimap, and Audio","textShapes":5}
+{"kind":"textbox","id":"sh/369sfq58","slide":7,"text":"Feedback: UI, Minimap, and Audio","textPreview":"Feedback: UI, Minimap, and Audio","textChars":32,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/o7itovmt","slide":7,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/psrah0ny","slide":7,"text":"CS427  |  Zombie House 3D  |  7","textPreview":"CS427  |  Zombie House 3D  |  7","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/e1gbilob","slide":7,"text":"The game communicates the state of each round through visible and audible feedback.","textPreview":"The game communicates the state of each round through visible and audible feedback.","textChars":83,"textLines":1,"bbox":[74,150,1050,48]}
+{"kind":"textbox","id":"sh/f2psb65w","slide":7,"text":"UI / MINIMAP SCREENSHOT\n\nInsert a capture that shows HUD, minimap, and a zombie marker.","textPreview":"UI / MINIMAP SCREENSHOT |  | Insert a capture that shows HUD, minimap, and a zombie marker.","textChars":87,"textLines":3,"bbox":[72,235,540,345]}
+{"kind":"textbox","id":"sh/14radgn2","slide":7,"text":"• Minimap follows the player and identifies enemies.\n\n• Win and lose panels close the round clearly.\n\n• Separate music supports menus and gameplay maps.\n\n• Sound effects reinforce UI, combat, plants, zombies, and results.","textPreview":"• Minimap follows the player and identifies enemies. |  | • Win and lose panels close the round clearly. |  | • Separate music supports m...","textChars":221,"textLines":7,"bbox":[694,240,460,290]}
+{"kind":"image","id":"im/hgzqtgz2","slide":7,"name":"","geometry":"roundRect","alt":"Project minimap marker","bbox":[545,510,58,58]}
+{"kind":"notes","id":"nt/k7luwg","slide":7,"text":"Use this slide to tie together orientation and feedback. Screenshot placeholder: make a capture with minimap and HUD visible. Minimap marker source: project asset Assets/Minimap/location_maker.png."}
+{"kind":"slide","id":"sl/zda22x","slide":8,"title":"Maps and Technical Stack","textShapes":7}
+{"kind":"textbox","id":"sh/v69wbi5w","slide":8,"text":"Maps and Technical Stack","textPreview":"Maps and Technical Stack","textChars":24,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/w7ixkn6h","slide":8,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/h8redsn2","slide":8,"text":"CS427  |  Zombie House 3D  |  8","textPreview":"CS427  |  Zombie House 3D  |  8","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/i90fmdon","slide":8,"text":"Map variants","textPreview":"Map variants","textChars":12,"textLines":1,"bbox":[76,151,400,42]}
+{"kind":"textbox","id":"sh/ja9wfi58","slide":8,"text":"• Day, cloudy, and night scenes present the same defense concept with different moods.\n\n• A tutorial map will introduce movement, planting, combat, removal, and objectives.","textPreview":"• Day, cloudy, and night scenes present the same defense concept with different moods. |  | • A tutorial map will introduce movement, pla...","textChars":172,"textLines":3,"bbox":[76,220,480,210]}
+{"kind":"textbox","id":"sh/4bixon6t","slide":8,"text":"MAP SCREENSHOT\n\nInsert a wide capture of one final map variant.","textPreview":"MAP SCREENSHOT |  | Insert a wide capture of one final map variant.","textChars":63,"textLines":3,"bbox":[76,465,490,118]}
+{"kind":"textbox","id":"sh/5crehsny","slide":8,"text":"Technology","textPreview":"Technology","textChars":10,"textLines":1,"bbox":[705,151,420,42]}
+{"kind":"textbox","id":"sh/ydwvato3","slide":8,"text":"• Unity 6.3 LTS with Universal Render Pipeline.\n\n• C# gameplay systems for input, waves, health, economy, UI, and audio.\n\n• Git and GitHub branches for team integration.","textPreview":"• Unity 6.3 LTS with Universal Render Pipeline. |  | • C# gameplay systems for input, waves, health, economy, UI, and audio. |  | • Git a...","textChars":169,"textLines":5,"bbox":[705,220,430,230]}
+{"kind":"notes","id":"nt/zda22x","slide":8,"text":"Summarize how the team uses Unity 6.3 LTS, URP, C#, and GitHub. Screenshot placeholder: pick the strongest final map scene."}
+{"kind":"slide","id":"sl/cqf0yd","slide":9,"title":"Team and Final Integration","textShapes":7}
+{"kind":"textbox","id":"sh/3edgrylk","slide":9,"text":"Team and Final Integration","textPreview":"Team and Final Integration","textChars":26,"textLines":1,"bbox":[72,46,1000,54]}
+{"kind":"shape","id":"sh/4fmxk325","slide":9,"bbox":[72,116,1140,5]}
+{"kind":"textbox","id":"sh/pgvyto3q","slide":9,"text":"CS427  |  Zombie House 3D  |  9","textPreview":"CS427  |  Zombie House 3D  |  9","textChars":31,"textLines":1,"bbox":[72,682,650,20]}
+{"kind":"textbox","id":"sh/u9kfe9k3","slide":9,"text":"Team","textPreview":"Team","textChars":4,"textLines":1,"bbox":[76,152,300,42]}
+{"kind":"textbox","id":"sh/vatgnelo","slide":9,"text":"Huynh Tran Uy\nCore gameplay and zombie systems\n\nTran My An\nMaps, menu, character selection, and win/lose UI\n\nNguyen Hoang Gia Han\nAudio, integration support, QA, and report\n\nPham Bao Kha\nMinimap, organization, and plantable squares","textPreview":"Huynh Tran Uy | Core gameplay and zombie systems |  | Tran My An | Maps, menu, character selection, and win/lose UI |  | Nguyen Hoang Gia...","textChars":231,"textLines":11,"bbox":[76,220,490,350]}
+{"kind":"textbox","id":"sh/gbmxgj29","slide":9,"text":"Final integration","textPreview":"Final integration","textChars":17,"textLines":1,"bbox":[686,152,400,42]}
+{"kind":"textbox","id":"sh/hcvypo3u","slide":9,"text":"• Bring plantable squares, minimap, waves, house, and result UI into the main maps.\n\n• Complete the tutorial scene and test the full route from Main Menu to game result.\n\n• Balance waves, plant costs, enemy health, and audio levels through playtests.","textPreview":"• Bring plantable squares, minimap, waves, house, and result UI into the main maps. |  | • Complete the tutorial scene and test the full ...","textChars":250,"textLines":5,"bbox":[686,224,460,270]}
+{"kind":"textbox","id":"sh/6lkfa9k7","slide":9,"text":"Thank you","textPreview":"Thank you","textChars":9,"textLines":1,"bbox":[688,555,420,58]}
+{"kind":"notes","id":"nt/cqf0yd","slide":9,"text":"Close by assigning the team roles and emphasizing the remaining integration and testing work before the deadline."}

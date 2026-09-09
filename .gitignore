@@ -149,4 +149,5 @@ ehthumbs_vista.db
 # =========================
 # Private Settings
 # =========================
+/[Aa]ssets/Screenshots/
 ProjectSettings/Packages/com.unity.ai.assistant/*

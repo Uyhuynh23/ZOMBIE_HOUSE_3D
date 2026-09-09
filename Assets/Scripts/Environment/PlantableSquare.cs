@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class PlantableSquare : MonoBehaviour
 {
@@ -9,16 +9,31 @@ public class PlantableSquare : MonoBehaviour
     /// </summary>
     public PlantBase currentPlant;
 
+    public GameObject hoverGlow;
     private Renderer rend;
     private MaterialPropertyBlock propBlock;
+    private MaterialPropertyBlock originalPropertyBlock;
     private Color originalColor;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
+        if (rend == null)
+        {
+            Transform dirt = transform.Find("DirtBed");
+            if (dirt != null) rend = dirt.GetComponent<Renderer>();
+            else rend = GetComponentInChildren<Renderer>();
+        }
+        Transform h = transform.Find("HoverGlow");
+        if (h != null) hoverGlow = h.gameObject;
         propBlock = new MaterialPropertyBlock();
+        originalPropertyBlock = new MaterialPropertyBlock();
         if (rend != null)
         {
+            // Preserve any scene/prefab overrides exactly. Restoring only a
+            // sampled colour can turn textured dirt black after a plant dies.
+            rend.GetPropertyBlock(originalPropertyBlock);
+
             // Read color without cloning material
             if (rend.sharedMaterial.HasProperty("_BaseColor"))
                 originalColor = rend.sharedMaterial.GetColor("_BaseColor");
@@ -27,6 +42,8 @@ public class PlantableSquare : MonoBehaviour
             else
                 originalColor = Color.white;
         }
+
+        UpdateVisual();
     }
 
     /// <summary>
@@ -51,7 +68,7 @@ public class PlantableSquare : MonoBehaviour
     }
 
     /// <summary>
-    /// Legacy method — prefer PlantHere/RemovePlant.
+    /// Legacy method ï¿½ prefer PlantHere/RemovePlant.
     /// </summary>
     public void SetOccupied(bool occupied)
     {
@@ -63,12 +80,27 @@ public class PlantableSquare : MonoBehaviour
         UpdateVisual();
     }
 
+    public void SetHover(bool hover)
+    {
+        if (hoverGlow != null) hoverGlow.SetActive(hover);
+    }
+
     void UpdateVisual()
     {
-        if (rend == null || propBlock == null) return;
+        if (rend == null || propBlock == null || originalPropertyBlock == null) return;
 
-        Color c = isOccupied ? originalColor * 0.5f : originalColor;
+        if (!isOccupied)
+        {
+            // Restore the renderer exactly as it was before occupancy tinting.
+            rend.SetPropertyBlock(originalPropertyBlock);
+            return;
+        }
 
+        Color c = originalColor * 0.85f;
+
+        // Start from the original override set so repeated plant/remove cycles
+        // never accumulate a darker tint.
+        rend.SetPropertyBlock(originalPropertyBlock);
         rend.GetPropertyBlock(propBlock);
         if (rend.sharedMaterial.HasProperty("_BaseColor"))
             propBlock.SetColor("_BaseColor", c);

@@ -1,0 +1,91 @@
+# Textured materials for PlantableArea_Textured.obj
+
+newmtl Soil
+Ka 0.03 0.03 0.03
+Kd 0.41176 0.27059 0.15294
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl SoilDark
+Ka 0.03 0.03 0.03
+Kd 0.26667 0.15686 0.09020
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl Stone
+Ka 0.03 0.03 0.03
+Kd 0.76863 0.73725 0.76078
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl StoneLight
+Ka 0.03 0.03 0.03
+Kd 0.88627 0.86275 0.88235
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl Pebble
+Ka 0.03 0.03 0.03
+Kd 0.56863 0.51765 0.51765
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl Moss
+Ka 0.03 0.03 0.03
+Kd 0.39608 0.54902 0.14902
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl Grass
+Ka 0.03 0.03 0.03
+Kd 0.30196 0.60392 0.10980
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl GrassLight
+Ka 0.03 0.03 0.03
+Kd 0.46667 0.72941 0.14902
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl Petal
+Ka 0.03 0.03 0.03
+Kd 0.95686 0.94902 0.92157
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png
+
+newmtl FlowerCore
+Ka 0.03 0.03 0.03
+Kd 0.95686 0.67059 0.09020
+Ks 0.03 0.03 0.03
+Ns 8.0
+illum 2
+map_Kd Textures/PlantableArea_Albedo.png
+map_Bump Textures/PlantableArea_Normal.png

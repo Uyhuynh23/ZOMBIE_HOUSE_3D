@@ -1,0 +1,42 @@
+\section{Technical Implementation}
+
+\subsection{Technology stack}
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.24\textwidth}X}
+\toprule
+Layer & Technology and role\\
+\midrule
+Game engine & Unity 6.3 LTS with Universal Render Pipeline (URP) for scene management, rendering, prefabs, physics, and UI.\\
+Programming & C\# scripts for player input, combat, zombies, waves, health, economy, object pooling, UI state, and audio.\\
+Input and UI & Unity Input System and Unity UI for character selection, round selection, HUD, and win/lose panels.\\
+Version control & Git and GitHub branches for parallel feature development and integration.\\
+Assets & Unity Asset Store packages, KayKit characters, a Cartoon Zombie model, and documented third-party audio.\\
+\bottomrule
+\end{tabularx}
+
+\subsection{Runtime structure}
+The project separates reusable gameplay systems from map presentation. The main menu selects a round and loads a map scene. Gameplay scenes contain the player, routes, planting area, house target, spawner, grid, and UI systems. Managers coordinate economy, waves, game state, and object pooling, while prefabs keep plants and enemy types reusable.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=8mm and 13mm,
+  box/.style={draw,rounded corners,align=center,minimum width=35mm,minimum height=9mm,fill=blue!5},
+  arrow/.style={-{Latex[length=2.2mm]},thick}
+]
+\node[box] (menu) {Main Menu\\round selection};
+\node[box,right=of menu] (map) {Map scene\\day / cloudy / night};
+\node[box,below left=of map] (player) {Player and\\planting grid};
+\node[box,below=of map] (manager) {Game, economy, pool\\and audio managers};
+\node[box,below right=of map] (enemy) {Zombie spawner,\\routes, and house};
+\draw[arrow] (menu)--(map);
+\draw[arrow] (map)--(player);
+\draw[arrow] (map)--(manager);
+\draw[arrow] (map)--(enemy);
+\draw[arrow] (player)--(manager);
+\draw[arrow] (enemy)--(manager);
+\end{tikzpicture}
+\caption{Scene-level organization of the game.}
+\end{figure}
+
+\subsection{Audio service}
+A persistent \texttt{AudioManager} selects menu music for \texttt{MainMenu} and gameplay music for map scenes. It exposes named one-shot cues for UI and gameplay events and uses several SFX sources so concurrent sounds do not cut each other off. A fallback Audio Listener supports isolated test scenes that do not have a camera.

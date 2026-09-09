@@ -1,0 +1,51 @@
+\begin{titlepage}
+%\SetWatermarkText{\includegraphics[width = 0.97\paperwidth,
+%height = 0.97\paperheight]{bia.png}}
+%\SetWatermarkAngle{0} 
+%\SetWatermarkText{\includegraphics[scale=1]{hust.png}}
+%\SetWatermarkAngle{0} 
+\begin{tikzpicture}[remember picture,overlay,inner sep=0,outer sep=0]
+     \draw[blue!70!black,line width=4pt] ([xshift=-1.5cm,yshift=-2cm]current page.north east) coordinate (A)--([xshift=1.5cm,yshift=-2cm]current page.north west) coordinate(B)--([xshift=1.5cm,yshift=2cm]current page.south west) coordinate (C)--([xshift=-1.5cm,yshift=2cm]current page.south east) coordinate(D)--cycle;
+
+     \draw ([yshift=0.5cm,xshift=-0.5cm]A)-- ([yshift=0.5cm,xshift=0.5cm]B)--
+     ([yshift=-0.5cm,xshift=0.5cm]B) --([yshift=-0.5cm,xshift=-0.5cm]B)--([yshift=0.5cm,xshift=-0.5cm]C)--([yshift=0.5cm,xshift=0.5cm]C)--([yshift=-0.5cm,xshift=0.5cm]C)-- ([yshift=-0.5cm,xshift=-0.5cm]D)--([yshift=0.5cm,xshift=-0.5cm]D)--([yshift=0.5cm,xshift=0.5cm]D)--([yshift=-0.5cm,xshift=0.5cm]A)--([yshift=-0.5cm,xshift=-0.5cm]A)--([yshift=0.5cm,xshift=-0.5cm]A);
+
+
+     \draw ([yshift=-0.3cm,xshift=0.3cm]A)-- ([yshift=-0.3cm,xshift=-0.3cm]B)--
+     ([yshift=0.3cm,xshift=-0.3cm]B) --([yshift=0.3cm,xshift=0.3cm]B)--([yshift=-0.3cm,xshift=0.3cm]C)--([yshift=-0.3cm,xshift=-0.3cm]C)--([yshift=0.3cm,xshift=-0.3cm]C)-- ([yshift=0.3cm,xshift=0.3cm]D)--([yshift=-0.3cm,xshift=0.3cm]D)--([yshift=-0.3cm,xshift=-0.3cm]D)--([yshift=0.3cm,xshift=-0.3cm]A)--([yshift=0.3cm,xshift=0.3cm]A)--([yshift=-0.3cm,xshift=0.3cm]A);
+
+   \end{tikzpicture}
+\begin{center}
+    \vspace{1pt}
+    \fontsize{13pt}{17pt}\selectfont 
+    \textbf{VNUHCM – UNIVERSITY OF SCIENCE}
+    
+    \vspace{7pt}
+    \textbf{ADVANCED PROGRAM IN COMPUTER SCIENCE}
+\end{center}
+\vspace{1cm}
+\begin{center}
+    \includegraphics[scale=0.55]{logo-khtn.png}
+    
+    \vspace{10pt}
+    \fontsize{30pt}{17pt}\selectfont 
+    
+    \vspace{50pt}
+    \textbf{Project 1: Socket Programming}
+
+\begin{flushleft}
+    \fontsize{14pt}{17pt}\selectfont  
+\end{flushleft}
+
+    \fontsize{15pt}{17pt}\selectfont 
+    \textbf{\textrm{Internetworking Protocols}}
+
+
+\vspace*{7cm} 
+{\large\bf 23125055 -- Nguyen Hoang Gia Han}\\
+
+\vspace*{0.5cm} 
+{\large\bf 23125043 -- Nguyen Van Hoang Nhat}\\
+
+\end{center}
+\end{titlepage}

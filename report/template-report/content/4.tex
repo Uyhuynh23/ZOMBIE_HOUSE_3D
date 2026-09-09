@@ -1,0 +1,21 @@
+\section{Task Assignment Matrix}
+
+\begin{longtable}{p{0.32\textwidth}p{0.15\textwidth}p{0.15\textwidth}p{0.20\textwidth}}
+\toprule
+Component & Owner & Collaborator & File\\
+\midrule
+Requirements and architecture & Both & Both & README, report\\
+Packet header and constants & Gia Han & Hoang Nhat & common/protocol.py\\
+GBN sender and receiver & Gia Han & Hoang Nhat & common/rdt.py\\
+Slow Start, AIMD, adaptive RTO & Gia Han & Hoang Nhat & common/rdt.py\\
+Hash, ASCII, listing utilities & Hoang Nhat & Gia Han & common/utils.py\\
+Authentication and dispatcher & Gia Han & Hoang Nhat & server/session.py\\
+PASV/PORT and server data path & Gia Han & Hoang Nhat & server/session.py\\
+Threaded server/session table & Gia Han & Hoang Nhat & server/server.py\\
+File and directory operations & Hoang Nhat & Gia Han & server/session.py\\
+Client protocol API and CLI & Hoang Nhat & Gia Han & client modules\\
+Unit tests & Hoang Nhat & Gia Han & tests/test\_core.py\\
+E2E and concurrency tests & Hoang Nhat & Gia Han & tests/test\_integration.py\\
+Demo evidence and report & Both & Both & demo\_evidence, report\\
+\bottomrule
+\end{longtable}
