@@ -9,6 +9,12 @@ public class PeashooterCombat : PlantBase
     public float projectileSpeed = 10f;
     public float aggroRadius = 5f;
     public float forwardConeThreshold = 0.3f; // dot product threshold (~72 degree cone)
+    [Tooltip("Maximum lateral distance from the aim axis for a zombie to be considered in this lane.")]
+    public float maxLaneDistance = 1.5f;
+    [Tooltip("Minimum forward distance along the aim axis. Enemies behind this distance are ignored.")]
+    public float minForwardDistance = 0.1f;
+    [Tooltip("When true, the plant fires strictly straight ahead along its aim direction.")]
+    public bool shootDirectlyOnly = true;
     [Tooltip("Fallback muzzle axis when a SpawnPoint is unavailable. The imported peashooter models use local +Z.")]
     public Vector3 localAimAxis = Vector3.forward;
 
@@ -43,6 +49,27 @@ public class PeashooterCombat : PlantBase
         ApplyLockedLaneRotation();
     }
 
+    /// <summary>
+    /// Returns the authoritative world-space aim direction (flattened to the horizontal plane).
+    /// Defaults to the square's forward (local +Z) or the plant's forward.
+    /// </summary>
+    public Vector3 GetAimDirection()
+    {
+        if (lockedLaneDirection.sqrMagnitude > 0.001f)
+            return lockedLaneDirection;
+
+        if (mySquare != null)
+        {
+            Vector3 sqForward = mySquare.transform.forward;
+            sqForward.y = 0f;
+            if (sqForward.sqrMagnitude > 0.001f)
+                return sqForward.normalized;
+        }
+
+        Vector3 currentWorldAim = GetCurrentAimDirection();
+        return currentWorldAim.sqrMagnitude > 0.001f ? currentWorldAim.normalized : Vector3.forward;
+    }
+
     private void LateUpdate()
     {
         // Some imported animation clips can write to the root transform.
@@ -66,6 +93,17 @@ public class PeashooterCombat : PlantBase
     void Start()
     {
         animator = GetComponent<Animator>();
+
+        // Default aim direction from the plantable square's Z direction if available
+        if (lockedLaneDirection.sqrMagnitude < 0.001f)
+        {
+            Vector3 initialAim = mySquare != null ? mySquare.transform.forward : transform.forward;
+            initialAim.y = 0f;
+            if (initialAim.sqrMagnitude > 0.001f)
+            {
+                SetAimDirection(initialAim);
+            }
+        }
 
         // Aggro trigger (SphereCollider)
         aggroCollider = GetComponent<SphereCollider>();
@@ -110,20 +148,41 @@ public class PeashooterCombat : PlantBase
             return health == null || health.currentHealth <= 0;
         });
 
-        // Select the closest valid enemy anywhere inside the aggro trigger.
-        // Projectiles already aim at the selected target, so restricting the
-        // target to a narrow lane made plants stop shooting when enemies were
-        // pushed or navigated slightly sideways.
+        Vector3 aimDir = GetAimDirection();
+        Vector3 aimSide = Vector3.Cross(Vector3.up, aimDir).normalized;
+
         currentTarget = null;
-        float closestDistance = float.MaxValue;
+        float closestForwardDistance = float.MaxValue;
+
         foreach (var z in zombiesInRange)
         {
             if (z == null) continue;
             Vector3 toZombie = z.transform.position - transform.position;
             toZombie.y = 0f;
-            if (toZombie.sqrMagnitude < closestDistance)
+
+            // 1. Distance along forward aim axis
+            float forwardDist = Vector3.Dot(toZombie, aimDir);
+
+            // Never shoot zombies behind or directly beside the plant
+            if (forwardDist <= minForwardDistance)
+                continue;
+
+            // 2. Lateral lane offset (perpendicular to aim axis)
+            float lateralDist = Mathf.Abs(Vector3.Dot(toZombie, aimSide));
+
+            // Must be within this plant's direct lane corridor (ignores adjacent lanes)
+            if (lateralDist > maxLaneDistance)
+                continue;
+
+            // 3. Forward cone threshold
+            if (toZombie.sqrMagnitude > 0.001f &&
+                Vector3.Dot(toZombie.normalized, aimDir) < forwardConeThreshold)
+                continue;
+
+            // Select closest enemy in front in the lane
+            if (forwardDist < closestForwardDistance)
             {
-                closestDistance = toZombie.sqrMagnitude;
+                closestForwardDistance = forwardDist;
                 currentTarget = z;
             }
         }
@@ -149,16 +208,25 @@ public class PeashooterCombat : PlantBase
 
         GameObject pea = ObjectPoolManager.Instance.GetPea();
         pea.transform.position = spawnPoint.position;
-        pea.transform.rotation = spawnPoint.rotation;
+
+        Vector3 aimDir = GetAimDirection();
+        Vector3 fireDirection = aimDir;
+
+        if (!shootDirectlyOnly && currentTarget != null)
+        {
+            Vector3 toTarget = currentTarget.transform.position + Vector3.up * 0.9f - spawnPoint.position;
+            if (Vector3.Dot(toTarget.normalized, aimDir) > 0f)
+            {
+                fireDirection = toTarget.normalized;
+            }
+        }
+
+        pea.transform.rotation = Quaternion.LookRotation(fireDirection);
 
         Rigidbody rb = pea.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            Vector3 direction = currentTarget != null
-                ? currentTarget.transform.position + Vector3.up * 0.9f - spawnPoint.position
-                : GetCurrentAimDirection();
-            direction.Normalize();
-            rb.linearVelocity = direction * projectileSpeed;
+            rb.linearVelocity = fireDirection * projectileSpeed;
         }
 
         PeaProjectile pp = pea.GetComponent<PeaProjectile>();
@@ -206,4 +274,36 @@ public class PeashooterCombat : PlantBase
         ZombieHealth health = other != null ? other.GetComponentInParent<ZombieHealth>() : null;
         if (health != null) zombiesInRange.Remove(health.gameObject);
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Vector3 aimDir = Application.isPlaying ? GetAimDirection() : transform.forward;
+        aimDir.y = 0f;
+        if (aimDir.sqrMagnitude < 0.001f) aimDir = Vector3.forward;
+        aimDir.Normalize();
+
+        Vector3 aimSide = Vector3.Cross(Vector3.up, aimDir).normalized;
+        Vector3 origin = transform.position + Vector3.up * 0.2f;
+
+        // Draw direct aim line
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(origin, aimDir * aggroRadius);
+
+        // Draw lane corridor boundaries
+        Gizmos.color = new Color(0f, 1f, 0f, 0.35f);
+        Vector3 leftBound = origin - aimSide * maxLaneDistance;
+        Vector3 rightBound = origin + aimSide * maxLaneDistance;
+        Gizmos.DrawRay(leftBound, aimDir * aggroRadius);
+        Gizmos.DrawRay(rightBound, aimDir * aggroRadius);
+        Gizmos.DrawLine(leftBound, rightBound);
+        Gizmos.DrawLine(leftBound + aimDir * aggroRadius, rightBound + aimDir * aggroRadius);
+
+        if (currentTarget != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(origin, currentTarget.transform.position + Vector3.up * 0.5f);
+        }
+    }
+#endif
 }

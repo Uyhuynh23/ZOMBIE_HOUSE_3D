@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
@@ -643,9 +643,12 @@ public class PlayerController : MonoBehaviour
                         PeashooterCombat combat = planted.GetComponent<PeashooterCombat>();
                         if (combat != null)
                         {
-                            Vector3 squarePosition = plantingSquare.transform.position;
-                            Vector3 outwardLaneDirection = GetOutwardLaneDirection(squarePosition);
-                            combat.SetAimDirection(outwardLaneDirection);
+                            Vector3 squareForward = plantingSquare.transform.forward;
+                            squareForward.y = 0f;
+                            Vector3 aimDir = squareForward.sqrMagnitude > 0.001f
+                                ? squareForward.normalized
+                                : GetOutwardLaneDirection(plantingSquare.transform.position);
+                            combat.SetAimDirection(aimDir);
                         }
                     }
                     else
