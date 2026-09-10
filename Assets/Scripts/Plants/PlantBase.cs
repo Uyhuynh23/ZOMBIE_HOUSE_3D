@@ -9,7 +9,7 @@ public abstract class PlantBase : MonoBehaviour
 {
     [Header("Plant Base Settings")]
     public int maxHealth = 100;
-    public int currentHealth;
+    public int currentHealth = 100;
     public event Action<int, int> HealthChanged;
 
     /// <summary>
