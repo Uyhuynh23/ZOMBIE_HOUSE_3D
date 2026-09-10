@@ -2724,9 +2724,9 @@ MonoBehaviour:
   waypoint1: {fileID: 496777139}
   waypoint2: {fileID: 471237161}
   gardenSquares:
-  - {fileID: 206050107}
-  - {fileID: 581149229}
-  - {fileID: 1050461666}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   tutorialRoute: {fileID: 1967919682}
   houseHealth: {fileID: 1522016556}
   sunPrefab: {fileID: 2222790445701324439, guid: 71c02fcdde724de4098978b7c4bc5ff2, type: 3}
@@ -3720,20 +3720,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
---- !u!114 &206050107 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
-  m_PrefabInstance: {fileID: 206050106}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff6a8f5d10e13747a2ca064785267c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantableSquare
---- !u!4 &206050108 stripped
+--- !u!4 &206050107 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 206050106}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &212061123
@@ -9225,9 +9214,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 206050108}
-  - {fileID: 581149230}
-  - {fileID: 1050461667}
+  - {fileID: 581149229}
+  - {fileID: 1050461666}
+  - {fileID: 206050107}
   m_Father: {fileID: 883875366}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &478485472
@@ -10979,20 +10968,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
---- !u!114 &581149229 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
-  m_PrefabInstance: {fileID: 581149228}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff6a8f5d10e13747a2ca064785267c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantableSquare
---- !u!4 &581149230 stripped
+--- !u!4 &581149229 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 581149228}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &581185915
@@ -20961,20 +20939,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
---- !u!114 &1050461666 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3748617330104376987, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
-  m_PrefabInstance: {fileID: 1050461665}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aff6a8f5d10e13747a2ca064785267c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantableSquare
---- !u!4 &1050461667 stripped
+--- !u!4 &1050461666 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 710301593452285802, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2556596123680565943, guid: a53a429a0dda6f54bb59160b76a90b80, type: 3}
   m_PrefabInstance: {fileID: 1050461665}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1050740763 stripped
@@ -23989,6 +23956,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
   spawnPoint: {fileID: 0}
+  defaultSpawnRotation: {x: 0, y: 180, z: 0}
   defaultCharacter: {fileID: 11400000, guid: 5cd262432a54d254d9cc0cfacf1ae1a1, type: 2}
   plantLoadout:
   - name: Peashooter
@@ -24010,6 +23978,9 @@ MonoBehaviour:
     currentCooldown: 0
     portrait: {fileID: 21300000, guid: cf1ed4901c30cdf4ab3996399aa5780e, type: 3}
   cameraFollow: {fileID: 330585548}
+  playerMarkerSprite: {fileID: 0}
+  playerMarkerColor: {r: 0.25, g: 0.9, b: 1, a: 1}
+  playerMarkerScale: 2.2
 --- !u!114 &1222713670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36007,6 +35978,99 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
+--- !u!1001 &1775218445
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[0].title
+      value: 'TUTORIAL: BASIC TRAINING'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[0].subtitle
+      value: BAKER'S HOMESTEAD & SURROUNDING ROADS
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[1].subtitle
+      value: 'TUTORIAL: SURVEYING COMPOUND FROM ROOFTOP'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[2].subtitle
+      value: 'TUTORIAL: EAST HIGHWAY (APPROACH CURRENTLY CLEAR)'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[3].subtitle
+      value: 'TUTORIAL: SOUTH ROAD (APPROACH CURRENTLY CLEAR)'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[4].subtitle
+      value: 'TUTORIAL: WEST FOREST (APPROACH CURRENTLY CLEAR)'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[5].subtitle
+      value: 'TUTORIAL: NORTH GATE (APPROACH CURRENTLY CLEAR)'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[6].subtitle
+      value: COMPLETE TRAINING CHECKPOINTS BEFORE HORDE ARRIVES
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[7].subtitle
+      value: PROCEED TO CHECKPOINT 1 TO BEGIN TRAINING
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5700786122537345598, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_Name
+      value: MapIntroFlythrough
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
 --- !u!1001 &1779001804
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38156,8 +38220,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55dd96f64a5e24be9b3513632497967d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  rows: 4
-  columns: 3
+  lanesPerZone: 3
+  rowsPerZone: 5
+  innerBoundary: 8
 --- !u!114 &1876487243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43163,3 +43228,4 @@ SceneRoots:
   - {fileID: 883875366}
   - {fileID: 479916093}
   - {fileID: 793918467}
+  - {fileID: 1775218445}

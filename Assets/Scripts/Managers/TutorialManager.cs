@@ -128,8 +128,38 @@ public class TutorialManager : MonoBehaviour
             if (bsTrans != null) bsTrans.gameObject.SetActive(false);
         }
 
+        if (MapIntroFlythrough.ActiveInstance != null && !MapIntroFlythrough.ActiveInstance.IsCompleted)
+        {
+            if (waypoint1 != null) waypoint1.SetActive(false);
+            MapIntroFlythrough.ActiveInstance.OnIntroCompleted += HandleIntroCompleted;
+        }
+        else
+        {
+            EnsureScreenObjectiveBanner();
+            StartPhase1();
+        }
+    }
+
+    private void HandleIntroCompleted()
+    {
+        if (MapIntroFlythrough.ActiveInstance != null)
+        {
+            MapIntroFlythrough.ActiveInstance.OnIntroCompleted -= HandleIntroCompleted;
+        }
+        if (waypoint1 != null && currentPhase == TutorialPhase.MovementAndAttack)
+        {
+            waypoint1.SetActive(true);
+        }
         EnsureScreenObjectiveBanner();
         StartPhase1();
+    }
+
+    private void OnDestroy()
+    {
+        if (MapIntroFlythrough.ActiveInstance != null)
+        {
+            MapIntroFlythrough.ActiveInstance.OnIntroCompleted -= HandleIntroCompleted;
+        }
     }
 
     private Canvas GetUICanvas()
