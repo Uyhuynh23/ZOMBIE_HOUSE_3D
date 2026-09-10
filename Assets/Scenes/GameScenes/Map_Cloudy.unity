@@ -37013,6 +37013,12 @@ MonoBehaviour:
     cooldownTime: 2.5
     currentCooldown: 0
     portrait: {fileID: 21300000, guid: cf1ed4901c30cdf4ab3996399aa5780e, type: 3}
+  - name: Wallnut
+    prefab: {fileID: 2210386816479631404, guid: 3538c4f5ea3f44417871807dd149770e, type: 3}
+    cost: 75
+    cooldownTime: 2.5
+    currentCooldown: 0
+    portrait: {fileID: 21300000, guid: c7fe012bc162e4edb846e4f4b1fdb688, type: 3}
   cameraFollow: {fileID: 330585548}
   playerMarkerSprite: {fileID: 21300000, guid: 0e6a3eb348ae6cd45a5e3b67b07f5c2e, type: 3}
   playerMarkerColor: {r: 0.25, g: 0.9, b: 1, a: 1}
@@ -48049,7 +48055,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.48, g: 0.2, b: 0.08, a: 1}
-    - _Color: {r: 0.47999996, g: 0.19999996, b: 0.079999976, a: 1}
+    - _Color: {r: 0.47999996, g: 0.19999996, b: 0.07999996, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

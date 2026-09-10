@@ -169,6 +169,10 @@ public class ZombieAttack : MonoBehaviour
             PlantBase plant = hit.GetComponentInParent<PlantBase>();
             if (plant == null || plant.currentHealth <= 0) continue;
 
+            Vector3 toPlant = (plant.transform.position - transform.position).normalized;
+            toPlant.y = 0f;
+            if (Vector3.Dot(transform.forward, toPlant) < -0.1f) continue;
+
             float distance = (hit.ClosestPoint(center) - center).sqrMagnitude;
             if (distance < closestDistance)
             {

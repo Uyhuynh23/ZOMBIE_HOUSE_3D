@@ -19,7 +19,7 @@ public class Sun : MonoBehaviour
 
         SphereCollider col = GetComponent<SphereCollider>();
         col.isTrigger = true;
-        col.radius = 1.5f;
+        col.radius = 3.5f;
     }
 
     void Update()

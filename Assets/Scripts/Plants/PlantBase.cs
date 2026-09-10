@@ -10,6 +10,8 @@ public abstract class PlantBase : MonoBehaviour
     [Header("Plant Base Settings")]
     public int maxHealth = 100;
     public int currentHealth = 100;
+    [Tooltip("Tinh chỉnh độ to/nhỏ của cây (nhân với scale tự động của Player)")]
+    public float customScaleMultiplier = 1.0f;
     public event Action<int, int> HealthChanged;
 
     /// <summary>

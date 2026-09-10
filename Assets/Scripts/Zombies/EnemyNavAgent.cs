@@ -208,6 +208,7 @@ public class EnemyNavAgent : MonoBehaviour
         // instead of touching visualRoot.localRotation, because Animator overwrites it.
 
         moveSpeedHash = Animator.StringToHash(moveSpeedParam);
+        moveSpeed *= UnityEngine.Random.Range(0.9f, 1.1f);
         baseSpeed     = moveSpeed;
     }
 
@@ -370,14 +371,14 @@ public class EnemyNavAgent : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private void UpdateAttackingPlant()
     {
-        // ZombieAttack calls ClearBlockingPlant() → state becomes MovingInLane
-        // We just keep still and face the plant
-        if (BlockingPlant != null)
+        if (BlockingPlant == null || !BlockingPlant.gameObject.activeInHierarchy || BlockingPlant.currentHealth <= 0)
         {
-            Vector3 toPlant = BlockingPlant.transform.position - transform.position;
-            toPlant.y = 0f;
-            RotateRoot(toPlant.normalized);
+            ClearBlockingPlant();
+            return;
         }
+
+        Vector3 forwardDir = HasLaneAssigned ? laneDir : transform.forward;
+        RotateRoot(forwardDir);
         SetAnimSpeed(0f);
     }
 
@@ -439,6 +440,8 @@ public class EnemyNavAgent : MonoBehaviour
                 toPlant.y = 0f;
                 float meleeRange = attack != null ? attack.attackRange : 1f;
                 if (toPlant.magnitude > meleeRange) continue;
+
+                if (Vector3.Dot(dir, toPlant.normalized) < -0.1f) continue;
 
                 BlockOnPlant(plant);
                 return true;

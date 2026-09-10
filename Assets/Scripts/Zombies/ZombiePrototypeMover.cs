@@ -125,6 +125,7 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
+        moveSpeed *= UnityEngine.Random.Range(0.9f, 1.1f);
     }
 
     private void Start()
@@ -215,6 +216,10 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
             PlantBase plant = hit.GetComponentInParent<PlantBase>();
             if (plant != null)
             {
+                Vector3 toPlant = (plant.transform.position - transform.position).normalized;
+                toPlant.y = 0f;
+                if (Vector3.Dot(advanceDirection, toPlant) < -0.1f) continue;
+
                 blockingPlant = plant;
                 StopMovement();
                 return;
@@ -332,6 +337,10 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
             PlantBase plant = hit.GetComponentInParent<PlantBase>();
             if (plant != null)
             {
+                Vector3 toPlant = (plant.transform.position - transform.position).normalized;
+                toPlant.y = 0f;
+                if (Vector3.Dot(movementDirection, toPlant) < -0.1f) continue;
+
                 blockingPlant = plant;
                 return true;
             }
