@@ -8999,6 +8999,95 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 494f6d43e170e9145bc7865d243ee00b, type: 3}
+--- !u!1001 &525989387
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[0].title
+      value: 'ROUND 1: SUNNY DAY'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[0].subtitle
+      value: BAKER'S HOMESTEAD & SURROUNDING ROADS
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[2].subtitle
+      value: 'SCOUTING ENEMY APPROACH: EAST ROAD'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[3].subtitle
+      value: 'SECTOR 2: SOUTH INVASION ROUTE'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[4].subtitle
+      value: 'SECTOR 3: WEST INVASION ROUTE'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[5].subtitle
+      value: 'SECTOR 4: NORTH INVASION ROUTE'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[6].subtitle
+      value: DEFEND BAKER'S HOUSE & PREPARE LAWN DEFENSES
+      objectReference: {fileID: 0}
+    - target: {fileID: 1534374445201825960, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: waypoints.Array.data[7].subtitle
+      value: STAND YOUR GROUND & DEFEND THE LAWN
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2092431254088933061, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5700786122537345598, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
+      propertyPath: m_Name
+      value: MapIntroFlythrough
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f61448594b6d83f44b870d8a8083f5db, type: 3}
 --- !u!4 &529698213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6143327382123120946, guid: 9e4d87ed8442a2a40b13957dd237e343, type: 3}
@@ -21042,6 +21131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
   spawnPoint: {fileID: 0}
+  defaultSpawnRotation: {x: 0, y: 180, z: 0}
   defaultCharacter: {fileID: 11400000, guid: 5cd262432a54d254d9cc0cfacf1ae1a1, type: 2}
   plantLoadout:
   - name: Peashooter
@@ -32472,6 +32562,8 @@ MonoBehaviour:
   activeEnemyCount: 0
   nextWaveCountdown: 0
   remainingToSpawn: 0
+  waitForIntro: 1
+  delayAfterIntro: 4
 --- !u!114 &1813148921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37512,3 +37604,4 @@ SceneRoots:
   - {fileID: 538836204}
   - {fileID: 1401874602}
   - {fileID: 1869724417}
+  - {fileID: 525989387}

@@ -11,6 +11,7 @@ public class MainMenuManager : MonoBehaviour
 {
     [Header("Panels")]
     public GameObject mainMenuPanel;
+    public GameObject mapSelectionPanel;
     public GameObject characterSettingPanel;
     [Tooltip("Title text shown only on the main menu screen")]
     public GameObject gameTitle;
@@ -43,27 +44,40 @@ public class MainMenuManager : MonoBehaviour
             carrier.AddComponent<GameDataCarrier>();
         }
 
-        characterSettingUI = characterSettingPanel.GetComponent<CharacterSettingUI>();
+        if (characterSettingPanel != null)
+        {
+            characterSettingUI = characterSettingPanel.GetComponent<CharacterSettingUI>();
+        }
 
-        // Buttons are wired by RoundButtonHandler / CharacterButtonHandler on each button GO.
         ShowMainMenu();
     }
 
     // ── Panel visibility ──────────────────────────────────────────────────────
 
-    /// <summary>Show the main menu with round buttons.</summary>
+    /// <summary>Show the main menu with Play, Instruction, Character buttons.</summary>
     public void ShowMainMenu()
     {
-        mainMenuPanel.SetActive(true);
-        characterSettingPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
+        if (mapSelectionPanel != null) mapSelectionPanel.SetActive(false);
+        if (characterSettingPanel != null) characterSettingPanel.SetActive(false);
         if (gameTitle != null) gameTitle.SetActive(true);
+    }
+
+    /// <summary>Show the map selection panel with the 3 map cards.</summary>
+    public void ShowMapSelection()
+    {
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (mapSelectionPanel != null) mapSelectionPanel.SetActive(true);
+        if (characterSettingPanel != null) characterSettingPanel.SetActive(false);
+        if (gameTitle != null) gameTitle.SetActive(false);
     }
 
     /// <summary>Show the character setting panel.</summary>
     public void ShowCharacterSetting()
     {
-        mainMenuPanel.SetActive(false);
-        characterSettingPanel.SetActive(true);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (mapSelectionPanel != null) mapSelectionPanel.SetActive(false);
+        if (characterSettingPanel != null) characterSettingPanel.SetActive(true);
         if (gameTitle != null) gameTitle.SetActive(false);
 
         if (characterSettingUI != null)

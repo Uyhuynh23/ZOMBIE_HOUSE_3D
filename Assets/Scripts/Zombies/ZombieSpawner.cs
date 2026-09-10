@@ -110,6 +110,12 @@ public class ZombieSpawner : MonoBehaviour
         }
     }
 
+    [Header("Intro Synchronization")]
+    [Tooltip("If true, waits for MapIntroFlythrough to finish before starting wave countdown.")]
+    public bool waitForIntro = true;
+    [Tooltip("Grace period in seconds after intro ends before wave 1 countdown starts.")]
+    public float delayAfterIntro = 4.0f;
+
     private void Start()
     {
         if (zombiePrefab == null && (enemyPrefabs == null || enemyPrefabs.Length == 0))
@@ -133,7 +139,38 @@ public class ZombieSpawner : MonoBehaviour
                 Debug.LogWarning("[ZombieSpawner] NavMesh not baked!");
         }
 
+        if (waitForIntro && MapIntroFlythrough.ActiveInstance != null && !MapIntroFlythrough.ActiveInstance.IsCompleted)
+        {
+            Debug.Log("[ZombieSpawner] MapIntroFlythrough active: waiting for intro to finish before starting waves.");
+            MapIntroFlythrough.ActiveInstance.OnIntroCompleted += HandleIntroCompleted;
+        }
+        else
+        {
+            StartCoroutine(RunWaves());
+        }
+    }
+
+    private void HandleIntroCompleted()
+    {
+        if (MapIntroFlythrough.ActiveInstance != null)
+        {
+            MapIntroFlythrough.ActiveInstance.OnIntroCompleted -= HandleIntroCompleted;
+        }
+
+        Debug.Log($"[ZombieSpawner] Intro finished! Starting wave countdown with {delayAfterIntro:F1}s grace period.");
+        if (waves != null && waves.Length > 0)
+        {
+            waves[0].delayBeforeWave = delayAfterIntro;
+        }
         StartCoroutine(RunWaves());
+    }
+
+    private void OnDestroy()
+    {
+        if (MapIntroFlythrough.ActiveInstance != null)
+        {
+            MapIntroFlythrough.ActiveInstance.OnIntroCompleted -= HandleIntroCompleted;
+        }
     }
 
     // ──────────────────────────────────────────────────────────

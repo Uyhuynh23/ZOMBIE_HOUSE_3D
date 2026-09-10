@@ -9,6 +9,8 @@ public class PlayerSpawner : MonoBehaviour
 {
     [Header("Spawn Settings")]
     public Transform spawnPoint;
+    [Tooltip("Default spawn rotation in degrees if spawnPoint is unassigned. Set Y to 180 to face away from the house.")]
+    public Vector3 defaultSpawnRotation = new Vector3(0f, 180f, 0f);
 
     [Header("Fallback (if no selection made)")]
     public CharacterData defaultCharacter;
@@ -57,8 +59,8 @@ public class PlayerSpawner : MonoBehaviour
         }
 
         // Determine spawn position and rotation
-        Vector3 spawnPos = spawnPoint != null ? spawnPoint.position : Vector3.zero;
-        Quaternion spawnRot = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
+        Vector3 spawnPos = spawnPoint != null ? spawnPoint.position : (transform.position != Vector3.zero ? transform.position : new Vector3(0f, 0.1f, -18f));
+        Quaternion spawnRot = spawnPoint != null ? spawnPoint.rotation : Quaternion.Euler(defaultSpawnRotation);
 
         // Instantiate the character
         spawnedPlayer = Instantiate(characterToSpawn.characterPrefab, spawnPos, spawnRot);
