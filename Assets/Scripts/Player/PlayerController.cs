@@ -302,8 +302,9 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.digit1Key.wasPressedThisFrame && plants.Length > 0) SelectPlant(0);
         if (Keyboard.current.digit2Key.wasPressedThisFrame && plants.Length > 1) SelectPlant(1);
         if (Keyboard.current.digit3Key.wasPressedThisFrame && plants.Length > 2) SelectPlant(2);
+        if (Keyboard.current.digit4Key.wasPressedThisFrame && plants.Length > 3) SelectPlant(3);
 
-        if (Keyboard.current.digit4Key.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame)
+        if (Keyboard.current.digit5Key.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame)
             SetShovelMode(true);
     }
 
@@ -693,6 +694,12 @@ public class PlayerController : MonoBehaviour
 
         float targetHeight = controller.height * plantedHeightRelativeToPlayer;
         float scaleFactor = Mathf.Clamp(targetHeight / bounds.size.y, 0.5f, 4f);
+        
+        PlantBase pBase = planted.GetComponent<PlantBase>();
+        if (pBase != null) {
+            scaleFactor *= pBase.customScaleMultiplier;
+        }
+
         planted.transform.localScale *= scaleFactor;
     }
 
