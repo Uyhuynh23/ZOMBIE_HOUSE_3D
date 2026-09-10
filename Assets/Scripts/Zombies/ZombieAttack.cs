@@ -20,6 +20,8 @@ public class ZombieAttack : MonoBehaviour
     [SerializeField, Min(0.1f)] private float plantContactRadius = 0.9f;
 
     [Header("Animation")]
+    [Tooltip("Disable for enemy prefabs that provide their own animation adapter.")]
+    [SerializeField] private bool useSharedAttackAnimation = true;
     [SerializeField] private Animator animator;
     [SerializeField] private Transform visualRoot;
     [SerializeField] private string attackStateName = "Attack";
@@ -41,7 +43,7 @@ public class ZombieAttack : MonoBehaviour
         navAgent    = GetComponent<EnemyNavAgent>();
         legacyMover = GetComponent<ZombiePrototypeMover>();
 
-        if (animator == null)
+        if (useSharedAttackAnimation && animator == null)
             animator = GetComponentInChildren<Animator>();
         if (visualRoot == null && animator != null)
             visualRoot = animator.transform;
@@ -188,6 +190,8 @@ public class ZombieAttack : MonoBehaviour
 
     private void TriggerAttackAnimation()
     {
+        if (!useSharedAttackAnimation) return;
+
         if (animator == null || animator.runtimeAnimatorController == null)
         {
             StartFallbackBite();

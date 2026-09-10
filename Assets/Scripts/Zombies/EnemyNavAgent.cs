@@ -65,6 +65,8 @@ public class EnemyNavAgent : MonoBehaviour
     [SerializeField, Min(0f)]       private float hitStaggerDuration = 0.4f;
 
     [Header("Animation")]
+    [Tooltip("Disable for enemy prefabs that provide their own animation adapter.")]
+    [SerializeField] private bool useSharedMoveAnimation = true;
     [SerializeField] private Animator animator;
     [SerializeField, Min(0.01f)] private float animDampTime = 0.1f;
     [SerializeField] private string moveSpeedParam = "MoveSpeed";
@@ -179,7 +181,7 @@ public class EnemyNavAgent : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         attack = GetComponent<ZombieAttack>();
-        if (animator == null)
+        if (useSharedMoveAnimation && animator == null)
             animator = GetComponentInChildren<Animator>();
 
         // Disable conflicting legacy mover
@@ -518,7 +520,7 @@ public class EnemyNavAgent : MonoBehaviour
 
     private void SetAnimSpeed(float value)
     {
-        if (animator != null)
+        if (useSharedMoveAnimation && animator != null)
             animator.SetFloat(moveSpeedHash, value, animDampTime, Time.deltaTime);
     }
 

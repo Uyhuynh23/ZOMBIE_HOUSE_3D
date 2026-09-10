@@ -27,3 +27,4 @@ The `.gitignore` is specifically configured to match these exact folder names, e
 | **Plant zone dressing** | Cartoon Farm Crops | Soil patches, crop props, garden decoration | [View on Asset Store](https://assetstore.unity.com/packages/3d/vegetation/plants/cartoon-farm-crops-79777) |
 | **Character** | Mini Simple Characters \| Free Demo | Main character and zombies | [View on Asset Store](https://assetstore.unity.com/packages/3d/characters/humanoids/mini-simple-characters-free-demo-262799) |
 | **Character** | KayKit Character Pack Adventures | Additional high-quality characters, enemies, animations | [View on GitHub](https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0) |
+| **Enemy** | 01\_Monster: Lizard | Rigged and animated Lizard Monster enemy prefab | [View on Asset Store](https://assetstore.unity.com/packages/3d/characters/animals/01-monster-lizard-181592) |

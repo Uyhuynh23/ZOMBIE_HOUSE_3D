@@ -32444,6 +32444,7 @@ MonoBehaviour:
   zombiePrefab: {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
   enemyPrefabs:
   - {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
+  - {fileID: 1308133915224819898, guid: 3256d0cb24f6242b8a31cd2beda4bc99, type: 3}
   spawnPoints: []
   spawnJitter: 0.5
   houseTarget: {fileID: 0}
