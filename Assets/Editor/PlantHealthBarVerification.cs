@@ -11,7 +11,8 @@ public static class PlantHealthBarVerification
     {
         "Assets/Prefabs/PeaShooter.prefab",
         "Assets/Prefabs/PeaShooterFroze.prefab",
-        "Assets/Prefabs/Sunflower.prefab"
+        "Assets/Prefabs/Sunflower.prefab",
+        "Assets/Prefabs/Wallnut.prefab"
     };
 
     private static readonly string ResultFile = "Temp/health_bar_verification.log";
@@ -47,9 +48,10 @@ public static class PlantHealthBarVerification
                 continue;
             }
 
-            if (plantBase.maxHealth != 100 || plantBase.currentHealth != 100)
+            int expectedHealth = path.Contains("Wallnut") ? 400 : 100;
+            if (plantBase.maxHealth != expectedHealth || plantBase.currentHealth != expectedHealth)
             {
-                output.AppendLine($"[Verification FAIL] {path} health values incorrect: max={plantBase.maxHealth}, current={plantBase.currentHealth}");
+                output.AppendLine($"[Verification FAIL] {path} health values incorrect: max={plantBase.maxHealth}, current={plantBase.currentHealth} (expected {expectedHealth})");
                 continue;
             }
 
@@ -109,46 +111,62 @@ public static class PlantHealthBarVerification
             try
             {
                 PlantBase instPlant = instance.GetComponent<PlantBase>();
+                PlantHealthBar instHealthBar = instance.GetComponent<PlantHealthBar>();
+                if (instHealthBar != null)
+                {
+                    instHealthBar.Initialize();
+                }
                 Transform instFill = instance.transform.Find("Plant Health Bar/Background/Fill");
                 RectTransform instFillRect = instFill as RectTransform;
 
-                // Initial full health check
-                if (Mathf.Abs(instFillRect.localScale.x - 1f) > 0.01f)
+                // Initial full health check: UX requires health bar to be hidden when full health
+                if (instHealthBar.IsVisible)
                 {
-                    output.AppendLine($"[Verification FAIL] {path} instance initial fill scale is not 1.0 (actual: {instFillRect.localScale.x})");
+                    output.AppendLine($"[Verification FAIL] {path} health bar should be hidden at full health for clear UX");
                     continue;
                 }
 
                 // Simulate 1 zombie attack tick (10 damage)
                 instPlant.TakeDamage(10);
-                if (instPlant.currentHealth != 90)
+                int expectedAfter10 = expectedHealth - 10;
+                if (instPlant.currentHealth != expectedAfter10)
                 {
-                    output.AppendLine($"[Verification FAIL] {path} currentHealth after 10 dmg is {instPlant.currentHealth}, expected 90");
+                    output.AppendLine($"[Verification FAIL] {path} currentHealth after 10 dmg is {instPlant.currentHealth}, expected {expectedAfter10}");
                     continue;
                 }
 
-                if (Mathf.Abs(instFillRect.localScale.x - 0.9f) > 0.01f)
+                // Health bar must now be visible after attack
+                if (!instHealthBar.IsVisible)
                 {
-                    output.AppendLine($"[Verification FAIL] {path} fill scale after 10 dmg is {instFillRect.localScale.x}, expected 0.9");
+                    output.AppendLine($"[Verification FAIL] {path} health bar should be visible after being attacked");
                     continue;
                 }
 
-                // Simulate another 30 damage (e.g. 3 more attacks = 60 health left)
+                float expectedRatio10 = (float)expectedAfter10 / expectedHealth;
+                if (Mathf.Abs(instFillRect.localScale.x - expectedRatio10) > 0.01f)
+                {
+                    output.AppendLine($"[Verification FAIL] {path} fill scale after 10 dmg is {instFillRect.localScale.x}, expected {expectedRatio10:F2}");
+                    continue;
+                }
+
+                // Simulate another 30 damage
                 instPlant.TakeDamage(30);
-                if (instPlant.currentHealth != 60)
+                int expectedAfter40 = expectedHealth - 40;
+                if (instPlant.currentHealth != expectedAfter40)
                 {
-                    output.AppendLine($"[Verification FAIL] {path} currentHealth after 40 dmg is {instPlant.currentHealth}, expected 60");
+                    output.AppendLine($"[Verification FAIL] {path} currentHealth after 40 dmg is {instPlant.currentHealth}, expected {expectedAfter40}");
                     continue;
                 }
 
-                if (Mathf.Abs(instFillRect.localScale.x - 0.6f) > 0.01f)
+                float expectedRatio40 = (float)expectedAfter40 / expectedHealth;
+                if (Mathf.Abs(instFillRect.localScale.x - expectedRatio40) > 0.01f)
                 {
-                    output.AppendLine($"[Verification FAIL] {path} fill scale after 40 dmg is {instFillRect.localScale.x}, expected 0.6");
+                    output.AppendLine($"[Verification FAIL] {path} fill scale after 40 dmg is {instFillRect.localScale.x}, expected {expectedRatio40:F2}");
                     continue;
                 }
 
                 passed++;
-                output.AppendLine($"[Verification PASS] {prefab.name}: Structure, components, and damage reaction verified successfully.");
+                output.AppendLine($"[Verification PASS] {prefab.name}: Structure, components, damage reaction, and UX visibility verified successfully.");
             }
             finally
             {

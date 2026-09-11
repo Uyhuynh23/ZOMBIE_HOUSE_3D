@@ -13,6 +13,7 @@ public static class PlantHealthBarSetup
     private const string PeaShooterPath      = "Assets/Prefabs/PeaShooter.prefab";
     private const string PeaShooterFrozePath = "Assets/Prefabs/PeaShooterFroze.prefab";
     private const string SunflowerPath       = "Assets/Prefabs/Sunflower.prefab";
+    private const string WallnutPath         = "Assets/Prefabs/Wallnut.prefab";
 
     static PlantHealthBarSetup()
     {
@@ -22,9 +23,10 @@ public static class PlantHealthBarSetup
     [MenuItem("Zombie House/Setup Plant Health Bars")]
     public static void SetupFromMenu()
     {
-        SetupPrefab(PeaShooterPath, new Vector3(0f, 1.2f, 0f));
-        SetupPrefab(PeaShooterFrozePath, new Vector3(0f, 1.3f, 0f));
-        SetupPrefab(SunflowerPath, new Vector3(0f, 1.2f, 0f));
+        SetupPrefab(PeaShooterPath, new Vector3(0f, 0f, 0f), 0.5f);
+        SetupPrefab(PeaShooterFrozePath, new Vector3(0f, 0f, 0f), 0.5f);
+        SetupPrefab(SunflowerPath, new Vector3(0f, 0f, 0f), 0.5f);
+        SetupPrefab(WallnutPath, new Vector3(0f, 0f, 0f), 0.5f);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("[PlantHealthBarSetup] All plant health bars successfully set up.");
@@ -33,9 +35,10 @@ public static class PlantHealthBarSetup
     public static void EnsureAllPlantHealthBars()
     {
         bool changed = false;
-        changed |= EnsurePrefab(PeaShooterPath, new Vector3(0f, 1.2f, 0f));
-        changed |= EnsurePrefab(PeaShooterFrozePath, new Vector3(0f, 1.3f, 0f));
-        changed |= EnsurePrefab(SunflowerPath, new Vector3(0f, 1.2f, 0f));
+        changed |= EnsurePrefab(PeaShooterPath, new Vector3(0f, 0f, 0f), 0.5f);
+        changed |= EnsurePrefab(PeaShooterFrozePath, new Vector3(0f, 0f, 0f), 0.5f);
+        changed |= EnsurePrefab(SunflowerPath, new Vector3(0f, 0f, 0f), 0.5f);
+        changed |= EnsurePrefab(WallnutPath, new Vector3(0f, 0f, 0f), 0.5f);
 
         if (changed)
         {
@@ -45,7 +48,7 @@ public static class PlantHealthBarSetup
         }
     }
 
-    private static bool EnsurePrefab(string path, Vector3 offset)
+    private static bool EnsurePrefab(string path, Vector3 offset, float heightAbovePlant)
     {
         GameObject asset = AssetDatabase.LoadAssetAtPath<GameObject>(path);
         if (asset == null) return false;
@@ -54,19 +57,20 @@ public static class PlantHealthBarSetup
         Transform barChild = asset.transform.Find("Plant Health Bar");
         PlantBase plantBase = asset.GetComponent<PlantBase>();
 
+        int expectedHealth = path.Contains("Wallnut") ? 400 : 100;
         bool needsSetup = bar == null || barChild == null ||
-                          (plantBase != null && plantBase.currentHealth != plantBase.maxHealth);
+                          (plantBase != null && (plantBase.maxHealth != expectedHealth || plantBase.currentHealth != expectedHealth));
 
         if (needsSetup)
         {
-            SetupPrefab(path, offset);
+            SetupPrefab(path, offset, heightAbovePlant);
             return true;
         }
 
         return false;
     }
 
-    public static void SetupPrefab(string path, Vector3 worldOffset)
+    public static void SetupPrefab(string path, Vector3 worldOffset, float heightAbovePlant = 0.5f)
     {
         GameObject root = PrefabUtility.LoadPrefabContents(path);
         if (root == null)
@@ -79,10 +83,11 @@ public static class PlantHealthBarSetup
         {
             // 1. Configure PlantBase health fields
             PlantBase plant = root.GetComponent<PlantBase>();
+            int expectedHealth = path.Contains("Wallnut") ? 400 : 100;
             if (plant != null)
             {
-                plant.maxHealth = 100;
-                plant.currentHealth = 100;
+                plant.maxHealth = expectedHealth;
+                plant.currentHealth = expectedHealth;
             }
 
             // 2. Attach and configure PlantHealthBar component on root
@@ -91,10 +96,16 @@ public static class PlantHealthBarSetup
                 healthBar = root.AddComponent<PlantHealthBar>();
 
             SerializedObject soBar = new SerializedObject(healthBar);
+            SerializedProperty propHeight = soBar.FindProperty("heightAbovePlant");
+            if (propHeight != null) propHeight.floatValue = heightAbovePlant;
             SerializedProperty propOffset = soBar.FindProperty("worldOffset");
             if (propOffset != null) propOffset.vector3Value = worldOffset;
             SerializedProperty propScale = soBar.FindProperty("worldSpaceScale");
             if (propScale != null) propScale.floatValue = 0.012f;
+            SerializedProperty propHideFull = soBar.FindProperty("hideAtFullHealth");
+            if (propHideFull != null) propHideFull.boolValue = true;
+            SerializedProperty propHideDelay = soBar.FindProperty("hideDelayAfterAttack");
+            if (propHideDelay != null) propHideDelay.floatValue = 4.0f;
             soBar.ApplyModifiedPropertiesWithoutUndo();
 
             // 3. Setup or find the "Plant Health Bar" child GameObject
@@ -106,7 +117,7 @@ public static class PlantHealthBarSetup
             if (canvasRect == null) canvasRect = barObject.AddComponent<RectTransform>();
 
             float parentScale = Mathf.Max(0.001f, root.transform.lossyScale.x, root.transform.lossyScale.y, root.transform.lossyScale.z);
-            canvasRect.localPosition = worldOffset;
+            canvasRect.localPosition = new Vector3(0f, 1.25f, 0f);
             canvasRect.localScale = Vector3.one * (0.012f / parentScale);
             canvasRect.sizeDelta = new Vector2(100f, 12f);
             canvasRect.anchorMin = new Vector2(0.5f, 0.5f);
@@ -117,7 +128,7 @@ public static class PlantHealthBarSetup
             if (canvas == null) canvas = barObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.overrideSorting = true;
-            canvas.sortingOrder = 20;
+            canvas.sortingOrder = 50;
 
             // 4. Setup "Background" child
             Transform bgTransform = barObject.transform.Find("Background");

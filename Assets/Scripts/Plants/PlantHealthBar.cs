@@ -9,8 +9,19 @@ using UnityEngine.UI;
 [RequireComponent(typeof(PlantBase))]
 public sealed class PlantHealthBar : MonoBehaviour
 {
-    [SerializeField] private Vector3 worldOffset = new Vector3(0f, 1.25f, 0f);
+    [Header("Positioning & Height")]
+    [Tooltip("Extra vertical clearance in meters above the highest point of the plant model.")]
+    [SerializeField, Min(0f)] private float heightAbovePlant = 0.5f;
+    [Tooltip("Manual fine-tuning offset in world space.")]
+    [SerializeField] private Vector3 worldOffset = Vector3.zero;
     [SerializeField, Min(0.001f)] private float worldSpaceScale = 0.012f;
+
+    [Header("Visibility / UX")]
+    [Tooltip("Hide health bar when plant is at full health.")]
+    [SerializeField] private bool hideAtFullHealth = true;
+    [Tooltip("Seconds to keep the health bar visible after taking damage. Set to 0 to keep it visible continuously while damaged.")]
+    [SerializeField, Min(0f)] private float hideDelayAfterAttack = 4.0f;
+
     [Header("Optional Custom Art")]
     [SerializeField] private Sprite backgroundSprite;
     [SerializeField] private Sprite fillSprite;
@@ -20,39 +31,63 @@ public sealed class PlantHealthBar : MonoBehaviour
     private RectTransform fill;
     private Image fillImage;
     private Transform canvasTransform;
+    private float hideTimer;
+    private bool isUnderAttack;
+
+    public bool IsVisible => canvasTransform != null && canvasTransform.gameObject.activeSelf;
+    public float HeightAbovePlant { get => heightAbovePlant; set => heightAbovePlant = value; }
+    public float HideDelayAfterAttack { get => hideDelayAfterAttack; set => hideDelayAfterAttack = value; }
+
+    public void Initialize()
+    {
+        if (plant == null) plant = GetComponent<PlantBase>();
+        BuildBar();
+
+        if (plant != null)
+        {
+            plant.HealthChanged -= OnHealthChanged;
+            plant.HealthChanged += OnHealthChanged;
+            Refresh(plant.currentHealth, plant.maxHealth);
+
+            if (hideAtFullHealth && plant.currentHealth >= plant.maxHealth)
+            {
+                SetVisible(false);
+                isUnderAttack = false;
+            }
+        }
+    }
 
     private void Awake()
     {
-        plant = GetComponent<PlantBase>();
-        BuildBar();
+        Initialize();
     }
 
     private void OnEnable()
     {
-        if (plant == null) plant = GetComponent<PlantBase>();
-        if (plant != null)
-        {
-            plant.HealthChanged += Refresh;
-            Refresh(plant.currentHealth, plant.maxHealth);
-        }
+        Initialize();
     }
 
     private void OnDisable()
     {
-        if (plant != null) plant.HealthChanged -= Refresh;
+        if (plant != null) plant.HealthChanged -= OnHealthChanged;
+    }
+
+    private void Update()
+    {
+        if (hideDelayAfterAttack > 0f && isUnderAttack)
+        {
+            hideTimer -= Time.deltaTime;
+            if (hideTimer <= 0f)
+            {
+                isUnderAttack = false;
+                SetVisible(false);
+            }
+        }
     }
 
     private void LateUpdate()
     {
-        if (canvasTransform == null) return;
-
-        if (Camera.main != null)
-            canvasTransform.rotation = Camera.main.transform.rotation;
-
-        // Keep localScale scaled against parent lossy scale so world size stays consistent
-        float parentScale = Mathf.Max(0.001f, transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
-        canvasTransform.localScale = Vector3.one * (worldSpaceScale / parentScale);
-        canvasTransform.localPosition = worldOffset;
+        UpdateBarTransform();
 
         if (plant != null)
             Refresh(plant.currentHealth, plant.maxHealth);
@@ -73,7 +108,10 @@ public sealed class PlantHealthBar : MonoBehaviour
             fillImage = existingFill.GetComponent<Image>();
             ApplySprites(existingBar);
             ConfigureCanvas(existingBar.GetComponent<Canvas>());
-            SetBarTransform();
+            UpdateBarTransform();
+
+            if (hideAtFullHealth && (plant == null || plant.currentHealth >= plant.maxHealth))
+                SetVisible(false);
             return;
         }
 
@@ -84,7 +122,7 @@ public sealed class PlantHealthBar : MonoBehaviour
 
         Canvas canvas = canvasObject.AddComponent<Canvas>();
         ConfigureCanvas(canvas);
-        SetBarTransform();
+        UpdateBarTransform();
         RectTransform canvasRect = canvas.GetComponent<RectTransform>();
         canvasRect.sizeDelta = new Vector2(100f, 12f);
 
@@ -122,6 +160,9 @@ public sealed class PlantHealthBar : MonoBehaviour
             iconImage.rectTransform.sizeDelta = new Vector2(18f, 18f);
             iconImage.rectTransform.anchoredPosition = new Vector2(-10f, 0f);
         }
+
+        if (hideAtFullHealth && (plant == null || plant.currentHealth >= plant.maxHealth))
+            SetVisible(false);
     }
 
     private void ConfigureCanvas(Canvas canvas)
@@ -129,7 +170,7 @@ public sealed class PlantHealthBar : MonoBehaviour
         if (canvas == null) return;
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.overrideSorting = true;
-        canvas.sortingOrder = 20;
+        canvas.sortingOrder = 50;
     }
 
     private void ApplySprites(Transform existingBar)
@@ -144,13 +185,95 @@ public sealed class PlantHealthBar : MonoBehaviour
             fillImage.sprite = fillSprite;
     }
 
-    private void SetBarTransform()
+    private float GetPlantTopWorldY()
+    {
+        float maxY = transform.position.y;
+        bool found = false;
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in renderers)
+        {
+            if (r is CanvasRenderer) continue;
+            if (canvasTransform != null && r.transform.IsChildOf(canvasTransform)) continue;
+            if (!r.enabled || !r.gameObject.activeInHierarchy) continue;
+
+            if (!found)
+            {
+                maxY = r.bounds.max.y;
+                found = true;
+            }
+            else
+            {
+                maxY = Mathf.Max(maxY, r.bounds.max.y);
+            }
+        }
+
+        if (!found)
+        {
+            Collider col = GetComponent<Collider>();
+            if (col != null) maxY = col.bounds.max.y;
+            else maxY = transform.position.y + 1.25f;
+        }
+
+        return maxY;
+    }
+
+    private void UpdateBarTransform()
     {
         if (canvasTransform == null) return;
 
-        canvasTransform.localPosition = worldOffset;
+        // Position directly in world space above the topmost point of the plant mesh
+        float topY = GetPlantTopWorldY();
+        Vector3 targetWorldPos = new Vector3(
+            transform.position.x + worldOffset.x,
+            topY + heightAbovePlant + worldOffset.y,
+            transform.position.z + worldOffset.z
+        );
+        canvasTransform.position = targetWorldPos;
+
+        // Face the main camera
+        if (Camera.main != null)
+            canvasTransform.rotation = Camera.main.transform.rotation;
+
+        // Scale proportionally so world size remains consistent regardless of parent lossy scale
         float parentScale = Mathf.Max(0.001f, transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
         canvasTransform.localScale = Vector3.one * (worldSpaceScale / parentScale);
+    }
+
+    private void OnHealthChanged(int current, int maximum)
+    {
+        if (current < maximum && current > 0)
+        {
+            isUnderAttack = true;
+            hideTimer = hideDelayAfterAttack;
+            SetVisible(true);
+        }
+        else if (current <= 0)
+        {
+            isUnderAttack = false;
+            SetVisible(false);
+        }
+        else if (hideAtFullHealth && current >= maximum)
+        {
+            isUnderAttack = false;
+            SetVisible(false);
+        }
+
+        Refresh(current, maximum);
+    }
+
+    public void TriggerDamageReveal()
+    {
+        isUnderAttack = true;
+        hideTimer = hideDelayAfterAttack;
+        SetVisible(true);
+    }
+
+    private void SetVisible(bool visible)
+    {
+        if (canvasTransform != null && canvasTransform.gameObject.activeSelf != visible)
+        {
+            canvasTransform.gameObject.SetActive(visible);
+        }
     }
 
     private void Refresh(int current, int maximum)
@@ -159,13 +282,9 @@ public sealed class PlantHealthBar : MonoBehaviour
 
         if (current <= 0)
         {
-            if (canvasTransform.gameObject.activeSelf)
-                canvasTransform.gameObject.SetActive(false);
+            SetVisible(false);
             return;
         }
-
-        if (!canvasTransform.gameObject.activeSelf)
-            canvasTransform.gameObject.SetActive(true);
 
         float ratio = maximum <= 0 ? 0f : Mathf.Clamp01((float)current / maximum);
 
