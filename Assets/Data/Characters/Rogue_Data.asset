@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 971568356a482f54a9c79d354f6de479, type: 3}
   m_Name: Rogue_Data
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  stableId: rogue
   characterName: Rogue
   characterClass: 3
   characterPrefab: {fileID: 104811172578036882, guid: bb1516cf4a56f8f40bb15c5ce087c6d8, type: 3}
@@ -19,3 +20,7 @@ MonoBehaviour:
   defaultRightHand: {fileID: 11400000, guid: 1bc9f18e5d21be4429ee6a9b06075bbf, type: 2}
   defaultLeftHand: {fileID: 0}
   allowedEquipmentTypes: 07000000000000000500000006000000
+  previewRotation: {x: 0, y: 165, z: 0}
+  previewOffset: {x: 0, y: -0.65, z: 0}
+  previewScale: 1
+  cameraOrthographicSize: 0.65

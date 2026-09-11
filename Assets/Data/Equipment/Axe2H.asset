@@ -15,5 +15,9 @@ MonoBehaviour:
   equipmentName: Great Axe
   equipmentType: 1
   equipmentPrefab: {fileID: 919132149155446097, guid: 5c5b82f183278754eab758a2e7180618, type: 3}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 67f9380d410807e4fae2c1add3e81495, type: 3}
   slot: 0
+  previewRotation: {x: 0, y: 0, z: -45}
+  previewOffset: {x: 0, y: 0, z: 0}
+  previewScale: 1
+  cameraOrthographicSize: 0.8

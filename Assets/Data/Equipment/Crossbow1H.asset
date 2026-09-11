@@ -15,5 +15,9 @@ MonoBehaviour:
   equipmentName: Crossbow
   equipmentType: 5
   equipmentPrefab: {fileID: 919132149155446097, guid: 52f13932f0d2d9b4aa18da681179c17f, type: 3}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: c31d4b97953ddf345930118c45f602bd, type: 3}
   slot: 0
+  previewRotation: {x: 0, y: 0, z: -45}
+  previewOffset: {x: 0, y: 0, z: 0}
+  previewScale: 1
+  cameraOrthographicSize: 0.8

@@ -80,6 +80,11 @@ public class MainMenuManager : MonoBehaviour
         if (characterSettingPanel != null) characterSettingPanel.SetActive(true);
         if (gameTitle != null) gameTitle.SetActive(false);
 
+        if (characterSettingUI == null && characterSettingPanel != null)
+        {
+            characterSettingUI = characterSettingPanel.GetComponent<CharacterSettingUI>();
+        }
+
         if (characterSettingUI != null)
         {
             characterSettingUI.Initialize(availableCharacters, allEquipment, characterPreviewSpot);
@@ -90,6 +95,12 @@ public class MainMenuManager : MonoBehaviour
                 characterSettingUI.backButton.onClick.AddListener(OnBackClicked);
             }
         }
+    }
+
+    private void OnSaveClicked()
+    {
+        Debug.Log("[MainMenuManager] Character and equipment saved.");
+        ShowMainMenu();
     }
 
     // ── Round loading ─────────────────────────────────────────────────────────
@@ -111,8 +122,10 @@ public class MainMenuManager : MonoBehaviour
         if (index >= 0 && index < roundSceneNames.Length)
         {
             GameDataCarrier.Instance?.SetRound(roundNumber);
-            Debug.Log($"[MainMenuManager] Loading scene: {roundSceneNames[index]}");
-            SceneManager.LoadScene(roundSceneNames[index]);
+            string sceneName = roundSceneNames[index];
+            Debug.Log($"[MainMenuManager] Loading solo scene through NGO: {sceneName}");
+            if (NetworkBootstrap.Instance == null || !NetworkBootstrap.Instance.StartSolo(sceneName, roundNumber))
+                SceneManager.LoadScene(sceneName);
         }
         else
         {
@@ -133,8 +146,8 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene("Map_Tutorial");
     }
 
-    private void OnBackClicked()
+    public void OnBackClicked()
     {
-        ShowMainMenu();
+        ShowMapSelection();
     }
 }

@@ -15,5 +15,9 @@ MonoBehaviour:
   equipmentName: Dagger
   equipmentType: 7
   equipmentPrefab: {fileID: 919132149155446097, guid: 4c0d6e40e8057b244af255eaede88778, type: 3}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ea58d3f40866a6e49926aa45d8ed0e18, type: 3}
   slot: 0
+  previewRotation: {x: 0, y: 0, z: -45}
+  previewOffset: {x: 0, y: 0, z: 0}
+  previewScale: 1
+  cameraOrthographicSize: 0.8

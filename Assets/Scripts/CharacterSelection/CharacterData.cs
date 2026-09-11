@@ -4,6 +4,10 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "NewCharacter", menuName = "Game/Character Data")]
 public class CharacterData : ScriptableObject
 {
+    [Header("Network Identity")]
+    [SerializeField, Tooltip("Stable identifier sent during NGO connection approval. Do not rename after shipping.")]
+    private string stableId;
+
     public string characterName;
     public CharacterClass characterClass;
     public GameObject characterPrefab;
@@ -21,5 +25,9 @@ public class CharacterData : ScriptableObject
     public Vector3 previewOffset = new Vector3(0, -0.65f, 0);
     public float previewScale = 1.0f;
     public float cameraOrthographicSize = 0.65f;
+
+    public string StableId => string.IsNullOrWhiteSpace(stableId)
+        ? characterName.Trim().ToLowerInvariant().Replace(" ", "-")
+        : stableId;
 }
 
