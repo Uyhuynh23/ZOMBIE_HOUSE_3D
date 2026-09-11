@@ -13,25 +13,27 @@ MonoBehaviour:
   m_Name: WaveConfig_Map_Night
   m_EditorClassIdentifier: Assembly-CSharp::MapWaveConfig
   mapName: Round 3 - Night
-  routeMoveSpeed: 2.95
+  routeMoveSpeed: 1.55
   routeSpawnJitter: 0.35
   allowedEnemyPrefabs:
   - {fileID: 8236233150771389117, guid: 33f78212e408c4e8bb4f4dc04a215d94, type: 3}
   - {fileID: 8236233150771389117, guid: 7e4c39129df8464ca5d2b1f8c857731a, type: 3}
+  - {fileID: 8236233150771389117, guid: 7e4c39129df8464ca5d2b1f8c857731a, type: 3}
+  - {fileID: 1308133915224819898, guid: 3256d0cb24f6242b8a31cd2beda4bc99, type: 3}
   - {fileID: 1308133915224819898, guid: 3256d0cb24f6242b8a31cd2beda4bc99, type: 3}
   waves:
-  - zombieCount: 8
+  - zombieCount: 10
+    spawnInterval: 1.6
+    delayBeforeWave: 5
+  - zombieCount: 18
     spawnInterval: 1.2
-    delayBeforeWave: 3
-  - zombieCount: 12
-    spawnInterval: 1
-    delayBeforeWave: 5
-  - zombieCount: 16
-    spawnInterval: 0.85
-    delayBeforeWave: 5
-  - zombieCount: 20
-    spawnInterval: 0.75
-    delayBeforeWave: 5.5
-  - zombieCount: 25
-    spawnInterval: 0.65
     delayBeforeWave: 6
+  - zombieCount: 28
+    spawnInterval: 0.85
+    delayBeforeWave: 7
+  - zombieCount: 38
+    spawnInterval: 0.65
+    delayBeforeWave: 8
+  - zombieCount: 50
+    spawnInterval: 0.45
+    delayBeforeWave: 8
