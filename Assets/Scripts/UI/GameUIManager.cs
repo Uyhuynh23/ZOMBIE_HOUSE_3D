@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -68,6 +68,7 @@ public class GameUIManager : MonoBehaviour
 
         if (winPanel != null) winPanel.SetActive(false);
         if (losePanel != null) losePanel.SetActive(false);
+        if (winLosePanelUI != null) winLosePanelUI.gameObject.SetActive(false);
     }
 
     void Start()

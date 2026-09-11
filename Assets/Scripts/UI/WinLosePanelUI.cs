@@ -55,10 +55,22 @@ public class WinLosePanelUI : MonoBehaviour
         if (btnHome_Lose    != null) btnHome_Lose.onClick.AddListener(OnHome);
     }
 
+    void Start()
+    {
+        // If not showing, ensure this full-screen dimmer doesn't block HUD clicks
+        if (!isShowing)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     // ── Public API ────────────────────────────────────────────────────────────
+
+    private bool isShowing = false;
 
     public void ShowWin(bool hasNextRound)
     {
+        isShowing = true;
         gameObject.SetActive(true);
         if (losePanel != null) losePanel.SetActive(false);
 
@@ -81,6 +93,7 @@ public class WinLosePanelUI : MonoBehaviour
 
     public void ShowLose()
     {
+        isShowing = true;
         gameObject.SetActive(true);
         if (winPanel      != null) winPanel.SetActive(false);
         if (winPanelFinal != null) winPanelFinal.SetActive(false);
