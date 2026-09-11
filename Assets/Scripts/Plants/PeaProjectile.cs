@@ -1,6 +1,7 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class PeaProjectile : MonoBehaviour
+public class PeaProjectile : NetworkBehaviour
 {
     public float lifetime = 3f;
     [Min(0.1f)] public float maxTravelDistance = 35f;
@@ -9,6 +10,12 @@ public class PeaProjectile : MonoBehaviour
     private Vector3 launchPosition;
     private Transform ownerRoot;
     private bool hasHit;
+
+    public override void OnNetworkSpawn()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null && !IsServer) rb.isKinematic = true;
+    }
 
     public void Initialize()
     {
@@ -25,6 +32,7 @@ public class PeaProjectile : MonoBehaviour
 
     void Update()
     {
+        if (NetworkBootstrap.IsNetworkSession && !IsServer) return;
         timer -= Time.deltaTime;
         if (timer <= 0f || (transform.position - launchPosition).sqrMagnitude >= maxTravelDistance * maxTravelDistance)
         {
@@ -34,6 +42,7 @@ public class PeaProjectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (!NetworkGameplayAuthority.IsServer || !NetworkGameplayAuthority.CanMutate) return;
         if (hasHit || other == null || (ownerRoot != null && other.transform.root == ownerRoot)) return;
         // Imported enemies can expose a child collider whose tag is Untagged.
         // Resolve health from the hierarchy so both Zombie and Spider take
@@ -50,7 +59,12 @@ public class PeaProjectile : MonoBehaviour
 
     private void ReturnToPool()
     {
-        if (ObjectPoolManager.Instance != null)
+        NetworkObject no = GetComponent<NetworkObject>();
+        if (NetworkBootstrap.IsNetworkSession && no != null && no.IsSpawned)
+        {
+            if (IsServer) no.Despawn(true);
+        }
+        else if (ObjectPoolManager.Instance != null)
         {
             ObjectPoolManager.Instance.ReturnPea(gameObject);
         }

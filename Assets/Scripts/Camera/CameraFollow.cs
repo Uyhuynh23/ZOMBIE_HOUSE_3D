@@ -55,6 +55,12 @@ public class CameraFollow : MonoBehaviour
 
     public bool IsOverridden => isOverridden;
 
+    public void BindTarget(Transform localTarget)
+    {
+        target = localTarget;
+        if (target != null) yaw = target.eulerAngles.y;
+    }
+
     public void SetOverrideView(Transform viewTransform, float speed = 8f)
     {
         isOverridden = true;

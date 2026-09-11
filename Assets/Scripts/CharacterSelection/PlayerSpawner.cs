@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 /// <summary>
 /// Placed in each gameplay scene. Spawns the player's selected character
@@ -7,6 +8,7 @@ using UnityEngine;
 /// </summary>
 public class PlayerSpawner : MonoBehaviour
 {
+    public static PlayerSpawner Instance { get; private set; }
     [Header("Spawn Settings")]
     public Transform spawnPoint;
     [Tooltip("Default spawn rotation in degrees if spawnPoint is unassigned. Set Y to 180 to face away from the house.")]
@@ -29,9 +31,50 @@ public class PlayerSpawner : MonoBehaviour
 
     private GameObject spawnedPlayer;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
     void Start()
     {
-        SpawnPlayer();
+        // NGO's server spawns one owned player after every client completes the
+        // network scene load. The original local path remains the fallback.
+        if (!NetworkBootstrap.IsNetworkSession)
+            SpawnPlayer();
+    }
+
+    public void SpawnNetworkPlayer(CharacterData character, GameObject prefab, ulong clientId, int spawnIndex)
+    {
+        NetworkManager manager = NetworkManager.Singleton;
+        if (manager == null || !manager.IsServer || prefab == null) return;
+        if (manager.ConnectedClients.TryGetValue(clientId, out NetworkClient client) && client.PlayerObject != null)
+            return;
+
+        Vector3 basePosition = spawnPoint != null
+            ? spawnPoint.position
+            : (transform.position != Vector3.zero ? transform.position : new Vector3(0f, 0.1f, -18f));
+        Vector3 offset = spawnIndex == 0 ? Vector3.left * 0.9f : Vector3.right * 0.9f;
+        Quaternion rotation = spawnPoint != null ? spawnPoint.rotation : Quaternion.Euler(defaultSpawnRotation);
+
+        GameObject player = Instantiate(prefab, basePosition + offset, rotation);
+        player.name = character != null ? character.characterName : $"Player {clientId}";
+        ConfigurePlayer(player, character, useCarrierEquipment: clientId == manager.LocalClientId);
+
+        NetworkObject networkObject = player.GetComponent<NetworkObject>();
+        if (networkObject == null)
+        {
+            Debug.LogError($"[NET][PLAYER] {prefab.name} is missing NetworkObject.");
+            Destroy(player);
+            return;
+        }
+        networkObject.SpawnAsPlayerObject(clientId, true);
+        Debug.Log($"[NET][PLAYER] Spawned player={player.name} owner={clientId} networkObject={networkObject.NetworkObjectId} position={player.transform.position}.");
     }
 
     void SpawnPlayer()
@@ -66,45 +109,54 @@ public class PlayerSpawner : MonoBehaviour
         spawnedPlayer = Instantiate(characterToSpawn.characterPrefab, spawnPos, spawnRot);
         spawnedPlayer.name = characterToSpawn.characterName;
 
-        // Setup Plant Loadout
-        PlayerController pc = spawnedPlayer.GetComponent<PlayerController>();
+        ConfigurePlayer(spawnedPlayer, characterToSpawn, true, rightHand, leftHand);
+        BindLocalPlayer(spawnedPlayer);
+
+        Debug.Log($"[PlayerSpawner] Spawned {characterToSpawn.characterName} at {spawnPos}");
+    }
+
+    private void ConfigurePlayer(GameObject player, CharacterData character, bool useCarrierEquipment,
+        EquipmentData explicitRight = null, EquipmentData explicitLeft = null)
+    {
+        PlayerController pc = player.GetComponent<PlayerController>();
         if (pc != null && plantLoadout != null)
         {
             pc.plants = plantLoadout;
             if (plantLoadout.Length > 0) pc.SelectPlant(0);
         }
 
-        // Apply equipment
-        EquipmentManager equipManager = spawnedPlayer.GetComponent<EquipmentManager>();
-        if (equipManager == null)
-            equipManager = spawnedPlayer.AddComponent<EquipmentManager>();
+        EquipmentData right = explicitRight;
+        EquipmentData left = explicitLeft;
+        if (!useCarrierEquipment || right == null) right = character != null ? character.defaultRightHand : null;
+        if (!useCarrierEquipment || left == null) left = character != null ? character.defaultLeftHand : null;
 
-        // Clear FBX built-in weapons/shields first
+        EquipmentManager equipManager = player.GetComponent<EquipmentManager>();
+        if (equipManager == null) equipManager = player.AddComponent<EquipmentManager>();
         equipManager.ClearBuiltInEquipment();
+        if (right != null) equipManager.EquipRight(right);
+        if (left != null) equipManager.EquipLeft(left);
+    }
 
-        if (rightHand != null)
-            equipManager.EquipRight(rightHand);
-        if (leftHand != null)
-            equipManager.EquipLeft(leftHand);
+    public void BindLocalPlayer(GameObject player)
+    {
+        if (player == null) return;
+        spawnedPlayer = player;
 
-        // Hook up camera
-        if (cameraFollow != null)
-        {
-            cameraFollow.target = spawnedPlayer.transform;
-        }
-        else
-        {
-            // Try to find CameraFollow in scene
-            CameraFollow cam = Object.FindFirstObjectByType<CameraFollow>();
-            if (cam != null)
-            {
-                cam.target = spawnedPlayer.transform;
-            }
-        }
+        CameraFollow follow = cameraFollow != null ? cameraFollow : Object.FindFirstObjectByType<CameraFollow>();
+        if (follow != null) follow.BindTarget(player.transform);
+
+        PlayerController controller = player.GetComponent<PlayerController>();
+        Camera gameplayCamera = follow != null ? follow.GetComponent<Camera>() : Camera.main;
+        if (controller != null) controller.BindGameplayCamera(gameplayCamera);
 
         SetupMinimapForPlayer();
+        if (GameUIManager.Instance != null) GameUIManager.Instance.BindLocalPlayer(controller);
 
-        Debug.Log($"[PlayerSpawner] Spawned {characterToSpawn.characterName} at {spawnPos}");
+        MapIntroFlythrough intro = Object.FindFirstObjectByType<MapIntroFlythrough>();
+        if (intro != null) intro.BindLocalPlayer(controller, follow);
+
+        NetworkObject localNetworkObject = player.GetComponent<NetworkObject>();
+        Debug.Log($"[NET][PLAYER] Bound local player={player.name} owner={(localNetworkObject != null ? localNetworkObject.OwnerClientId : 0)} camera={(follow != null ? follow.name : "none")} minimap={(Object.FindFirstObjectByType<MinimapFollow>() != null ? "bound" : "none")} hud={(GameUIManager.Instance != null ? "bound" : "none")}.");
     }
 
     /// <summary>
@@ -124,7 +176,7 @@ public class PlayerSpawner : MonoBehaviour
         MinimapFollow minimapFollow = Object.FindFirstObjectByType<MinimapFollow>();
         if (minimapFollow != null)
         {
-            minimapFollow.target = spawnedPlayer.transform;
+            minimapFollow.BindTarget(spawnedPlayer.transform);
 
             Camera minimapCamera = minimapFollow.GetComponent<Camera>();
             if (minimapCamera != null)

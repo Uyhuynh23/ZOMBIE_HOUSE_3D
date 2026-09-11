@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.Netcode;
 
 /// <summary>
 /// Spawns waves of enemies that navigate to Baker_house via NavMesh.
@@ -87,6 +88,7 @@ public class ZombieSpawner : MonoBehaviour
     private List<GameObject> activeEnemies = new List<GameObject>();
     private bool allWavesComplete;
     private int  spawnSequence;
+    private System.Random serverRandom;
 
     // ──────────────────────────────────────────────────────────
     // Unity lifecycle
@@ -118,6 +120,16 @@ public class ZombieSpawner : MonoBehaviour
 
     private void Start()
     {
+        if (NetworkBootstrap.IsNetworkSession && !NetworkGameplayAuthority.IsServer)
+        {
+            Debug.Log("[NET][WAVE] Guest wave simulation disabled; replicated counters are render-only.");
+            enabled = false;
+            return;
+        }
+
+        int seed = NetworkMatchState.Instance != null ? NetworkMatchState.Instance.MatchSeed.Value : System.Environment.TickCount;
+        serverRandom = new System.Random(seed == 0 ? 1 : seed);
+
         if (zombiePrefab == null && (enemyPrefabs == null || enemyPrefabs.Length == 0))
         {
             Debug.LogError("[ZombieSpawner] No enemy prefabs assigned!");
@@ -139,7 +151,11 @@ public class ZombieSpawner : MonoBehaviour
                 Debug.LogWarning("[ZombieSpawner] NavMesh not baked!");
         }
 
-        if (waitForIntro && MapIntroFlythrough.ActiveInstance != null && !MapIntroFlythrough.ActiveInstance.IsCompleted)
+        if (NetworkBootstrap.IsNetworkSession)
+        {
+            StartCoroutine(WaitForAuthoritativePlaying());
+        }
+        else if (waitForIntro && MapIntroFlythrough.ActiveInstance != null && !MapIntroFlythrough.ActiveInstance.IsCompleted)
         {
             Debug.Log("[ZombieSpawner] MapIntroFlythrough active: waiting for intro to finish before starting waves.");
             MapIntroFlythrough.ActiveInstance.OnIntroCompleted += HandleIntroCompleted;
@@ -148,6 +164,14 @@ public class ZombieSpawner : MonoBehaviour
         {
             StartCoroutine(RunWaves());
         }
+    }
+
+    private IEnumerator WaitForAuthoritativePlaying()
+    {
+        yield return new WaitUntil(() => NetworkMatchState.Instance != null &&
+                                         NetworkMatchState.Instance.Phase.Value == MatchPhase.Playing);
+        Debug.Log($"[NET][WAVE] Server wave loop starting seed={NetworkMatchState.Instance.MatchSeed.Value}.");
+        StartCoroutine(RunWaves());
     }
 
     private void HandleIntroCompleted()
@@ -178,22 +202,25 @@ public class ZombieSpawner : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     private IEnumerator RunWaves()
     {
+        if (!NetworkGameplayAuthority.IsServer) yield break;
         for (int i = 0; i < waves.Length; i++)
         {
             currentWaveIndex = i;
             WaveData wave = waves[i];
+            NetworkMatchState.Instance?.ServerSetWave(i, wave.zombieCount);
 
             nextWaveCountdown = Mathf.Max(0f, wave.delayBeforeWave);
             while (nextWaveCountdown > 0f)
             {
-                if (GameManager.Instance == null ||
-                    GameManager.Instance.CurrentState == GameManager.GameState.Playing)
+                if (NetworkGameplayAuthority.CanMutate &&
+                    (GameManager.Instance == null || GameManager.Instance.CurrentState == GameManager.GameState.Playing))
                     nextWaveCountdown -= Time.deltaTime;
                 yield return null;
             }
 
             Debug.Log($"[ZombieSpawner] Wave {i + 1}/{waves.Length} — {wave.zombieCount} enemies, speed={WaveSpeed(i):F2}");
             remainingToSpawn = wave.zombieCount;
+            NetworkMatchState.Instance?.ServerSetRemainingToSpawn(remainingToSpawn);
 
             for (int z = 0; z < wave.zombieCount; z++)
             {
@@ -207,6 +234,7 @@ public class ZombieSpawner : MonoBehaviour
                     SpawnNavMeshEnemy(i);
 
                 remainingToSpawn--;
+                NetworkMatchState.Instance?.ServerSetRemainingToSpawn(remainingToSpawn);
                 yield return new WaitForSeconds(wave.spawnInterval);
             }
 
@@ -217,7 +245,12 @@ public class ZombieSpawner : MonoBehaviour
         nextWaveCountdown = 0f;
         remainingToSpawn  = 0;
         Debug.Log("[ZombieSpawner] All waves complete!");
-        GameManager.Instance?.OnAllWavesComplete();
+        if (NetworkMatchState.Instance != null)
+        {
+            NetworkMatchState.Instance.AllWavesComplete.Value = true;
+            NetworkMatchState.Instance.ServerRequestWin();
+        }
+        else GameManager.Instance?.OnAllWavesComplete();
     }
 
     // ──────────────────────────────────────────────────────────
@@ -245,7 +278,21 @@ public class ZombieSpawner : MonoBehaviour
 
         activeEnemies.Add(enemy);
         activeEnemyCount++;
-        Debug.Log($"[ZombieSpawner] Spawned {prefab.name} at {spawnPos}");
+        NetworkObject networkObject = enemy.GetComponent<NetworkObject>();
+        if (NetworkBootstrap.IsNetworkSession)
+        {
+            if (networkObject == null)
+            {
+                Debug.LogError($"[NET][ENEMY] {prefab.name} is missing NetworkObject; rejecting spawn.");
+                activeEnemies.Remove(enemy);
+                activeEnemyCount--;
+                Destroy(enemy);
+                return;
+            }
+            networkObject.Spawn(true);
+        }
+        NetworkMatchState.Instance?.ServerEnemySpawned();
+        Debug.Log($"[NET][ENEMY] Spawn prefab={prefab.name} networkId={(networkObject != null && networkObject.IsSpawned ? networkObject.NetworkObjectId : 0)} pos={spawnPos}.");
     }
 
     /// <summary>
@@ -265,8 +312,8 @@ public class ZombieSpawner : MonoBehaviour
             {
                 candidate = sp.position;
                 // Small XZ jitter so zombies don't stack on the same point
-                candidate.x += Random.Range(-spawnJitter, spawnJitter);
-                candidate.z += Random.Range(-spawnJitter, spawnJitter);
+                candidate.x += NextServerFloat(-spawnJitter, spawnJitter);
+                candidate.z += NextServerFloat(-spawnJitter, spawnJitter);
             }
         }
 
@@ -290,7 +337,7 @@ public class ZombieSpawner : MonoBehaviour
         Transform next = route.GetWaypoint(1);
         Vector3 fwd    = next != null ? (next.position - sp.position).normalized : Vector3.forward;
         Vector3 side   = Vector3.Cross(Vector3.up, fwd).normalized;
-        Vector3 pos    = sp.position + side * Random.Range(-routeSpawnJitter, routeSpawnJitter);
+        Vector3 pos    = sp.position + side * NextServerFloat(-routeSpawnJitter, routeSpawnJitter);
 
         GameObject prefab = GetRandomEnemyPrefab();
         if (prefab == null) return;
@@ -305,7 +352,14 @@ public class ZombieSpawner : MonoBehaviour
 
         activeEnemies.Add(enemy);
         activeEnemyCount++;
-        Debug.Log($"[ZombieSpawner] (Legacy) Spawned {prefab.name} on route {route.name}");
+        NetworkObject networkObject = enemy.GetComponent<NetworkObject>();
+        if (NetworkBootstrap.IsNetworkSession)
+        {
+            if (networkObject == null) { activeEnemies.Remove(enemy); activeEnemyCount--; Destroy(enemy); return; }
+            networkObject.Spawn(true);
+        }
+        NetworkMatchState.Instance?.ServerEnemySpawned();
+        Debug.Log($"[NET][ENEMY] Spawn legacy prefab={prefab.name} route={route.name}.");
     }
 
     // ──────────────────────────────────────────────────────────
@@ -329,7 +383,7 @@ public class ZombieSpawner : MonoBehaviour
             foreach (var p in enemyPrefabs)
                 if (p != null) valid.Add(p);
             if (valid.Count > 0)
-                return valid[Random.Range(0, valid.Count)];
+                return valid[serverRandom != null ? serverRandom.Next(valid.Count) : Random.Range(0, valid.Count)];
         }
         return zombiePrefab;
     }
@@ -339,8 +393,16 @@ public class ZombieSpawner : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     public void OnZombieDied(GameObject enemy)
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         activeEnemies.Remove(enemy);
         activeEnemyCount = Mathf.Max(0, activeEnemyCount - 1);
+        NetworkMatchState.Instance?.ServerEnemyDied();
+    }
+
+    private float NextServerFloat(float min, float max)
+    {
+        if (serverRandom == null) return Random.Range(min, max);
+        return min + (float)serverRandom.NextDouble() * (max - min);
     }
 
     // ──────────────────────────────────────────────────────────

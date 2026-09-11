@@ -92,7 +92,7 @@ public class MapIntroFlythrough : MonoBehaviour
         // Immediately snap the main camera to the first waypoint so
         // the very first rendered frame shows the Overview — no flash
         // of the default CameraFollow angle before Play() is called.
-        if (playOnStart && waypoints != null && waypoints.Count > 0 && waypoints[0].point != null)
+        if (playOnStart && !NetworkBootstrap.IsNetworkSession && waypoints != null && waypoints.Count > 0 && waypoints[0].point != null)
         {
             // Snap camera position
             Camera cam = Camera.main;
@@ -116,10 +116,40 @@ public class MapIntroFlythrough : MonoBehaviour
 
     private void Start()
     {
-        if (playOnStart)
+        if (playOnStart && !NetworkBootstrap.IsNetworkSession)
         {
             StartCoroutine(DelayedStartRoutine());
         }
+    }
+
+    public void BindLocalPlayer(PlayerController localPlayer, CameraFollow localCameraFollow)
+    {
+        playerController = localPlayer;
+        cameraFollow = localCameraFollow;
+        mainCam = cameraFollow != null ? cameraFollow.GetComponent<Camera>() : Camera.main;
+
+        if (!NetworkBootstrap.IsNetworkSession) return;
+        if (NetworkMatchState.Instance != null)
+        {
+            NetworkMatchState.Instance.PhaseChanged -= OnNetworkPhaseChanged;
+            NetworkMatchState.Instance.PhaseChanged += OnNetworkPhaseChanged;
+            OnNetworkPhaseChanged(NetworkMatchState.Instance.Phase.Value, NetworkMatchState.Instance.Phase.Value);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (NetworkMatchState.Instance != null)
+            NetworkMatchState.Instance.PhaseChanged -= OnNetworkPhaseChanged;
+        if (ActiveInstance == this) ActiveInstance = null;
+    }
+
+    private void OnNetworkPhaseChanged(MatchPhase _, MatchPhase current)
+    {
+        if (current == MatchPhase.Intro && playOnStart && !isPlaying && !isCompleted)
+            Play();
+        else if (playerController != null)
+            playerController.isInputLocked = current != MatchPhase.Playing;
     }
 
     private IEnumerator DelayedStartRoutine()
@@ -151,14 +181,15 @@ public class MapIntroFlythrough : MonoBehaviour
             return;
         }
 
-        mainCam = Camera.main;
-        cameraFollow = UnityEngine.Object.FindFirstObjectByType<CameraFollow>();
-        playerController = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+        if (mainCam == null) mainCam = Camera.main;
+        if (cameraFollow == null) cameraFollow = UnityEngine.Object.FindFirstObjectByType<CameraFollow>();
+        if (playerController == null && !NetworkBootstrap.IsNetworkSession)
+            playerController = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
 
         // Lock player controller
         if (playerController != null)
         {
-            playerController.enabled = false;
+            playerController.isInputLocked = true;
         }
 
         // Place virtual rig at first waypoint
@@ -323,13 +354,16 @@ public class MapIntroFlythrough : MonoBehaviour
         // Unlock player controller
         if (playerController != null)
         {
-            playerController.enabled = true;
+            playerController.isInputLocked = NetworkBootstrap.IsNetworkSession &&
+                (NetworkMatchState.Instance == null || NetworkMatchState.Instance.Phase.Value != MatchPhase.Playing);
         }
 
         Debug.Log("[MapIntroFlythrough] Intro sequence completed. Handing over to gameplay.");
 
         OnIntroCompleted?.Invoke();
         OnAnyIntroFinished?.Invoke(this);
+        if (NetworkBootstrap.IsNetworkSession && NetworkMatchState.Instance != null)
+            NetworkMatchState.Instance.ReportLocalIntroComplete();
     }
 
     private void UpdateShotBanner(string title, string subtitle)

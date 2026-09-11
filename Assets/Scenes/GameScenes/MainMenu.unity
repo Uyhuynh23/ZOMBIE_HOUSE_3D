@@ -3948,8 +3948,8 @@ MonoBehaviour:
   roundButtons: []
   selectionHighlights: []
   roundScenes:
-  - Map_Cloudy
   - Map_Day
+  - Map_Cloudy
   - Map_Night
   soloButton: {fileID: 384393323}
   hostButton: {fileID: 2049064231}
@@ -8671,8 +8671,8 @@ MonoBehaviour:
   characterSettingPanel: {fileID: 1493385886}
   gameTitle: {fileID: 0}
   roundSceneNames:
-  - Map_Cloudy
   - Map_Day
+  - Map_Cloudy
   - Map_Night
   availableCharacters:
   - {fileID: 11400000, guid: 5cd262432a54d254d9cc0cfacf1ae1a1, type: 2}
@@ -14290,7 +14290,7 @@ MonoBehaviour:
   - stableId: rogue
     character: {fileID: 11400000, guid: 0321feb50681a4c449dbc9f4dab1cc94, type: 2}
     prefab: {fileID: 104811172578036882, guid: bb1516cf4a56f8f40bb15c5ce087c6d8, type: 3}
-  gameplayScene: Map_Cloudy
+  gameplayScene: Map_Day
   gameplayRound: 1
   mainMenuScene: MainMenu
 --- !u!114 &1951415342
