@@ -15,5 +15,9 @@ MonoBehaviour:
   equipmentName: Spike Shield
   equipmentType: 2
   equipmentPrefab: {fileID: 919132149155446097, guid: 22874ebc698c29445b9e6a82e3ca1c77, type: 3}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 011065a2b2144d04ca28522ccbda29e4, type: 3}
   slot: 1
+  previewRotation: {x: 0, y: 0, z: -45}
+  previewOffset: {x: 0, y: 0, z: 0}
+  previewScale: 1
+  cameraOrthographicSize: 0.8

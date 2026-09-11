@@ -15,5 +15,9 @@ MonoBehaviour:
   equipmentName: Staff
   equipmentType: 3
   equipmentPrefab: {fileID: 919132149155446097, guid: 5ea12c7eeaba08b4d8f34d94b68a905f, type: 3}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 025ff2567bed0794195d2cfa7373875e, type: 3}
   slot: 0
+  previewRotation: {x: 0, y: 0, z: -45}
+  previewOffset: {x: 0, y: 0, z: 0}
+  previewScale: 1
+  cameraOrthographicSize: 0.8

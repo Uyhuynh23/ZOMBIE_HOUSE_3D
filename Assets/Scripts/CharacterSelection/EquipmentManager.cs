@@ -66,6 +66,7 @@ public class EquipmentManager : MonoBehaviour
     public void EquipRight(EquipmentData equipment)
     {
         if (equipment == null || equipment.equipmentPrefab == null) return;
+        if (rightHandSlot == null) FindHandSlots();
 
         ClearSlot(EquipSlot.RightHand);
 
@@ -84,6 +85,7 @@ public class EquipmentManager : MonoBehaviour
     public void EquipLeft(EquipmentData equipment)
     {
         if (equipment == null || equipment.equipmentPrefab == null) return;
+        if (leftHandSlot == null) FindHandSlots();
 
         ClearSlot(EquipSlot.LeftHand);
 
@@ -143,8 +145,21 @@ public class EquipmentManager : MonoBehaviour
     /// </summary>
     public void ClearBuiltInEquipment()
     {
+        if (rightHandSlot == null || leftHandSlot == null) FindHandSlots();
         ClearChildMeshes(rightHandSlot);
         ClearChildMeshes(leftHandSlot);
+
+        foreach (var mf in GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (mf.transform.parent != null && mf.transform.parent.name.ToLower().StartsWith("handslot"))
+            {
+                mf.gameObject.SetActive(false);
+                if (Application.isPlaying)
+                    Destroy(mf.gameObject);
+                else
+                    DestroyImmediate(mf.gameObject);
+            }
+        }
     }
 
     private void ClearChildMeshes(Transform slot)
@@ -154,6 +169,7 @@ public class EquipmentManager : MonoBehaviour
         for (int i = slot.childCount - 1; i >= 0; i--)
         {
             Transform child = slot.GetChild(i);
+            child.gameObject.SetActive(false);
             if (Application.isPlaying)
                 Destroy(child.gameObject);
             else

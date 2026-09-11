@@ -15,5 +15,9 @@ MonoBehaviour:
   equipmentName: Greatsword
   equipmentType: 1
   equipmentPrefab: {fileID: 919132149155446097, guid: 5b1140ba002bc2b44b74473451035896, type: 3}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: cc7c79e679ba3e346a123593583d7381, type: 3}
   slot: 0
+  previewRotation: {x: 0, y: 0, z: -45}
+  previewOffset: {x: 0, y: 0, z: 0}
+  previewScale: 1
+  cameraOrthographicSize: 0.8
