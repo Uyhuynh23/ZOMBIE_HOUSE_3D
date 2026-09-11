@@ -123,9 +123,8 @@ public class MainMenuManager : MonoBehaviour
         {
             GameDataCarrier.Instance?.SetRound(roundNumber);
             string sceneName = roundSceneNames[index];
-            Debug.Log($"[MainMenuManager] Loading solo scene through NGO: {sceneName}");
-            if (NetworkBootstrap.Instance == null || !NetworkBootstrap.Instance.StartSolo(sceneName, roundNumber))
-                SceneManager.LoadScene(sceneName);
+            Debug.Log($"[MainMenuManager] Loading scene: {sceneName}");
+            SceneManager.LoadScene(sceneName);
         }
         else
         {
