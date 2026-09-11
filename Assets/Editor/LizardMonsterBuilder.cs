@@ -16,6 +16,7 @@ public static class LizardMonsterBuilder
     private const string SourceMaterialPath = "Assets/Hatogame_new/Lizard/Material/LizardB_Mat.mat";
     private const string OutputPrefabPath = "Assets/Prefabs/LizardMonster.prefab";
     private const string UrpMaterialPath = "Assets/Materials/LizardMonsterURP.mat";
+    private const string ControllerPath = "Assets/Animation/Lizard/LizardMonster.controller";
 
     [MenuItem("Tools/Zombie House/Create Lizard Monster Enemy")]
     public static void CreateLizardMonsterEnemy()
@@ -75,23 +76,27 @@ public static class LizardMonsterBuilder
             attack.attackRange = 1.15f;
         }
 
-        // The Lizard has its own animation controller with named states, so
-        // the generic Zombie animator hooks must remain empty.
-        AssignReference(instance.GetComponent<EnemyNavAgent>(), "animator", null);
+        Animator visualAnimator = visual.GetComponentInChildren<Animator>();
+        RuntimeAnimatorController lizardController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(ControllerPath);
+        if (visualAnimator != null && lizardController != null)
+            visualAnimator.runtimeAnimatorController = lizardController;
+
+        AssignReference(instance.GetComponent<EnemyNavAgent>(), "animator", visualAnimator);
         AssignReference(instance.GetComponent<EnemyNavAgent>(), "visualRoot", visual.transform);
-        AssignBool(instance.GetComponent<EnemyNavAgent>(), "useSharedMoveAnimation", false);
+        AssignBool(instance.GetComponent<EnemyNavAgent>(), "useSharedMoveAnimation", true);
         AssignFloat(instance.GetComponent<EnemyNavAgent>(), "visualYawOffset", 0f);
-        AssignReference(instance.GetComponent<ZombieAttack>(), "animator", null);
+        AssignReference(instance.GetComponent<ZombieAttack>(), "animator", visualAnimator);
         AssignReference(instance.GetComponent<ZombieAttack>(), "visualRoot", visual.transform);
-        AssignBool(instance.GetComponent<ZombieAttack>(), "useSharedAttackAnimation", false);
-        AssignReference(instance.GetComponent<ZombiePrototypeMover>(), "animator", null);
+        AssignBool(instance.GetComponent<ZombieAttack>(), "useSharedAttackAnimation", true);
+        AssignReference(instance.GetComponent<ZombiePrototypeMover>(), "animator", visualAnimator);
 
         ZombieSway sway = instance.GetComponent<ZombieSway>();
         if (sway != null) UnityEngine.Object.DestroyImmediate(sway);
 
+#pragma warning disable CS0618
         LizardAnimationDriver driver = instance.GetComponent<LizardAnimationDriver>();
-        if (driver == null) driver = instance.AddComponent<LizardAnimationDriver>();
-        AssignReference(driver, "animator", visual.GetComponentInChildren<Animator>());
+        if (driver != null) UnityEngine.Object.DestroyImmediate(driver);
+#pragma warning restore CS0618
 
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(instance, OutputPrefabPath);
         UnityEngine.Object.DestroyImmediate(instance);

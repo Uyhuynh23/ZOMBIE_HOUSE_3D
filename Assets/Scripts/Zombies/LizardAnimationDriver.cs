@@ -1,16 +1,16 @@
 using UnityEngine;
 
 /// <summary>
-/// Visual-only animation adapter for the imported Lizard Monster asset.
-/// It reads the existing shared enemy state but never changes movement,
-/// lane assignment, combat, health, or wave logic.
+/// Legacy visual adapter for Lizard Monster.
+/// LizardMonster now uses standard parameters (MoveSpeed, Attack) in Lizard_Controller like Spider.
 /// </summary>
+[System.Obsolete("LizardMonster now uses standard parameters (MoveSpeed, Attack) in Lizard_Controller like Spider.")]
 [RequireComponent(typeof(EnemyNavAgent), typeof(ZombieHealth), typeof(ZombieAttack))]
 public sealed class LizardAnimationDriver : MonoBehaviour
 {
     [SerializeField] private Animator animator;
-    [SerializeField] private string idleState = "idle";
-    [SerializeField] private string walkState = "walk";
+    [SerializeField] private string idleState = "Idle";
+    [SerializeField] private string walkState = "Walk";
     [SerializeField] private string attackState = "attack1";
     [SerializeField] private string hitState = "hit";
     [SerializeField] private string deathState = "die";
@@ -26,6 +26,8 @@ public sealed class LizardAnimationDriver : MonoBehaviour
 
     private void Awake()
     {
+        // Auto-disable if present so it doesn't conflict with controller transitions
+        enabled = false;
         navAgent = GetComponent<EnemyNavAgent>();
         health = GetComponent<ZombieHealth>();
         if (animator == null) animator = GetComponentInChildren<Animator>();

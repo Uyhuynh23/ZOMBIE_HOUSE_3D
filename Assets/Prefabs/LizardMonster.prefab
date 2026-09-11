@@ -167,7 +167,6 @@ GameObject:
   - component: {fileID: 1394899405080008405}
   - component: {fileID: 350430098528507340}
   - component: {fileID: 3106625728383110187}
-  - component: {fileID: 986338635080143436}
   m_Layer: 8
   m_Name: LizardMonster
   m_TagString: Zombie
@@ -256,7 +255,7 @@ MonoBehaviour:
   plantLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  animator: {fileID: 0}
+  animator: {fileID: 5667056641204536894}
   animationDampTime: 0.12
   visualFacesBackward: 1
 --- !u!114 &8580929682872898210
@@ -275,8 +274,8 @@ MonoBehaviour:
   attackInterval: 1.05
   attackRange: 1.15
   plantContactRadius: 0.9
-  useSharedAttackAnimation: 0
-  animator: {fileID: 0}
+  useSharedAttackAnimation: 1
+  animator: {fileID: 5667056641204536894}
   visualRoot: {fileID: 367678925114167598}
   attackStateName: Attack
   fallbackBiteDuration: 0.28
@@ -365,7 +364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyNavAgent
   houseTarget: {fileID: 0}
-  moveSpeed: 1.5
+  moveSpeed: 1.4
   angularSpeed: 300
   navStoppingDistance: 1.2
   laneEntryRadius: 0.6
@@ -378,32 +377,12 @@ MonoBehaviour:
     m_Bits: 4294967295
   hitSpeedMultiplier: 0.15
   hitStaggerDuration: 0.4
-  useSharedMoveAnimation: 0
-  animator: {fileID: 0}
+  useSharedMoveAnimation: 1
+  animator: {fileID: 5667056641204536894}
   animDampTime: 0.1
   moveSpeedParam: MoveSpeed
   visualRoot: {fileID: 367678925114167598}
   visualYawOffset: 0
---- !u!114 &986338635080143436
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308133915224819898}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 282c65741496d43b4a3dc482b35413b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LizardAnimationDriver
-  animator: {fileID: 5667056641204536894}
-  idleState: idle
-  walkState: walk
-  attackState: attack1
-  hitState: hit
-  deathState: die
-  attackVisualInterval: 1.05
-  transitionDuration: 0.08
 --- !u!1 &2080237825493106385
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,10 +542,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8283346638512062134}
     m_Modifications:
+    - target: {fileID: 2546959539220627550, guid: 0ebfcda0b2f673b48845fd7d5185ef6d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.112978764
+      objectReference: {fileID: 0}
+    - target: {fileID: 2546959539220627550, guid: 0ebfcda0b2f673b48845fd7d5185ef6d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.107484944
+      objectReference: {fileID: 0}
     - target: {fileID: 3722931776231957421, guid: 0ebfcda0b2f673b48845fd7d5185ef6d, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 1fcf5f63eadd54028b940e9c6edef8a3, type: 2}
+    - target: {fileID: 4377533473604221291, guid: 0ebfcda0b2f673b48845fd7d5185ef6d, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 69d2a3981cf722f4e99adfd9a0ee20e2, type: 2}
     - target: {fileID: 8610654295540346491, guid: 0ebfcda0b2f673b48845fd7d5185ef6d, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.7470195
