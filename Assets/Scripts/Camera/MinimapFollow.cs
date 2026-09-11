@@ -13,6 +13,11 @@ public class MinimapFollow : MonoBehaviour
     public float minZ = -50f;
     public float maxZ = 50f;
 
+    public void BindTarget(Transform localTarget)
+    {
+        target = localTarget;
+    }
+
     void LateUpdate()
     {
         if (target != null)

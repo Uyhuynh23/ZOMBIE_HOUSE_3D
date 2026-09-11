@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Collections;
 
 [System.Serializable]
 public struct PlantData
@@ -13,7 +15,7 @@ public struct PlantData
     public Sprite portrait;
 }
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 5f;
@@ -51,6 +53,13 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private PlantableSquare currentSquare;
     private PlantableSquare plantingSquare;
+    private int plantingPlantIndex;
+    private uint placementSequence;
+    private readonly Dictionary<int, double> serverPlantCooldowns = new();
+    private double serverNextMeleeTime;
+    private Vector3 serverLastValidatedPosition;
+    private double serverLastMovementSample;
+    private double serverMovementGraceUntil;
     
     private bool isShovelMode = false;
 
@@ -85,18 +94,21 @@ public class PlayerController : MonoBehaviour
     private bool isAttacking = false;
     private Coroutine attackCoroutine = null;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private Camera localGameplayCamera;
 
     public int CurrentPlantIndex => currentPlantIndex;
     public bool IsShovelMode => isShovelMode;
     public bool IsAttacking => isAttacking;
     [HideInInspector] public bool isInputLocked = false;
+    public bool HasLocalControl => !IsSpawned || IsOwner;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
         
-        SetupIndicator();
+        if (HasLocalControl)
+            SetupIndicator();
         
         if (plants != null && plants.Length > 0)
         {
@@ -107,6 +119,32 @@ public class PlayerController : MonoBehaviour
         SnapToGround();
         lastSafeGroundPosition = transform.position;
         hasSafeGroundPosition = true;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            serverLastValidatedPosition = transform.position;
+            serverLastMovementSample = Time.unscaledTimeAsDouble;
+            serverMovementGraceUntil = serverLastMovementSample + 3.0;
+        }
+        if (IsOwner)
+        {
+            if (currentIndicator == null) SetupIndicator();
+            PlayerSpawner.Instance?.BindLocalPlayer(gameObject);
+        }
+        else
+        {
+            if (currentIndicator != null) Destroy(currentIndicator);
+            currentIndicator = null;
+            isInputLocked = true;
+        }
+    }
+
+    public void BindGameplayCamera(Camera gameplayCamera)
+    {
+        localGameplayCamera = gameplayCamera;
     }
 
     /// <summary>Teleport the character down onto the terrain/collider beneath it at spawn.</summary>
@@ -203,6 +241,13 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        ValidateRemoteMovementOnServer();
+        if (!HasLocalControl)
+        {
+            if (animator != null) animator.SetBool("IsMoving", false);
+            return;
+        }
+
         if (plants != null)
         {
             for (int i = 0; i < plants.Length; i++)
@@ -369,9 +414,10 @@ public class PlayerController : MonoBehaviour
 
         if (direction.magnitude >= 0.1f)
         {
-            if (Camera.main != null)
+            Camera movementCamera = localGameplayCamera != null ? localGameplayCamera : Camera.main;
+            if (movementCamera != null)
             {
-                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y;
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + movementCamera.transform.eulerAngles.y;
                 direction = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
                 
                 float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
@@ -566,6 +612,31 @@ public class PlayerController : MonoBehaviour
         
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
+            if (NetworkBootstrap.IsNetworkSession)
+            {
+                if (NetworkMatchState.Instance == null || NetworkMatchState.Instance.Phase.Value != MatchPhase.Playing)
+                    return;
+                if (isShovelMode)
+                {
+                    if (currentSquare.isOccupied) RequestShovelRpc(currentSquare.StableId);
+                    return;
+                }
+                if (currentSquare.isOccupied || plants == null || currentPlantIndex < 0 || currentPlantIndex >= plants.Length)
+                    return;
+                PlantData requested = plants[currentPlantIndex];
+                if (requested.prefab == null || requested.currentCooldown > 0f) return;
+                if (EconomyManager.Instance != null && EconomyManager.Instance.currentSun < requested.cost)
+                {
+                    GameUIManager.Instance?.TriggerInsufficientSunFlash();
+                    return;
+                }
+                isPlanting = true;
+                plantingTimer = plantingDuration;
+                plantingSquare = currentSquare;
+                plantingPlantIndex = currentPlantIndex;
+                currentIndicator.SetActive(false);
+                return;
+            }
             if (isShovelMode)
             {
                 if (currentSquare.isOccupied && currentSquare.currentPlant != null)
@@ -620,6 +691,14 @@ public class PlayerController : MonoBehaviour
         
         if (plantingTimer <= 0f)
         {
+            if (NetworkBootstrap.IsNetworkSession)
+            {
+                if (plantingSquare != null)
+                    RequestPlacePlantRpc(plantingSquare.StableId, plantingPlantIndex, ++placementSequence);
+                isPlanting = false;
+                plantingSquare = null;
+                return;
+            }
             if (plantingSquare != null && !plantingSquare.isOccupied &&
                 plants != null && currentPlantIndex >= 0 && currentPlantIndex < plants.Length)
             {
@@ -741,7 +820,8 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(attackDamageDelay);
 
         // Deal damage at the exact moment of impact
-        ApplyMeleeDamage();
+        if (NetworkBootstrap.IsNetworkSession) RequestMeleeRpc();
+        else ApplyMeleeDamage();
 
         // Wait for the remaining recovery duration of the attack animation
         float recoveryTime = Mathf.Max(0f, attackDuration - attackDamageDelay);
@@ -763,9 +843,9 @@ public class PlayerController : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
-            if (hit.CompareTag("Zombie"))
+            ZombieHealth enemyHealth = hit.GetComponentInParent<ZombieHealth>();
+            if (enemyHealth != null)
             {
-                ZombieHealth enemyHealth = hit.GetComponentInParent<ZombieHealth>();
                 if (enemyHealth != null && !damagedEnemies.Contains(enemyHealth))
                 {
                     damagedEnemies.Add(enemyHealth);
@@ -774,6 +854,140 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void ValidateRemoteMovementOnServer()
+    {
+        if (!IsSpawned || !IsServer || IsOwner || NetworkManager == null ||
+            Time.unscaledTimeAsDouble < serverMovementGraceUntil) return;
+        double now = Time.unscaledTimeAsDouble;
+        double elapsed = now - serverLastMovementSample;
+        if (elapsed < 0.25) return;
+        float distance = Vector3.Distance(transform.position, serverLastValidatedPosition);
+        float allowed = moveSpeed * (float)elapsed * 3f + 2f;
+        if (distance > allowed)
+        {
+            Debug.LogWarning($"[NET][CONN] Disconnect owner={OwnerClientId}: movement delta={distance:F2} allowed={allowed:F2}.");
+            NetworkManager.DisconnectClient(OwnerClientId, "Movement validation failed.");
+        }
+        serverLastValidatedPosition = transform.position;
+        serverLastMovementSample = now;
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+    private void RequestPlacePlantRpc(int squareId, int plantIndex, uint requestId, RpcParams rpcParams = default)
+    {
+        string rejection = ValidatePlacement(squareId, plantIndex, rpcParams.Receive.SenderClientId,
+            out PlantableSquare square, out PlantData data);
+        if (rejection != null)
+        {
+            PlacementResultRpc(false, plantIndex, new FixedString64Bytes(rejection));
+            Debug.LogWarning($"[NET][PLANT] Reject owner={OwnerClientId} request={requestId} square={squareId}: {rejection}");
+            return;
+        }
+
+        if (!square.ServerTryReserve())
+        {
+            PlacementResultRpc(false, plantIndex, new FixedString64Bytes("Square already occupied."));
+            Debug.LogWarning($"[NET][PLANT] Race rejected owner={OwnerClientId} request={requestId} square={squareId}.");
+            return;
+        }
+
+        if (EconomyManager.Instance == null || !EconomyManager.Instance.SpendSun(data.cost))
+        {
+            square.ServerCancelReservation();
+            PlacementResultRpc(false, plantIndex, new FixedString64Bytes("Not enough team Sun."));
+            return;
+        }
+
+        Quaternion rotation = square.transform.rotation * data.prefab.transform.rotation;
+        GameObject planted = Instantiate(data.prefab, square.transform.position + Vector3.up * 0.05f, rotation);
+        ScalePlantToPlayerHeight(planted);
+        PlantBase plant = planted.GetComponent<PlantBase>();
+        NetworkObject no = planted.GetComponent<NetworkObject>();
+        if (plant == null || no == null)
+        {
+            square.ServerCancelReservation();
+            NetworkMatchState.Instance?.ServerAddSun(data.cost);
+            Destroy(planted);
+            PlacementResultRpc(false, plantIndex, new FixedString64Bytes("Plant is not network configured."));
+            return;
+        }
+
+        plant.ServerInitialize(square);
+        PeashooterCombat combat = planted.GetComponent<PeashooterCombat>();
+        if (combat != null)
+        {
+            Vector3 aim = square.transform.forward;
+            aim.y = 0f;
+            combat.SetAimDirection(aim.sqrMagnitude > 0.001f ? aim.normalized : GetOutwardLaneDirection(square.transform.position));
+        }
+        no.Spawn(true);
+        serverPlantCooldowns[plantIndex] = Time.unscaledTimeAsDouble + Mathf.Max(0f, data.cooldownTime);
+        PlacementResultRpc(true, plantIndex, new FixedString64Bytes("Placed"));
+        Debug.Log($"[NET][PLANT] Accept owner={OwnerClientId} request={requestId} square={squareId} plant={data.name} networkId={no.NetworkObjectId} cost={data.cost}.");
+    }
+
+    private string ValidatePlacement(int squareId, int plantIndex, ulong sender,
+        out PlantableSquare square, out PlantData data)
+    {
+        square = PlantableSquare.Find(squareId);
+        data = default;
+        if (!IsServer || !NetworkGameplayAuthority.CanMutate) return "Match is not playing.";
+        if (sender != OwnerClientId) return "Invalid owner.";
+        if (square == null) return "Unknown square.";
+        if ((square.transform.position - transform.position).sqrMagnitude > 9f) return "Square is too far away.";
+        if (square.isOccupied) return "Square already occupied.";
+        if (plants == null || plantIndex < 0 || plantIndex >= plants.Length) return "Plant is not in loadout.";
+        data = plants[plantIndex];
+        if (data.prefab == null) return "Plant prefab is missing.";
+        if (serverPlantCooldowns.TryGetValue(plantIndex, out double readyAt) && Time.unscaledTimeAsDouble < readyAt)
+            return "Plant is on cooldown.";
+        return null;
+    }
+
+    [Rpc(SendTo.Owner)]
+    private void PlacementResultRpc(bool accepted, int plantIndex, FixedString64Bytes message)
+    {
+        if (accepted && plants != null && plantIndex >= 0 && plantIndex < plants.Length)
+        {
+            plants[plantIndex].currentCooldown = plants[plantIndex].cooldownTime;
+            AudioManager.PlaySfx(AudioCue.PlantPlaced);
+        }
+        else
+        {
+            Debug.LogWarning($"[NET][PLANT] Placement rejected: {message}.");
+            if (message.ToString().Contains("Sun")) GameUIManager.Instance?.TriggerInsufficientSunFlash();
+        }
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+    private void RequestShovelRpc(int squareId, RpcParams rpcParams = default)
+    {
+        if (!IsServer || !NetworkGameplayAuthority.CanMutate || rpcParams.Receive.SenderClientId != OwnerClientId) return;
+        PlantableSquare square = PlantableSquare.Find(squareId);
+        if (square == null || square.currentPlant == null ||
+            (square.transform.position - transform.position).sqrMagnitude > 9f) return;
+        string plantName = square.currentPlant.name;
+        square.currentPlant.OnShoveled();
+        ShovelResultRpc(new FixedString64Bytes(plantName));
+        Debug.Log($"[NET][PLANT] Shovel owner={OwnerClientId} square={squareId} plant={plantName}.");
+    }
+
+    [Rpc(SendTo.Owner)]
+    private void ShovelResultRpc(FixedString64Bytes plantName)
+    {
+        UpdateTargetedPlant(null);
+        AudioManager.PlaySfx(AudioCue.PlantRemoved);
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+    private void RequestMeleeRpc(RpcParams rpcParams = default)
+    {
+        if (!IsServer || !NetworkGameplayAuthority.CanMutate || rpcParams.Receive.SenderClientId != OwnerClientId) return;
+        if (Time.unscaledTimeAsDouble < serverNextMeleeTime) return;
+        serverNextMeleeTime = Time.unscaledTimeAsDouble + Mathf.Max(0.1f, attackDuration);
+        ApplyMeleeDamage();
     }
 
     private void OnDrawGizmosSelected()

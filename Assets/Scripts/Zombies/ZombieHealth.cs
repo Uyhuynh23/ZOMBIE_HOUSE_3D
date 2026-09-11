@@ -1,12 +1,13 @@
 using System;
 using UnityEngine;
+using Unity.Netcode;
 
 /// <summary>
 /// Health component for all enemy types (Zombie, Spider).
 /// Fires OnZombieDied so spawner and game manager can react.
 /// Triggers hit stagger on EnemyNavAgent when damaged.
 /// </summary>
-public class ZombieHealth : MonoBehaviour
+public class ZombieHealth : NetworkBehaviour
 {
     [Header("Stats")]
     public int maxHealth = 100;
@@ -24,6 +25,10 @@ public class ZombieHealth : MonoBehaviour
 
     private bool isDead;
     private EnemyNavAgent navAgent;
+    public readonly NetworkVariable<int> NetworkHealth = new(0,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public readonly NetworkVariable<bool> NetworkDead = new(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Awake()
     {
@@ -37,6 +42,25 @@ public class ZombieHealth : MonoBehaviour
         HealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
+    public override void OnNetworkSpawn()
+    {
+        NetworkHealth.OnValueChanged += OnNetworkHealthChanged;
+        NetworkDead.OnValueChanged += OnNetworkDeadChanged;
+        if (IsServer)
+        {
+            NetworkHealth.Value = maxHealth;
+            NetworkDead.Value = false;
+        }
+        currentHealth = NetworkHealth.Value > 0 ? NetworkHealth.Value : maxHealth;
+        HealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        NetworkHealth.OnValueChanged -= OnNetworkHealthChanged;
+        NetworkDead.OnValueChanged -= OnNetworkDeadChanged;
+    }
+
     private void Start()
     {
         currentHealth = maxHealth;
@@ -45,9 +69,11 @@ public class ZombieHealth : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        if (!NetworkGameplayAuthority.IsServer || !NetworkGameplayAuthority.CanMutate) return;
         if (isDead) return;
 
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Max(0, amount));
+        if (IsSpawned) NetworkHealth.Value = currentHealth;
         HealthChanged?.Invoke(currentHealth, maxHealth);
 
         // Trigger hit stagger (slow down briefly)
@@ -61,6 +87,7 @@ public class ZombieHealth : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+        if (IsSpawned) NetworkDead.Value = true;
 
         AudioManager.PlaySfx(AudioCue.ZombieDeath);
 
@@ -86,6 +113,31 @@ public class ZombieHealth : MonoBehaviour
         ZombieAttack attack = GetComponent<ZombieAttack>();
         if (attack != null) attack.enabled = false;
 
-        Destroy(gameObject, deathDelay);
+        StartCoroutine(ServerDespawnAfterDelay());
+    }
+
+    private System.Collections.IEnumerator ServerDespawnAfterDelay()
+    {
+        yield return new WaitForSeconds(deathDelay);
+        NetworkObject no = GetComponent<NetworkObject>();
+        if (no != null && no.IsSpawned && IsServer) no.Despawn(true);
+        else if (this != null) Destroy(gameObject);
+    }
+
+    private void OnNetworkHealthChanged(int previous, int current)
+    {
+        currentHealth = current;
+        HealthChanged?.Invoke(currentHealth, maxHealth);
+        if (!IsServer && current < previous) navAgent?.TriggerHitStaggerVisual();
+    }
+
+    private void OnNetworkDeadChanged(bool previous, bool current)
+    {
+        if (!current || IsServer) return;
+        isDead = true;
+        navAgent?.ApplyRemoteDeathVisual();
+        foreach (Collider col in GetComponentsInChildren<Collider>()) col.enabled = false;
+        AudioManager.PlaySfx(AudioCue.ZombieDeath);
+        if (deathFXPrefab != null) Instantiate(deathFXPrefab, transform.position, Quaternion.identity);
     }
 }

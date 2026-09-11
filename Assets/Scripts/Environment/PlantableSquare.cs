@@ -2,6 +2,7 @@
 
 public class PlantableSquare : MonoBehaviour
 {
+    private static readonly System.Collections.Generic.Dictionary<int, PlantableSquare> Registry = new();
     public bool isOccupied = false;
 
     /// <summary>
@@ -14,6 +15,40 @@ public class PlantableSquare : MonoBehaviour
     private MaterialPropertyBlock propBlock;
     private MaterialPropertyBlock originalPropertyBlock;
     private Color originalColor;
+    private bool serverReserved;
+    public int StableId { get; private set; }
+
+    private void Awake()
+    {
+        StableId = ComputeStableId(transform);
+        if (Registry.TryGetValue(StableId, out PlantableSquare existing) && existing != this)
+            Debug.LogError($"[NET][PLANT] Duplicate square id={StableId}: {existing.name} and {name}.");
+        Registry[StableId] = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Registry.TryGetValue(StableId, out PlantableSquare current) && current == this)
+            Registry.Remove(StableId);
+    }
+
+    public static PlantableSquare Find(int stableId)
+    {
+        Registry.TryGetValue(stableId, out PlantableSquare square);
+        return square;
+    }
+
+    public bool ServerTryReserve()
+    {
+        if (!NetworkGameplayAuthority.IsServer || isOccupied || serverReserved) return false;
+        serverReserved = true;
+        return true;
+    }
+
+    public void ServerCancelReservation()
+    {
+        if (NetworkGameplayAuthority.IsServer) serverReserved = false;
+    }
 
     void Start()
     {
@@ -51,6 +86,7 @@ public class PlantableSquare : MonoBehaviour
     /// </summary>
     public void PlantHere(PlantBase plant)
     {
+        serverReserved = false;
         isOccupied = true;
         currentPlant = plant;
         plant.mySquare = this;
@@ -62,9 +98,28 @@ public class PlantableSquare : MonoBehaviour
     /// </summary>
     public void RemovePlant()
     {
+        serverReserved = false;
         isOccupied = false;
         currentPlant = null;
         UpdateVisual();
+    }
+
+    private static int ComputeStableId(Transform value)
+    {
+        unchecked
+        {
+            string path = value.GetSiblingIndex() + ":" + value.name;
+            Transform current = value;
+            while (current.parent != null)
+            {
+                current = current.parent;
+                path = current.GetSiblingIndex() + ":" + current.name + "/" + path;
+            }
+            string key = value.gameObject.scene.name + "/" + path;
+            uint hash = 2166136261;
+            for (int i = 0; i < key.Length; i++) { hash ^= key[i]; hash *= 16777619; }
+            return (int)(hash & 0x7fffffff);
+        }
     }
 
     /// <summary>

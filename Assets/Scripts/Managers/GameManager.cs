@@ -31,11 +31,44 @@ public class GameManager : MonoBehaviour
 
     public GameState CurrentState => currentState;
 
+    private void Start()
+    {
+        if (NetworkMatchState.Instance == null) return;
+        NetworkMatchState.Instance.PhaseChanged += OnNetworkPhaseChanged;
+        OnNetworkPhaseChanged(NetworkMatchState.Instance.Phase.Value, NetworkMatchState.Instance.Phase.Value);
+    }
+
+    private void OnNetworkPhaseChanged(MatchPhase previous, MatchPhase current)
+    {
+        if (current == MatchPhase.Won)
+        {
+            currentState = GameState.Won;
+            AudioManager.PlaySfx(AudioCue.Win);
+            bool hasNext = NetworkMatchState.Instance != null && NetworkMatchState.Instance.CurrentRound.Value < 3;
+            GameUIManager.Instance?.ShowWinScreen(hasNext);
+        }
+        else if (current == MatchPhase.Lost)
+        {
+            currentState = GameState.Lost;
+            AudioManager.PlaySfx(AudioCue.Lose);
+            GameUIManager.Instance?.ShowLoseScreen();
+        }
+        else if (current == MatchPhase.Playing)
+        {
+            currentState = GameState.Playing;
+        }
+    }
+
     // ──────────────────────────────────────────────────────────
     // Called by ZombieSpawner when all waves are cleared
     // ──────────────────────────────────────────────────────────
     public void OnAllWavesComplete()
     {
+        if (NetworkMatchState.Instance != null)
+        {
+            NetworkMatchState.Instance.ServerRequestWin();
+            return;
+        }
         if (currentState != GameState.Playing) return;
 
         currentState = GameState.Won;
@@ -67,6 +100,11 @@ public class GameManager : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     public void OnHouseDestroyed()
     {
+        if (NetworkMatchState.Instance != null)
+        {
+            NetworkMatchState.Instance.ServerTrySetTerminal(MatchPhase.Lost);
+            return;
+        }
         if (currentState != GameState.Playing) return;
 
         currentState = GameState.Lost;
@@ -87,12 +125,22 @@ public class GameManager : MonoBehaviour
     public void RestartScene()
     {
         Time.timeScale = 1f;
+        if (NetworkBootstrap.IsNetworkSession && NetworkBootstrap.Instance != null)
+        {
+            if (NetworkBootstrap.Instance.IsHost) NetworkBootstrap.Instance.ServerRestartCurrentScene();
+            return;
+        }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void LoadNextRound()
     {
         Time.timeScale = 1f;
+        if (NetworkBootstrap.IsNetworkSession && NetworkBootstrap.Instance != null)
+        {
+            if (NetworkBootstrap.Instance.IsHost) NetworkBootstrap.Instance.ServerLoadNextRound();
+            return;
+        }
         if (GameDataCarrier.Instance != null && GameDataCarrier.Instance.HasNextRound)
         {
             string nextScene = GameDataCarrier.Instance.GetNextRoundScene();
@@ -108,6 +156,11 @@ public class GameManager : MonoBehaviour
     public void ReturnToMainMenu()
     {
         Time.timeScale = 1f;
+        if (NetworkBootstrap.IsNetworkSession && NetworkBootstrap.Instance != null)
+        {
+            _ = NetworkBootstrap.Instance.LeaveToMenuAsync();
+            return;
+        }
         string sceneName = GameDataCarrier.MainMenuSceneName;
         if (string.IsNullOrEmpty(sceneName)) sceneName = "MainMenu";
         SceneManager.LoadScene(sceneName);
@@ -115,6 +168,8 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (NetworkMatchState.Instance != null)
+            NetworkMatchState.Instance.PhaseChanged -= OnNetworkPhaseChanged;
         if (Instance == this) Instance = null;
         Time.timeScale = 1f;
     }

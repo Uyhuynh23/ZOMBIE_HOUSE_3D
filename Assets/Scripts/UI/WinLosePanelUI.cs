@@ -92,11 +92,24 @@ public class WinLosePanelUI : MonoBehaviour
     private void OnRestart()
     {
         Time.timeScale = 1f;
+        if (NetworkBootstrap.IsNetworkSession && NetworkBootstrap.Instance != null)
+        {
+            if (NetworkBootstrap.Instance.IsHost)
+                NetworkBootstrap.Instance.ServerRestartCurrentScene();
+            return;
+        }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void OnNext()
     {
+        if (NetworkBootstrap.IsNetworkSession && NetworkBootstrap.Instance != null)
+        {
+            if (NetworkBootstrap.Instance.IsHost)
+                NetworkBootstrap.Instance.ServerLoadNextRound();
+            return;
+        }
+
         if (GameManager.Instance != null)
             GameManager.Instance.LoadNextRound();
         else
@@ -106,9 +119,14 @@ public class WinLosePanelUI : MonoBehaviour
         }
     }
 
-    private void OnHome()
+    private async void OnHome()
     {
         Time.timeScale = 1f;
+        if (NetworkBootstrap.IsNetworkSession && NetworkBootstrap.Instance != null)
+        {
+            await NetworkBootstrap.Instance.LeaveToMenuAsync();
+            return;
+        }
         string menuScene = GameDataCarrier.MainMenuSceneName;
         if (string.IsNullOrEmpty(menuScene)) menuScene = "MainMenu";
         SceneManager.LoadScene(menuScene);

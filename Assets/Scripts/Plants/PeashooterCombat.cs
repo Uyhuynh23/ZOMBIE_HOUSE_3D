@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(SphereCollider), typeof(CapsuleCollider))]
 public class PeashooterCombat : PlantBase
@@ -139,6 +140,7 @@ public class PeashooterCombat : PlantBase
 
     void Update()
     {
+        if (!NetworkGameplayAuthority.CanMutate) return;
         // Clean up destroyed/dead enemies. Taking damage does not disable this
         // combat component, so a living plant keeps firing while being eaten.
         zombiesInRange.RemoveWhere(z =>
@@ -206,7 +208,10 @@ public class PeashooterCombat : PlantBase
     {
         if (ObjectPoolManager.Instance == null || spawnPoint == null) return;
 
-        GameObject pea = ObjectPoolManager.Instance.GetPea();
+        bool networked = NetworkBootstrap.IsNetworkSession;
+        GameObject pea = networked
+            ? Instantiate(ObjectPoolManager.Instance.peaPrefab)
+            : ObjectPoolManager.Instance.GetPea();
         pea.transform.position = spawnPoint.position;
 
         Vector3 aimDir = GetAimDirection();
@@ -236,6 +241,19 @@ public class PeashooterCombat : PlantBase
         }
         pp.Initialize(gameObject);
 
+        if (networked)
+        {
+            NetworkObject no = pea.GetComponent<NetworkObject>();
+            if (no == null)
+            {
+                Debug.LogError("[NET][PLANT] Pea projectile is missing NetworkObject.");
+                Destroy(pea);
+                return;
+            }
+            no.Spawn(true);
+            Debug.Log($"[NET][PLANT] Projectile spawned id={no.NetworkObjectId} ownerPlant={NetworkObjectId}.");
+        }
+
         AudioManager.PlaySfx(AudioCue.PeashooterShot);
 
         if (animator != null)
@@ -260,6 +278,7 @@ public class PeashooterCombat : PlantBase
 
     void OnTriggerEnter(Collider other)
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         ZombieHealth health = other != null ? other.GetComponentInParent<ZombieHealth>() : null;
         if (health != null && health.currentHealth > 0)
         {
@@ -271,6 +290,7 @@ public class PeashooterCombat : PlantBase
 
     void OnTriggerExit(Collider other)
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         ZombieHealth health = other != null ? other.GetComponentInParent<ZombieHealth>() : null;
         if (health != null) zombiesInRange.Remove(health.gameObject);
     }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(CapsuleCollider))]
 public class SunflowerLogic : PlantBase
@@ -39,6 +40,7 @@ public class SunflowerLogic : PlantBase
 
     void Update()
     {
+        if (!NetworkGameplayAuthority.CanMutate) return;
         timer -= Time.deltaTime;
         if (timer <= 0f)
         {
@@ -57,7 +59,14 @@ public class SunflowerLogic : PlantBase
         if (sunPrefab != null)
         {
             Vector3 spawnPos = transform.position + transform.forward * 1f + Vector3.up * 1f;
-            Instantiate(sunPrefab, spawnPos, Quaternion.identity);
+            GameObject sun = Instantiate(sunPrefab, spawnPos, Quaternion.identity);
+            if (NetworkBootstrap.IsNetworkSession)
+            {
+                NetworkObject no = sun.GetComponent<NetworkObject>();
+                if (no == null) { Debug.LogError("[NET][ECON] Sun prefab missing NetworkObject."); Destroy(sun); return; }
+                no.Spawn(true);
+                Debug.Log($"[NET][ECON] Sunflower spawned Sun id={no.NetworkObjectId}.");
+            }
         }
         else
         {

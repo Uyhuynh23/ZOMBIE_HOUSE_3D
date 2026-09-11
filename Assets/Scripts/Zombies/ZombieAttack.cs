@@ -49,6 +49,7 @@ public class ZombieAttack : MonoBehaviour
 
     private void Update()
     {
+        if (!NetworkGameplayAuthority.CanMutate) return;
         if (GameManager.Instance != null &&
             GameManager.Instance.CurrentState != GameManager.GameState.Playing)
             return;
@@ -138,11 +139,13 @@ public class ZombieAttack : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         TryBlockOnPlant(collision.collider);
     }
 
     private void OnCollisionStay(Collision collision)
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         TryBlockOnPlant(collision.collider);
     }
 

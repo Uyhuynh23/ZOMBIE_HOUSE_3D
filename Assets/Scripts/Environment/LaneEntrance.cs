@@ -34,6 +34,7 @@ public class LaneEntrance : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         if (other.isTrigger) return;
 
         EnemyNavAgent navAgent = other.GetComponentInParent<EnemyNavAgent>();

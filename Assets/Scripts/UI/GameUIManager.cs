@@ -44,6 +44,19 @@ public class GameUIManager : MonoBehaviour
 
     private PlayerController player;
 
+    public PlayerController BoundPlayer => player;
+
+    public void BindLocalPlayer(PlayerController localPlayer)
+    {
+        player = localPlayer;
+        if (plantCards != null)
+        {
+            foreach (PlantCardUI card in plantCards)
+                if (card != null) card.BindPlayer(localPlayer);
+        }
+        if (shovelCard != null) shovelCard.BindPlayer(localPlayer);
+    }
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -167,12 +180,6 @@ public class GameUIManager : MonoBehaviour
             insufficientFlashTimer -= Time.deltaTime;
         }
 
-        // Lazy lookup for player
-        if (player == null)
-        {
-            player = Object.FindFirstObjectByType<PlayerController>();
-        }
-
         // Clear burst flash timer immediately when selection changes
         if (player != null)
         {
@@ -241,6 +248,21 @@ public class GameUIManager : MonoBehaviour
 
     private void UpdateBattleStatus()
     {
+        NetworkMatchState match = NetworkMatchState.Instance;
+        if (match != null)
+        {
+            if (roundText != null) roundText.text = $"ROUND {match.CurrentRound.Value} / 3";
+            ZombieSpawner authoritativeSpawner = ZombieSpawner.Instance;
+            int totalWaves = authoritativeSpawner != null ? authoritativeSpawner.TotalWaves : 1;
+            if (waveText != null) waveText.text = $"WAVE {match.CurrentWaveIndex.Value + 1}/{totalWaves}";
+            if (zombieText != null)
+                zombieText.text = $"ZOMBIES  {match.ActiveEnemyCount.Value} active  •  {match.RemainingToSpawn.Value} incoming";
+            int maxHouse = HouseHealth.Instance != null ? HouseHealth.Instance.maxHealth : Mathf.Max(1, match.HouseHealth.Value);
+            if (houseHealthFill != null) houseHealthFill.fillAmount = Mathf.Clamp01((float)match.HouseHealth.Value / maxHouse);
+            if (houseHealthText != null) houseHealthText.text = $"HOUSE  {match.HouseHealth.Value}/{maxHouse}";
+            return;
+        }
+
         if (roundText != null && GameDataCarrier.Instance != null)
         {
             roundText.text = $"ROUND {GameDataCarrier.Instance.currentRound} / {GameDataCarrier.Instance.roundSceneNames.Length}";

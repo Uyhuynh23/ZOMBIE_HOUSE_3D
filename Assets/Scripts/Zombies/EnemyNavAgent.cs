@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.Netcode;
 
 /// <summary>
 /// Hybrid AI controller — Plants vs. Zombies style.
@@ -33,7 +34,7 @@ using UnityEngine.AI;
 ///                         Use 90 / -90 for models whose art faces ±X.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
-public class EnemyNavAgent : MonoBehaviour
+public class EnemyNavAgent : NetworkBehaviour
 {
     // ──────────────────────────────────────────────────────────
     // Inspector
@@ -91,7 +92,7 @@ public class EnemyNavAgent : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     // Private
     // ──────────────────────────────────────────────────────────
-    private enum AIState
+    public enum AIState : byte
     {
         OutsideFence,    // NavMesh free movement
         EnteringLane,    // Manual walk to laneEntry point
@@ -101,6 +102,12 @@ public class EnemyNavAgent : MonoBehaviour
         Dead
     }
     private AIState state = AIState.OutsideFence;
+    public readonly NetworkVariable<byte> NetworkState = new((byte)AIState.OutsideFence,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public readonly NetworkVariable<int> NetworkLaneId = new(-1,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public AIState CurrentState => NetworkBootstrap.IsNetworkSession && IsSpawned
+        ? (AIState)NetworkState.Value : state;
 
     // Lane
     private LanePath  assignedLane;
@@ -127,6 +134,7 @@ public class EnemyNavAgent : MonoBehaviour
     /// </summary>
     public void AssignLane(LanePath lane)
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         if (HasLaneAssigned || lane == null || !lane.IsValid) return;
 
         assignedLane    = lane;
@@ -144,8 +152,9 @@ public class EnemyNavAgent : MonoBehaviour
             agent.enabled = false;
         }
 
-        state = AIState.EnteringLane;
-        Debug.Log($"[EnemyNavAgent] {name}: assigned lane '{lane.name}', entering lane.");
+        NetworkLaneId.Value = lane.StableId;
+        SetState(AIState.EnteringLane);
+        Debug.Log($"[NET][ENEMY] {name} assigned lane={lane.name} stableId={NetworkLaneId.Value}.");
     }
 
     /// <summary>Called by ZombieAttack (via ClearBlockingPlant) when attacking plant dies.</summary>
@@ -154,7 +163,7 @@ public class EnemyNavAgent : MonoBehaviour
         BlockingPlant = null;
         // Resume movement along the same lane — never call NavMesh again
         if (!IsDead && state == AIState.AttackingPlant)
-            state = AIState.MovingInLane;
+            SetState(AIState.MovingInLane);
     }
 
     /// <summary>
@@ -168,7 +177,7 @@ public class EnemyNavAgent : MonoBehaviour
 
         BlockingPlant = plant;
         if (AgentValid()) agent.isStopped = true;
-        state = AIState.AttackingPlant;
+        SetState(AIState.AttackingPlant);
         SetAnimSpeed(0f);
     }
 
@@ -211,6 +220,11 @@ public class EnemyNavAgent : MonoBehaviour
 
     private void Start()
     {
+        if (NetworkBootstrap.IsNetworkSession && !IsServer)
+        {
+            if (agent != null) agent.enabled = false;
+            return;
+        }
         if (houseTarget == null)
         {
             GameObject h = GameObject.FindWithTag("HouseTarget");
@@ -231,6 +245,11 @@ public class EnemyNavAgent : MonoBehaviour
 
     private void Update()
     {
+        if (NetworkBootstrap.IsNetworkSession && !IsServer)
+        {
+            ApplyRemoteVisualState();
+            return;
+        }
         if (IsDead) return;
 
         bool paused = GameManager.Instance != null &&
@@ -301,7 +320,7 @@ public class EnemyNavAgent : MonoBehaviour
         if (toTarget.magnitude <= laneEntryRadius)
         {
             manualMoveDir = laneDir;
-            state = AIState.MovingInLane;
+            SetState(AIState.MovingInLane);
             return;
         }
 
@@ -319,7 +338,7 @@ public class EnemyNavAgent : MonoBehaviour
         // Plant detection ahead along lane direction
         if (DetectPlantAhead(laneDir))
         {
-            state = AIState.AttackingPlant;
+            SetState(AIState.AttackingPlant);
             SetAnimSpeed(0f);
             return;
         }
@@ -359,7 +378,7 @@ public class EnemyNavAgent : MonoBehaviour
     private void ArriveAtHouse()
     {
         IsAtHouse = true;
-        state     = AIState.AttackingHouse;
+        SetState(AIState.AttackingHouse);
         SetAnimSpeed(0f);
     }
 
@@ -468,6 +487,7 @@ public class EnemyNavAgent : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     public void TriggerHitStagger()
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         if (IsDead || isStaggered) return;
         StartCoroutine(HitStaggerRoutine());
     }
@@ -488,8 +508,9 @@ public class EnemyNavAgent : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     public void OnDeath()
     {
+        if (!NetworkGameplayAuthority.IsServer) return;
         IsDead = true;
-        state  = AIState.Dead;
+        SetState(AIState.Dead);
         if (AgentValid()) { agent.isStopped = true; agent.enabled = false; }
         SetAnimSpeed(0f);
         StopAllCoroutines();
@@ -511,6 +532,36 @@ public class EnemyNavAgent : MonoBehaviour
         agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
         agent.avoidancePriority = Random.Range(20, 80);
         baseSpeed = moveSpeed;
+    }
+
+    public void TriggerHitStaggerVisual()
+    {
+        if (IsServer || IsDead || isStaggered) return;
+        StartCoroutine(HitStaggerRoutine());
+    }
+
+    public void ApplyRemoteDeathVisual()
+    {
+        if (IsServer) return;
+        IsDead = true;
+        state = AIState.Dead;
+        SetAnimSpeed(0f);
+    }
+
+    private void SetState(AIState next)
+    {
+        state = next;
+        if (IsSpawned && IsServer) NetworkState.Value = (byte)next;
+    }
+
+    private void ApplyRemoteVisualState()
+    {
+        AIState remote = (AIState)NetworkState.Value;
+        bool moving = remote == AIState.OutsideFence || remote == AIState.EnteringLane || remote == AIState.MovingInLane;
+        SetAnimSpeed(moving ? 1f : 0f);
+        IsAtHouse = remote == AIState.AttackingHouse;
+        IsDead = remote == AIState.Dead;
+        HasLaneAssigned = NetworkLaneId.Value >= 0;
     }
 
     private bool AgentValid() =>

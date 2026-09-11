@@ -28,6 +28,30 @@ public class LanePath : MonoBehaviour
     public Transform laneEnd;
 
     public bool IsValid => laneEntry != null && laneEnd != null;
+    public int StableId
+    {
+        get
+        {
+            unchecked
+            {
+                uint hash = 2166136261;
+                string key = gameObject.scene.name + "/" + GetHierarchyPath(transform);
+                for (int i = 0; i < key.Length; i++) { hash ^= key[i]; hash *= 16777619; }
+                return (int)(hash & 0x7fffffff);
+            }
+        }
+    }
+
+    private static string GetHierarchyPath(Transform value)
+    {
+        string path = value.GetSiblingIndex() + ":" + value.name;
+        while (value.parent != null)
+        {
+            value = value.parent;
+            path = value.GetSiblingIndex() + ":" + value.name + "/" + path;
+        }
+        return path;
+    }
 
     private void OnDrawGizmos()
     {

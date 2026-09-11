@@ -33,6 +33,11 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     private Color originalCardColor = Color.white;
     private int lastCostSet = -1; // Track to avoid per-frame string alloc
 
+    public void BindPlayer(PlayerController localPlayer)
+    {
+        player = localPlayer;
+    }
+
     void Awake()
     {
         EnsureRectTransform();
@@ -50,7 +55,6 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     void Start()
     {
         EnsureRectTransform();
-        if (player == null) player = Object.FindFirstObjectByType<PlayerController>();
         if (selectionBorder != null)
         {
             selectionBorder.enabled = false;
@@ -64,7 +68,6 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
     {
         if (isShovelCard)
         {
-            if (player == null) player = Object.FindFirstObjectByType<PlayerController>();
             if (player != null)
             {
                 UpdateShovel(player.IsShovelMode);
@@ -176,7 +179,6 @@ public class PlantCardUI : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (player == null) player = Object.FindFirstObjectByType<PlayerController>();
         if (player == null) return;
 
         if (isShovelCard)
