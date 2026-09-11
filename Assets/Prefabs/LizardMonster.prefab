@@ -159,6 +159,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8283346638512062134}
+  - component: {fileID: 5353061399265038706}
   - component: {fileID: 6487212690560708208}
   - component: {fileID: 1386438713804572725}
   - component: {fileID: 8963225281609498997}
@@ -192,6 +193,31 @@ Transform:
   - {fileID: 367678925114167598}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5353061399265038706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308133915224819898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 4107082794
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6487212690560708208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,6 +230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95b98da4e36f34ae09c7d8851d31196d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieHealth
+  ShowTopMostFoldoutHeaderGroup: 1
   maxHealth: 150
   currentHealth: 150
   deathFXPrefab: {fileID: 0}
@@ -363,6 +390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13810d8da005533409408bed1c909149, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyNavAgent
+  ShowTopMostFoldoutHeaderGroup: 1
   houseTarget: {fileID: 0}
   moveSpeed: 1.4
   angularSpeed: 300

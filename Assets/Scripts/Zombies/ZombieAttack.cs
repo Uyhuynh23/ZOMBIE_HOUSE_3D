@@ -57,12 +57,12 @@ public class ZombieAttack : MonoBehaviour
             return;
 
         // Pull state from whichever AI is active
-        PlantBase blockingPlant = navAgent != null  ? navAgent.BlockingPlant
-                                : legacyMover != null ? legacyMover.BlockingPlant
+        PlantBase blockingPlant = (navAgent != null && navAgent.enabled) ? navAgent.BlockingPlant
+                                : (legacyMover != null && legacyMover.enabled) ? legacyMover.BlockingPlant
                                 : null;
 
-        bool isAtHouse = navAgent != null      ? navAgent.IsAtHouse
-                       : legacyMover != null   ? legacyMover.IsAtHouse
+        bool isAtHouse = (navAgent != null && navAgent.enabled) ? navAgent.IsAtHouse
+                       : (legacyMover != null && legacyMover.enabled) ? legacyMover.IsAtHouse
                        : false;
 
         currentTarget = blockingPlant;

@@ -32,6 +32,8 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
     [Header("Map Route")]
     [SerializeField] private ZombieRoute assignedRoute;
     [SerializeField] private int routePointIndex;
+    [Tooltip("Distance threshold to consider a route waypoint reached.")]
+    [SerializeField, Min(0.1f)] private float waypointReachRadius = 0.75f;
 
     [Header("Movement")]
     [SerializeField, Min(0.1f)] private float moveSpeed = 0.95f;
@@ -135,6 +137,8 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
 
         SetAnimationSpeed(0f);
     }
+
+
 
     private void Update()
     {
@@ -283,8 +287,31 @@ public sealed class ZombiePrototypeMover : MonoBehaviour
 
             Vector3 toTarget = point.position - transform.position;
             toTarget.y = 0f;
-            if (toTarget.sqrMagnitude > 0.12f * 0.12f)
+            if (toTarget.sqrMagnitude > waypointReachRadius * waypointReachRadius)
+            {
+                // Check if we already moved past this waypoint towards the next one
+                if (routePointIndex + 1 < assignedRoute.WaypointCount)
+                {
+                    Transform nextPoint = assignedRoute.GetWaypoint(routePointIndex + 1);
+                    if (nextPoint != null)
+                    {
+                        Vector3 segDir = nextPoint.position - point.position;
+                        segDir.y = 0f;
+                        if (segDir.sqrMagnitude > 0.01f)
+                        {
+                            Vector3 fromPoint = transform.position - point.position;
+                            fromPoint.y = 0f;
+                            // If dot product > 0, the zombie is ahead of the waypoint along the segment
+                            if (Vector3.Dot(segDir.normalized, fromPoint) > 0f && toTarget.sqrMagnitude < 2.0f * 2.0f)
+                            {
+                                routePointIndex++;
+                                continue;
+                            }
+                        }
+                    }
+                }
                 break;
+            }
 
             routePointIndex++;
         }

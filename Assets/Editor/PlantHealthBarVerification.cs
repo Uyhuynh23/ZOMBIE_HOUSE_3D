@@ -119,10 +119,10 @@ public static class PlantHealthBarVerification
                 Transform instFill = instance.transform.Find("Plant Health Bar/Background/Fill");
                 RectTransform instFillRect = instFill as RectTransform;
 
-                // Initial full health check: UX requires health bar to be hidden when full health
+                // Initial full health check: UX requires health bar to be hidden when full health (only show when attacked)
                 if (instHealthBar.IsVisible)
                 {
-                    output.AppendLine($"[Verification FAIL] {path} health bar should be hidden at full health for clear UX");
+                    output.AppendLine($"[Verification FAIL] {path} health bar should be hidden at full health (only show when attacked)");
                     continue;
                 }
 

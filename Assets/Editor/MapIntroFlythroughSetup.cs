@@ -371,13 +371,41 @@ public static class MapIntroFlythroughSetup
 
             if (scenePath.Contains("Tutorial"))
             {
-                flyComp.waypoints[1].subtitle = "TUTORIAL: SURVEYING COMPOUND FROM ROOFTOP";
-                flyComp.waypoints[2].subtitle = "TUTORIAL: EAST HIGHWAY (APPROACH CURRENTLY CLEAR)";
-                flyComp.waypoints[3].subtitle = "TUTORIAL: SOUTH ROAD (APPROACH CURRENTLY CLEAR)";
-                flyComp.waypoints[4].subtitle = "TUTORIAL: WEST FOREST (APPROACH CURRENTLY CLEAR)";
-                flyComp.waypoints[5].subtitle = "TUTORIAL: NORTH GATE (APPROACH CURRENTLY CLEAR)";
-                flyComp.waypoints[6].subtitle = "COMPLETE TRAINING CHECKPOINTS BEFORE HORDE ARRIVES";
-                flyComp.waypoints[7].subtitle = "PROCEED TO CHECKPOINT 1 TO BEGIN TRAINING";
+                // For Tutorial: ONLY 1 Threat (East Road) where zombies appear.
+                // Unpack instance so prefab asset and other maps remain unaffected.
+                PrefabUtility.UnpackPrefabInstance(instance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+
+                var wpOverview = flyComp.waypoints[0];
+                var wpRooftop = flyComp.waypoints[1];
+                var wpEast = flyComp.waypoints[2];
+                var wpObjective = flyComp.waypoints[6];
+                var wpHero = flyComp.waypoints[7];
+
+                wpOverview.title = mapTitle;
+                wpOverview.subtitle = "BAKER'S HOMESTEAD & DEFENSE PERIMETER";
+                wpRooftop.subtitle = "TUTORIAL: SURVEYING COMPOUND FROM ROOFTOP";
+                wpEast.title = "THREAT APPROACH: EAST ROAD";
+                wpEast.subtitle = "SCOUTING APPROACH: ZOMBIES WILL ATTACK FROM HERE";
+                wpObjective.subtitle = "COMPLETE TRAINING CHECKPOINTS BEFORE HORDE ARRIVES";
+                wpHero.subtitle = "PROCEED TO CHECKPOINT 1 TO BEGIN TRAINING";
+
+                // Remove unused threat GameObjects from the unpacked scene instance
+                for (int w = 3; w <= 5; w++)
+                {
+                    if (flyComp.waypoints[w].point != null)
+                    {
+                        Object.DestroyImmediate(flyComp.waypoints[w].point.gameObject);
+                    }
+                }
+
+                flyComp.waypoints = new List<MapIntroFlythrough.WaypointData>
+                {
+                    wpOverview,
+                    wpRooftop,
+                    wpEast,
+                    wpObjective,
+                    wpHero
+                };
             }
             else
             {

@@ -188,6 +188,13 @@ public class EnemyNavAgent : NetworkBehaviour
     // ──────────────────────────────────────────────────────────
     private void Awake()
     {
+        // In Tutorial scenes, simple route movement (ZombiePrototypeMover) is used
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name.IndexOf("Tutorial", System.StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            enabled = false;
+            return;
+        }
+
         agent = GetComponent<NavMeshAgent>();
         attack = GetComponent<ZombieAttack>();
         if (useSharedMoveAnimation && animator == null)

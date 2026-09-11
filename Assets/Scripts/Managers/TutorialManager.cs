@@ -14,7 +14,17 @@ using UnityEngine.UI;
 /// </summary>
 public class TutorialManager : MonoBehaviour
 {
-    public static TutorialManager Instance { get; private set; }
+    private static TutorialManager _instance;
+    public static TutorialManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = Object.FindFirstObjectByType<TutorialManager>();
+            return _instance;
+        }
+        private set => _instance = value;
+    }
 
     public enum TutorialPhase
     {
@@ -40,7 +50,7 @@ public class TutorialManager : MonoBehaviour
     public GameObject zombiePrefab;
     public Transform[] sunSpawnPoints;
     public float zombieSpawnInterval = 2.0f;
-    public int tutorialZombieCount = 5;
+    public int tutorialZombieCount = 3;
 
     [Header("End-Tutorial UI")]
     public GameObject completionPanel;
@@ -80,6 +90,7 @@ public class TutorialManager : MonoBehaviour
 
     private void Awake()
     {
+        Application.runInBackground = true;
         if (Instance == null) Instance = this;
         else if (Instance != this) { Destroy(gameObject); return; }
 
@@ -407,7 +418,7 @@ public class TutorialManager : MonoBehaviour
         string a = hasAttacked ? "<color=#55FF55>[✓]</color>" : "[ ]";
         string r = hasReachedWaypoint1 ? "<color=#55FF55>[✓]</color>" : "[ ]";
         SetObjectiveBanner("CHECKPOINT 1: HERO MANEUVERS & COMBAT",
-            $"{m} Move (WASD)   •   {a} Strike (Space/LMB)   •   {r} Reach Beacon");
+            $"{m} Move   •   {a} Strike   •   {r} Reach Beacon");
     }
 
     private string GetPhase1Checklist()
@@ -526,7 +537,7 @@ public class TutorialManager : MonoBehaviour
         string s2 = hasPlantedSunflower ? "<color=#55FF55>[✓]</color>" : "[ ]";
         string s3 = hasPlantedPeashooter ? "<color=#55FF55>[✓]</color>" : "[ ]";
         SetObjectiveBanner("CHECKPOINT 2: SUN HARVEST & PLANT DEFENSES",
-            $"{s1} Collect Sun (+25)   •   {s2} Plant Sunflower (3+E)   •   {s3} Plant Peashooter (1+E)");
+            $"{s1} Collect Sun   •   {s2} Plant Sunflower   •   {s3} Plant Peashooter");
     }
 
     private string GetPhase2Checklist()
@@ -584,7 +595,7 @@ public class TutorialManager : MonoBehaviour
         }
 
         SetObjectiveBanner("CHECKPOINT 3: REPEL THE ZOMBIE WAVE",
-            $"[ ] Defend the Baker's House   •   [ ] Defeat Zombies (0/{tutorialZombieCount})");
+            $"[ ] Defend Baker's House   •   [ ] Defeat Zombies: 0/{tutorialZombieCount}");
 
         StartCoroutine(SpawnTutorialZombieWave());
     }
@@ -610,9 +621,18 @@ public class TutorialManager : MonoBehaviour
                 GameObject zombieObj = Instantiate(zombiePrefab, spawnPos, Quaternion.identity);
                 zombieObj.name = $"TutorialZombie_{i + 1}";
 
+                // Disable NavMesh and Network components in Tutorial scene since tutorial uses simple route movement
+                var nav = zombieObj.GetComponent<EnemyNavAgent>();
+                if (nav != null) nav.enabled = false;
+                var agent = zombieObj.GetComponent<UnityEngine.AI.NavMeshAgent>();
+                if (agent != null) agent.enabled = false;
+                var nt = zombieObj.GetComponent<Unity.Netcode.Components.NetworkTransform>();
+                if (nt != null) nt.enabled = false;
+
                 ZombiePrototypeMover mover = zombieObj.GetComponent<ZombiePrototypeMover>();
                 if (mover != null)
                 {
+                    mover.enabled = true;
                     Animator anim = zombieObj.GetComponentInChildren<Animator>();
                     mover.ConfigureRoute(anim, tutorialRoute, 1.6f);
                 }
@@ -645,7 +665,7 @@ public class TutorialManager : MonoBehaviour
 
             string zCheck = (eliminated >= tutorialZombieCount) ? "<color=#55FF55>[✓]</color>" : "[ ]";
             SetObjectiveBanner("CHECKPOINT 3: REPEL THE ZOMBIE WAVE",
-                $"[ ] Defend the Baker's House   •   {zCheck} Defeat Zombies ({eliminated}/{tutorialZombieCount})");
+                $"[ ] Defend Baker's House   •   {zCheck} Defeat Zombies: {eliminated}/{tutorialZombieCount}");
 
             if (!isSpawningZombies && activeTutorialZombies.Count == 0 && !isCompletingTutorial)
             {
@@ -657,10 +677,12 @@ public class TutorialManager : MonoBehaviour
 
     private void UpdatePhase3()
     {
+        if (isSpawningZombies) return;
+
         // Clean up any destroyed zombies
         activeTutorialZombies.RemoveAll(z => z == null || z.currentHealth <= 0);
 
-        if (!isSpawningZombies && activeTutorialZombies.Count == 0 && !isCompletingTutorial)
+        if (activeTutorialZombies.Count == 0 && !isCompletingTutorial)
         {
             isCompletingTutorial = true;
             StartCoroutine(CompleteTutorial());

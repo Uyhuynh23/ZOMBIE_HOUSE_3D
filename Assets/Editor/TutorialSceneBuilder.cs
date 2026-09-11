@@ -103,7 +103,7 @@ public static class TutorialSceneBuilder
         manager.houseHealth = houseHealth;
         manager.sunPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SunPrefabPath);
         manager.zombiePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(ZombiePrefabPath);
-        manager.tutorialZombieCount = 5;
+        manager.tutorialZombieCount = 3;
         manager.zombieSpawnInterval = 2.0f;
         manager.completionPanel = completionPanel;
         manager.titleFont = LoadShlopFont();
@@ -233,7 +233,7 @@ public static class TutorialSceneBuilder
     {
         GameObject line = new GameObject("East Road Plants");
         line.transform.SetParent(parent);
-        float[] distances = { 15f, 11f, 7f };
+        float[] distances = { 16f, 13f, 10f, 7f };
 
         foreach (float distance in distances)
         {
@@ -242,9 +242,15 @@ public static class TutorialSceneBuilder
                 ? (GameObject)PrefabUtility.InstantiatePrefab(squarePrefab, line.transform)
                 : GameObject.CreatePrimitive(PrimitiveType.Cube);
 
+            if (squarePrefab != null)
+            {
+                PrefabUtility.UnpackPrefabInstance(square, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            }
+
             square.name = $"Plantable East {distance:00}";
-            square.transform.position = GroundPoint(terrain, center + Vector3.right * distance, 0.06f);
-            square.transform.rotation = Quaternion.identity;
+            square.tag = "PlantableNode";
+            square.transform.position = GroundPoint(terrain, center + Vector3.right * distance, 0.04f);
+            square.transform.rotation = Quaternion.Euler(0f, 90f, 0f); // Face East down the road toward oncoming zombies
             square.transform.localScale = new Vector3(1.35f, 0.14f, 1.35f);
 
             PlantableSquare plantable = square.GetComponent<PlantableSquare>();

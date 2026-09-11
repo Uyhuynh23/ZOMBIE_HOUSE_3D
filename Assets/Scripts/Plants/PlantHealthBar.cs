@@ -54,6 +54,10 @@ public sealed class PlantHealthBar : MonoBehaviour
                 SetVisible(false);
                 isUnderAttack = false;
             }
+            else
+            {
+                SetVisible(plant.currentHealth > 0);
+            }
         }
     }
 
@@ -74,7 +78,7 @@ public sealed class PlantHealthBar : MonoBehaviour
 
     private void Update()
     {
-        if (hideDelayAfterAttack > 0f && isUnderAttack)
+        if (hideAtFullHealth && hideDelayAfterAttack > 0f && isUnderAttack)
         {
             hideTimer -= Time.deltaTime;
             if (hideTimer <= 0f)
@@ -112,6 +116,8 @@ public sealed class PlantHealthBar : MonoBehaviour
 
             if (hideAtFullHealth && (plant == null || plant.currentHealth >= plant.maxHealth))
                 SetVisible(false);
+            else
+                SetVisible(plant == null || plant.currentHealth > 0);
             return;
         }
 
@@ -163,6 +169,8 @@ public sealed class PlantHealthBar : MonoBehaviour
 
         if (hideAtFullHealth && (plant == null || plant.currentHealth >= plant.maxHealth))
             SetVisible(false);
+        else
+            SetVisible(plant == null || plant.currentHealth > 0);
     }
 
     private void ConfigureCanvas(Canvas canvas)
@@ -192,7 +200,6 @@ public sealed class PlantHealthBar : MonoBehaviour
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         foreach (Renderer r in renderers)
         {
-            if (r is CanvasRenderer) continue;
             if (canvasTransform != null && r.transform.IsChildOf(canvasTransform)) continue;
             if (!r.enabled || !r.gameObject.activeInHierarchy) continue;
 
@@ -252,10 +259,10 @@ public sealed class PlantHealthBar : MonoBehaviour
             isUnderAttack = false;
             SetVisible(false);
         }
-        else if (hideAtFullHealth && current >= maximum)
+        else if (current >= maximum)
         {
             isUnderAttack = false;
-            SetVisible(false);
+            SetVisible(!hideAtFullHealth);
         }
 
         Refresh(current, maximum);
@@ -263,6 +270,7 @@ public sealed class PlantHealthBar : MonoBehaviour
 
     public void TriggerDamageReveal()
     {
+        if (plant != null && plant.currentHealth <= 0) return;
         isUnderAttack = true;
         hideTimer = hideDelayAfterAttack;
         SetVisible(true);

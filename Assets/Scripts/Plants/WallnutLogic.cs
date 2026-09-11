@@ -36,6 +36,8 @@ public class WallnutLogic : PlantBase
     {
         base.TakeDamage(amount);
 
+        if (currentHealth <= 0) return;
+
         // Trigger squash & wobble reaction when bitten
         hitReactionTime = ReactionDuration;
 

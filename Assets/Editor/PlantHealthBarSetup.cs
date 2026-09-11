@@ -112,6 +112,7 @@ public static class PlantHealthBarSetup
             Transform barTransform = root.transform.Find("Plant Health Bar");
             GameObject barObject = barTransform != null ? barTransform.gameObject : new GameObject("Plant Health Bar");
             barObject.transform.SetParent(root.transform, false);
+            barObject.SetActive(true);
 
             RectTransform canvasRect = barObject.GetComponent<RectTransform>();
             if (canvasRect == null) canvasRect = barObject.AddComponent<RectTransform>();
