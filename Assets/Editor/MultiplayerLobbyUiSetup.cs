@@ -126,10 +126,10 @@ public static class MultiplayerLobbyUiSetup
 
         // 6. Right Multiplayer Panel (using user provided background frame)
         GameObject multiplayer = UiObject("MultiplayerArea", root.transform);
-        SetRect(multiplayer.GetComponent<RectTransform>(), new Vector2(635f, -65f), new Vector2(490f, 860f));
+        SetRect(multiplayer.GetComponent<RectTransform>(), new Vector2(630f, -85f), new Vector2(475f, 830f));
 
         Image panelArt = CreateArt(multiplayer.transform, "MultiplayerPanelArt", "mp_panel_base.png",
-            Vector2.zero, new Vector2(490f, 860f));
+            Vector2.zero, new Vector2(475f, 830f));
         panelArt.preserveAspect = false;
 
         GameObject interaction = UiObject("InteractionLayer", multiplayer.transform);
@@ -137,61 +137,66 @@ public static class MultiplayerLobbyUiSetup
 
         // Multiplayer Header
         CreateArt(interaction.transform, "MultiplayerHeader", "hdr_multi.png",
-            new Vector2(0f, 355f), new Vector2(416f, 70f));
+            new Vector2(0f, 345f), new Vector2(380f, 85f));
 
         // Solo Button
         ui.soloButton = CreateSpriteButton(interaction.transform, "SoloButton",
             "btn_solo.png", "btn_solo_hover.png", "btn_solo_pressed.png", "btn_solo_disabled.png",
-            new Vector2(0f, 270f), new Vector2(416f, 82f));
+            new Vector2(0f, 245f), new Vector2(380f, 85f));
         ui.soloButton.gameObject.AddComponent<UIButtonHoverEffect>();
 
         // Host Online Button
         ui.hostButton = CreateSpriteButton(interaction.transform, "HostOnlineButton",
             "btn_host.png", "btn_host_hover.png", "btn_host_pressed.png", "btn_host_disabled.png",
-            new Vector2(0f, 172f), new Vector2(416f, 82f));
+            new Vector2(0f, 145f), new Vector2(380f, 85f));
         ui.hostButton.gameObject.AddComponent<UIButtonHoverEffect>();
 
         // Join Room Header
         CreateArt(interaction.transform, "JoinRoomHeader", "hdr_join.png",
-            new Vector2(-60f, 95f), new Vector2(290f, 57f));
+            new Vector2(-20f, 55f), new Vector2(300f, 70f));
 
         // Room Code Input & Join Button
         ui.roomCodeInput = CreateInput(interaction.transform, "RoomCodeInput",
-            new Vector2(-63f, 32f), new Vector2(254f, 55f));
+            new Vector2(-65f, -15f), new Vector2(240f, 58f));
 
         ui.joinButton = CreateSpriteButton(interaction.transform, "JoinButton",
             "btn_join.png", "btn_join_hover.png", "btn_join_pressed.png", "btn_join_disabled.png",
-            new Vector2(148f, 32f), new Vector2(118f, 55f));
+            new Vector2(135f, -15f), new Vector2(115f, 58f));
         ui.joinButton.gameObject.AddComponent<UIButtonHoverEffect>();
 
-        // Info Box
-        CreateArt(interaction.transform, "RoomInfoFill", "info_box_bg.png",
-            new Vector2(0f, -62f), new Vector2(416f, 96f));
+        // Info Box (Image already has "Room code:" and "Players:" rendered cleanly on the left)
+        Image infoFill = CreateArt(interaction.transform, "RoomInfoFill", "info_box_bg.png",
+            new Vector2(0f, -113f), new Vector2(380f, 115f));
+        infoFill.preserveAspect = false;
 
-        CreateText(interaction.transform, "RoomCodeLabel", "Room code:", 18f,
-            new Vector2(-85f, -46f), new Vector2(170f, 26f), TextAlignmentOptions.MidlineLeft);
-        CreateText(interaction.transform, "PlayerCountLabel", "Players:", 18f,
-            new Vector2(-85f, -78f), new Vector2(170f, 26f), TextAlignmentOptions.MidlineLeft);
-        ui.roomCodeText = CreateText(interaction.transform, "RoomCodeValue", "—", 19f,
-            new Vector2(85f, -46f), new Vector2(170f, 26f), TextAlignmentOptions.MidlineLeft);
-        ui.rosterText = CreateText(interaction.transform, "PlayerCountValue", "offline", 19f,
-            new Vector2(85f, -78f), new Vector2(170f, 26f), TextAlignmentOptions.MidlineLeft);
+        // Dynamic values placed neatly to the right of baked labels
+        ui.roomCodeText = CreateText(interaction.transform, "RoomCodeValue", "—", 28f,
+            new Vector2(-30f, -99f), new Vector2(190f, 36f), TextAlignmentOptions.MidlineLeft);
+        ui.roomCodeText.rectTransform.pivot = new Vector2(0f, 0.5f);
+        ui.roomCodeText.color = new Color(1f, 0.88f, 0.35f, 1f); // Vibrant warm gold
+        ui.roomCodeText.fontStyle = FontStyles.Bold;
+
+        ui.rosterText = CreateText(interaction.transform, "PlayerCountValue", "—", 28f,
+            new Vector2(-30f, -125f), new Vector2(190f, 36f), TextAlignmentOptions.MidlineLeft);
+        ui.rosterText.rectTransform.pivot = new Vector2(0f, 0.5f);
+        ui.rosterText.color = new Color(0.35f, 0.98f, 0.6f, 1f); // Vibrant neon lime
+        ui.rosterText.fontStyle = FontStyles.Bold;
 
         // Start Match Button
         ui.startButton = CreateSpriteButton(interaction.transform, "StartMatchButton",
             "btn_start.png", "btn_start_hover.png", "btn_start_pressed.png", "btn_start_disabled.png",
-            new Vector2(0f, -172f), new Vector2(416f, 82f));
+            new Vector2(0f, -215f), new Vector2(380f, 85f));
         ui.startButton.gameObject.AddComponent<UIButtonHoverEffect>();
 
         // Leave Button
         ui.leaveButton = CreateSpriteButton(interaction.transform, "LeaveButton",
             "btn_leave.png", "btn_leave_hover.png", "btn_leave_pressed.png", "btn_leave_disabled.png",
-            new Vector2(0f, -270f), new Vector2(416f, 82f));
+            new Vector2(0f, -315f), new Vector2(380f, 85f));
         ui.leaveButton.gameObject.AddComponent<UIButtonHoverEffect>();
 
         // Session Status
         ui.statusText = CreateText(root.transform, "SessionStatus", "Choose solo, host, or join a room.", 19f,
-            new Vector2(635f, -510f), new Vector2(490f, 40f), TextAlignmentOptions.Center);
+            new Vector2(630f, -515f), new Vector2(475f, 40f), TextAlignmentOptions.Center);
 
         // Save & wire menuManager
         menuManager.mainMenuPanel = mainRoot;
@@ -350,13 +355,16 @@ public static class MultiplayerLobbyUiSetup
         viewportRect.offsetMax = new Vector2(-16f, -4f);
         viewport.AddComponent<RectMask2D>();
 
-        TMP_Text value = CreateText(viewport.transform, "Text", string.Empty, 20f, Vector2.zero,
+        TMP_Text value = CreateText(viewport.transform, "Text", string.Empty, 22f, Vector2.zero,
             Vector2.zero, TextAlignmentOptions.MidlineLeft);
         Stretch(value.rectTransform);
-        TMP_Text placeholder = CreateText(viewport.transform, "Placeholder", "Enter room code...", 17f,
+        value.color = new Color(1f, 0.92f, 0.55f, 1f);
+        value.fontStyle = FontStyles.Bold;
+
+        TMP_Text placeholder = CreateText(viewport.transform, "Placeholder", "Enter room code...", 18f,
             Vector2.zero, Vector2.zero, TextAlignmentOptions.MidlineLeft);
         Stretch(placeholder.rectTransform);
-        placeholder.color = new Color(0.75f, 0.83f, 0.9f, 0.65f);
+        placeholder.color = new Color(0.65f, 0.75f, 0.85f, 0.65f);
 
         TMP_InputField input = root.AddComponent<TMP_InputField>();
         input.targetGraphic = target;

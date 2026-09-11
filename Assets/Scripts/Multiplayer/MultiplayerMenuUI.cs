@@ -175,8 +175,8 @@ public sealed class MultiplayerMenuUI : MonoBehaviour
             roomCodeText.text = string.IsNullOrEmpty(session.RoomCode) ? "—" : session.RoomCode;
         if (rosterText != null)
             rosterText.text = session.CurrentSession == null
-                ? "offline"
-                : $"{session.PlayerCount}/{OnlineSessionManager.MaxPlayers}";
+                ? "—"
+                : $"{session.PlayerCount} / {OnlineSessionManager.MaxPlayers}";
         if (!string.IsNullOrEmpty(session.LastError)) SetStatus(session.LastError);
     }
 
