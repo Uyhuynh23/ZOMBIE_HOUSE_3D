@@ -20084,6 +20084,12 @@ MonoBehaviour:
     cooldownTime: 2.5
     currentCooldown: 0
     portrait: {fileID: 21300000, guid: cf1ed4901c30cdf4ab3996399aa5780e, type: 3}
+  - name: Wallnut
+    prefab: {fileID: 2210386816479631404, guid: 3538c4f5ea3f44417871807dd149770e, type: 3}
+    cost: 75
+    cooldownTime: 2.5
+    currentCooldown: 0
+    portrait: {fileID: 21300000, guid: c7fe012bc162e4edb846e4f4b1fdb688, type: 3}
   cameraFollow: {fileID: 330585548}
   playerMarkerSprite: {fileID: 0}
   playerMarkerColor: {r: 0.25, g: 0.9, b: 1, a: 1}
