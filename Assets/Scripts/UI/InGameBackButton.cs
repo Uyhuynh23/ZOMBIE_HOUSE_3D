@@ -11,6 +11,11 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public sealed class InGameBackButton : MonoBehaviour, IPointerClickHandler
 {
+    [Header("Confirmation Modal")]
+    [Tooltip("If true, shows the confirmation modal dialog. If false (e.g. tutorial), directly leaves.")]
+    public bool requireConfirmation = true;
+    public LeaveRoundConfirmModal confirmModal;
+
     private Button button;
     private bool isLeaving = false;
 
@@ -21,6 +26,11 @@ public sealed class InGameBackButton : MonoBehaviour, IPointerClickHandler
         {
             button.onClick.AddListener(OnClickBack);
         }
+
+        if (confirmModal == null && requireConfirmation)
+        {
+            confirmModal = Object.FindFirstObjectByType<LeaveRoundConfirmModal>(FindObjectsInactive.Include);
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -28,12 +38,33 @@ public sealed class InGameBackButton : MonoBehaviour, IPointerClickHandler
         OnClickBack();
     }
 
-    public async void OnClickBack()
+    public void OnClickBack()
+    {
+        if (isLeaving) return;
+
+        if (requireConfirmation)
+        {
+            if (confirmModal == null)
+            {
+                confirmModal = Object.FindFirstObjectByType<LeaveRoundConfirmModal>(FindObjectsInactive.Include);
+            }
+
+            if (confirmModal != null)
+            {
+                confirmModal.Open();
+                return;
+            }
+        }
+
+        DirectLeave();
+    }
+
+    public async void DirectLeave()
     {
         if (isLeaving) return;
         isLeaving = true;
 
-        Debug.Log("[InGameBackButton] Clicked! Returning to Main Menu...");
+        Debug.Log("[InGameBackButton] Returning to Main Menu...");
         AudioManager.PlaySfx(AudioCue.UiClick);
         Time.timeScale = 1f;
 

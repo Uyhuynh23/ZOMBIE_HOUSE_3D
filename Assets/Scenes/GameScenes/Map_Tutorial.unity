@@ -36546,6 +36546,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf639baf7a0ca5647bbf0fc0a6d67834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InGameBackButton
+  requireConfirmation: 0
+  confirmModal: {fileID: 0}
 --- !u!114 &1803224914
 MonoBehaviour:
   m_ObjectHideFlags: 0
